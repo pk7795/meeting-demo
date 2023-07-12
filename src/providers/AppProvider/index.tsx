@@ -7,23 +7,23 @@ import { RecoilRoot } from 'recoil'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 const AntdProvider = dynamic(() => import('@/providers/AntdProvider'), {
-  ssr: false,
+    ssr: false,
 })
 
 type AppProviderProps = {
-  children?: ReactNode
+    children?: ReactNode
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const [queryClient] = useState(() => new QueryClient())
+    const [queryClient] = useState(() => new QueryClient())
 
-  return (
-    <SessionProvider>
-      <RecoilRoot>
-        <QueryClientProvider client={queryClient}>
-          <AntdProvider>{children}</AntdProvider>
-        </QueryClientProvider>
-      </RecoilRoot>
-    </SessionProvider>
-  )
+    return (
+        <SessionProvider>
+            <RecoilRoot>
+                <QueryClientProvider client={queryClient}>
+                    <AntdProvider>{children}</AntdProvider>
+                </QueryClientProvider>
+            </RecoilRoot>
+        </SessionProvider>
+    )
 }

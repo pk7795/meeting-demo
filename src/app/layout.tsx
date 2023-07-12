@@ -5,16 +5,16 @@ import { AppProvider } from '@/providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Bluesea Broadcast',
-  description: 'Bluesea Broadcast',
+    title: 'Bluesea Broadcast',
+    description: 'Bluesea Broadcast',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AppProvider>{children}</AppProvider>
-      </body>
-    </html>
-  )
+    return (
+        <html lang="en">
+            <body className={inter.className}>
+                <AppProvider>{children}</AppProvider>
+            </body>
+        </html>
+    )
 }

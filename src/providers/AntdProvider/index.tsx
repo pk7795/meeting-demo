@@ -3,13 +3,13 @@ import enUS from 'antd/locale/en_US'
 import { ReactNode } from 'react'
 
 type Props = {
-  children?: ReactNode
+    children?: ReactNode
 }
 
-export default ({ children }: Props) => {
-  return (
-    <ConfigProvider locale={enUS} theme={{ token: { colorPrimary: '#3333ff' } }}>
-      <App>{children}</App>
-    </ConfigProvider>
-  )
+export default function AntdProvider({ children }: Props) {
+    return (
+        <ConfigProvider locale={enUS} theme={{ token: { colorPrimary: '#3333ff' } }}>
+            <App>{children}</App>
+        </ConfigProvider>
+    )
 }
