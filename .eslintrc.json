@@ -22,6 +22,16 @@
                 "ts-check": "allow-with-description"
             }
         ],
+        "@typescript-eslint/naming-convention": [
+            "error",
+            {
+                "selector": ["variable", "function"],
+                "format": ["camelCase", "UPPER_CASE", "PascalCase"],
+                "leadingUnderscore": "allow",
+                "trailingUnderscore": "allow"
+            }
+        ],
+        "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/parser": "off",
         "@typescript-eslint/no-explicit-any": "off",
