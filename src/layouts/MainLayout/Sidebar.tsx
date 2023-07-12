@@ -114,7 +114,7 @@ export const Sidebar: React.FC<Props> = () => {
                   )}
                   onClick={() => {
                     signOut({
-                      callbackUrl: '/auth/login',
+                      callbackUrl: '/',
                     })
                   }}
                 >

@@ -1,8 +1,8 @@
 'use client'
 
-import { Input, Space, Typography } from 'antd'
+import { Divider, Input, Typography } from 'antd'
 import { HashIcon, PlusIcon } from 'lucide-react'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useState } from 'react'
 import { LOGO_SHORT } from '@public'
@@ -13,9 +13,18 @@ export default function IndexJoinMeeting() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') || '/new-meeting'
   const [code, setCode] = useState('')
+  const { data: user } = useSession()
+
+  const onNewMeeting = useCallback(() => {
+    if (user) {
+      router.push('/new-meeting')
+      return
+    }
+    signIn('github', { callbackUrl })
+  }, [callbackUrl, router, user])
 
   const onJoin = useCallback(() => {
-    router.push(`/meeting/${code}`)
+    router.push(`/prepare-meeting/${code}`)
   }, [code, router])
 
   return (
@@ -28,27 +37,22 @@ export default function IndexJoinMeeting() {
             Bluesea live is a service that provides secure, high-quality video calling and meetings to anyone, on any
             device.
           </Typography.Paragraph>
-          <Space>
-            <ButtonIcon
-              type="primary"
-              size="middle"
-              icon={<PlusIcon size={16} />}
-              onClick={() => signIn('github', { callbackUrl })}
-            >
-              New meeting
-            </ButtonIcon>
+          <ButtonIcon type="primary" size="middle" icon={<PlusIcon size={16} />} onClick={onNewMeeting} block>
+            New meeting
+          </ButtonIcon>
+          <Divider>or</Divider>
+          <div className="flex items-center">
             <Input
               value={code}
               onChange={(e) => setCode(e.target.value)}
               prefix={<HashIcon size={16} />}
-              suffix={
-                <ButtonIcon className="text-primary" disabled={!code} onClick={onJoin}>
-                  Join
-                </ButtonIcon>
-              }
-              placeholder="Enter code"
+              placeholder="Enter code to join meeting"
+              className="flex-1 mr-2"
             />
-          </Space>
+            <ButtonIcon size="middle" type="primary" disabled={!code} onClick={onJoin}>
+              Join
+            </ButtonIcon>
+          </div>
         </div>
       </div>
     </div>
