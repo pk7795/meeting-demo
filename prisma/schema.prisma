@@ -67,6 +67,10 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  
+  roomInvites RoomInvite[]
+  roomParticipants RoomParticipant[]
+  rooms Room[]
 }
 
 model VerificationToken {
@@ -75,4 +79,50 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// For room manager
+
+model Room {
+  id           String   @id @default(cuid())
+  name         String
+  passcode     String?
+  record       Boolean  @default(false)
+  ownerId      String
+
+  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  invites      RoomInvite[]
+  participants RoomParticipant[]
+
+  @@index([ownerId])
+}
+
+model RoomInvite {
+  id          String   @id @default(cuid())
+  roomId      String
+  userId      String
+
+  createdAt   DateTime @default(now())
+  validUntil  DateTime
+
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([userId, validUntil])
+}
+
+model RoomParticipant {
+  id          String   @id @default(cuid())
+  roomId      String
+  name        String
+  userId      String?
+  joinedAt    DateTime @default(now())
+
+  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([userId])
 }
