@@ -8,7 +8,7 @@ const PAGE_SIZE = 10
 type Arg = {
     url: string
     page?: number | string
-    page_size?: number | string
+    pageSize?: number | string
     dependencies: any[]
     query?: any
     enabled?: boolean
@@ -16,9 +16,9 @@ type Arg = {
 
 export const usePageDataQuery = (arg: Arg) => {
     const fetcher = useCallback(async () => {
-        const page_size = arg.page_size || PAGE_SIZE
-        const limit = page_size
-        const skip = Number(arg.page || 0) * Number(page_size)
+        const pageSize = arg.pageSize || PAGE_SIZE
+        const limit = pageSize
+        const skip = Number(arg.page || 0) * Number(pageSize)
         const query = qs.stringify({
             limit,
             skip,

@@ -6,7 +6,8 @@ import { UserRole, UserStatus } from '@prisma/client'
 
 export async function getSessionUser(): Promise<AuthUser | null> {
     const cookieStore = cookies()
-    const tokenCookie = cookieStore.get('next-auth.session-token')
+    const tokenCookie =
+        cookieStore.get('next-auth.session-token') || cookieStore.get('__Secure-next-auth.session-token')
     if (!tokenCookie || !tokenCookie.value) return null
     const user = await getPrisma().user.findFirst({
         where: {

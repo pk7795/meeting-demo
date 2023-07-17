@@ -1,11 +1,13 @@
 'use client'
 
-import { Avatar, Badge, Input, Popover, Space } from 'antd'
+import { Chat } from '../components'
+import { Badge, Popover, Space } from 'antd'
 import classNames from 'classnames'
 import { map, times } from 'lodash'
 import {
     CopyIcon,
     Disc2Icon,
+    LayoutGridIcon,
     MaximizeIcon,
     MessageCircleIcon,
     MicIcon,
@@ -13,14 +15,13 @@ import {
     MoreHorizontalIcon,
     RadioIcon,
     ScreenShareIcon,
-    SendIcon,
     VideoIcon,
     VideoOffIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
-import { LOGO_SHORT } from '@public'
+import { LOGO_WHITE_LONG } from '@public'
 import { ButtonIcon, Copy, Icon, useApp } from '@/components'
 
 type Props = {}
@@ -50,22 +51,20 @@ export const Meeting: React.FC<Props> = () => {
     }, [modal, router])
 
     return (
-        <div className="bg-white h-full">
-            <div className="flex items-center justify-between h-16 px-4 border-b">
-                <div className="flex items-center h-full">
-                    <div className="flex items-center justify-center w-16 h-full border-r mr-4">
+        <div className="bg-[#101826] h-screen">
+            <div className="h-full flex items-center">
+                <div className="flex-1 h-full flex flex-col w-[calc(100vw-420px)]">
+                    <div className="flex items-center justify-between border-b border-b-[#232C3C] h-16 px-4 bg-[#17202E]">
                         <Link href="/">
-                            <img src={LOGO_SHORT} alt="" className="h-10" />
+                            <img src={LOGO_WHITE_LONG} alt="" className="h-8" />
                         </Link>
+                        <Space>
+                            <ButtonIcon icon={<LayoutGridIcon size={16} color="#fff" />} />
+                        </Space>
+                        <div>
+                            <div />
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <div className="text-lg font-medium">[Internal] Weekly Report Marketing + Sales</div>
-                        <div className="text-xs text-gray-500">June 12th, 2022 | 11:00 AM </div>
-                    </div>
-                </div>
-            </div>
-            <div className="h-[calc(100vh-64px)] bg-gray-100 flex items-center">
-                <div className="flex-1 h-full flex flex-col border-r w-[calc(100vw-420px)]">
                     <div className="flex-1 flex flex-col w-full">
                         <div className="flex-1 p-4 pb-0">
                             <div className="relative h-full">
@@ -115,7 +114,7 @@ export const Meeting: React.FC<Props> = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center justify-center h-16 bg-white border-t">
+                    <div className="flex items-center justify-center h-16 bg-[#17202E] border-t border-t-[#232C3C]">
                         <div className="flex items-center justify-between w-full px-6">
                             <div className="flex-1 flex items-center justify-center">
                                 <Space>
@@ -220,41 +219,7 @@ export const Meeting: React.FC<Props> = () => {
                         </div>
                     </div>
                 </div>
-                {chat && (
-                    <div className="w-full h-full flex flex-col bg-white">
-                        <div className="flex-1 flex flex-col">
-                            <div className="px-6 py-3 bg-white border-b">
-                                <div className="text-lg font-semibold">Chat</div>
-                            </div>
-                            <div className="h-[calc(100vh-180px)] overflow-x-auto px-6 py-3">
-                                {map(
-                                    map(times(20), (i) => ({
-                                        key: i,
-                                        name: `Name ${i}`,
-                                    })),
-                                    (i) => (
-                                        <div className="flex items-start mb-2" key={i?.name}>
-                                            <Avatar>C</Avatar>
-                                            <div className="bg-[#DFEBFF] rounded-md p-2 ml-2">
-                                                <div className="text-xs text-[#AFAFAF]">{i?.name}</div>
-                                                <div>Good afternoon, everyone.</div>
-                                            </div>
-                                        </div>
-                                    )
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex items-center justify-center h-16 bg-white border-t">
-                            <div className="flex items-center justify-between w-full px-6">
-                                <Input
-                                    className="bg-[#F6F6F6] border-transparent flex-1 mr-2"
-                                    placeholder="Type something..."
-                                />
-                                <ButtonIcon size="middle" type="primary" icon={<SendIcon size={16} />} />
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <Chat />
             </div>
         </div>
     )

@@ -1,10 +1,12 @@
 export * from './CardInfo'
 export * from './CardPrimary'
 export * from './CardSecondary'
+export * from './CardCopy'
 export * from './Drawer'
 export * from './Table'
 export * from './App'
 export * from './Icon'
+export * from './Result'
 
 export * from './ButtonIcon'
 export * from './ButtonConfirm'

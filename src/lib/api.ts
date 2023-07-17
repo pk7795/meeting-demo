@@ -50,8 +50,8 @@ export const SessionUser = createParamDecorator<AuthUser>((req) => req.user)
 
 export function ApiExceptionHandler(error: unknown, req: NextApiRequest, res: NextApiResponse) {
     console.error(error)
-    const error_str = error instanceof Error ? error.message : 'An unknown error occurred.'
-    res.status(200).json({ status: false, error: error_str })
+    const errorStr = error instanceof Error ? error.message : 'An unknown error occurred.'
+    res.status(200).json({ status: false, error: errorStr })
 }
 
 export const NextAuthGuard = createMiddlewareDecorator(

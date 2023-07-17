@@ -1,4 +1,5 @@
 import type { User } from 'next-auth'
+import { UserRole, UserStatus } from '@prisma/client'
 
 declare module 'next-auth' {
     interface Session {
@@ -10,6 +11,8 @@ declare module 'next-auth' {
 
     interface User {
         id: string
+        status: UserStatus
+        role: UserRole
     }
 }
 
