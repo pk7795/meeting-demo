@@ -9,7 +9,7 @@ type Props = {
 
 export default function AntdProvider({ children }: Props) {
     return (
-        <ConfigProvider locale={enUS} theme={{ token: { colorPrimary: '#3333ff' } }}>
+        <ConfigProvider locale={enUS} theme={{ token: { colorPrimary: '#2D8CFF' } }}>
             <App>{children}</App>
         </ConfigProvider>
     )

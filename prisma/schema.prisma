@@ -61,7 +61,7 @@ model User {
   emailVerified DateTime?
   image         String?
   role          UserRole   @default(User)
-  status        UserStatus @default(Inactive)
+  status        UserStatus @default(Actived)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
@@ -95,22 +95,26 @@ model Room {
   invites      RoomInvite[]
   participants RoomParticipant[]
 
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   @@index([ownerId])
 }
 
 model RoomInvite {
   id          String   @id @default(cuid())
   roomId      String
-  userId      String
+  email       String
 
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   validUntil  DateTime
 
   room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [email], references: [email], onDelete: Cascade)
 
-  @@unique([roomId, userId])
-  @@index([userId, validUntil])
+  @@unique([roomId, email])
+  @@index([email, validUntil])
 }
 
 model RoomParticipant {
@@ -119,6 +123,8 @@ model RoomParticipant {
   name        String
   userId      String?
   joinedAt    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)

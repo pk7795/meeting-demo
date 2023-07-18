@@ -9,6 +9,7 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { LOGO_BLACK_LONG } from '@public'
+import { IconBrandGoogle } from '@tabler/icons-react'
 
 type Props = {}
 
@@ -79,6 +80,7 @@ export const Header: React.FC<Props> = () => {
                             size="large"
                             onClick={() => signIn('google', { callbackUrl })}
                             className="border border-gray-300"
+                            icon={<IconBrandGoogle size={16} />}
                         >
                             Sign in
                         </ButtonIcon>

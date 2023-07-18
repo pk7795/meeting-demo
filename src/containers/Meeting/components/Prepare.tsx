@@ -5,15 +5,22 @@ import classNames from 'classnames'
 import { filter, find, map } from 'lodash'
 import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon, Volume2Icon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { useCallback, useEffect, useState, useTransition } from 'react'
 import Webcam from 'react-webcam'
+import { createRoomParticipant } from '@/app/actions'
 import { ButtonIcon, Header, Icon } from '@/components'
 
-export default function IndexPrepareMeeting() {
-    const router = useRouter()
-    const params = useParams()
+type Props = {
+    setIsJoined: (isJoined: boolean) => void
+    name: string
+    setName: (name: string) => void
+}
+
+export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
     const { data: user } = useSession()
+    const params = useParams()
+    const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
     const [videoInput, setVideoInput] = useState<MediaDeviceInfo[]>([])
     const [selectedVideoInput, setSelectedVideoInput] = useState<MediaDeviceInfo>()
 
@@ -27,8 +34,6 @@ export default function IndexPrepareMeeting() {
 
     const [mic, setMic] = useState(false)
     const [camera, setCamera] = useState(false)
-
-    const [name, setName] = useState('')
 
     const handleDevices = useCallback((mediaDevices: MediaDeviceInfo[]) => {
         const videoInput = filter(mediaDevices, ({ kind }) => kind === 'videoinput')
@@ -56,12 +61,23 @@ export default function IndexPrepareMeeting() {
     }, [handleDevices])
 
     const onJoinMeeting = useCallback(() => {
-        router.push(`/meeting/${params?.code}`)
-    }, [params?.code, router])
+        startTransitionCreateRoomParticipant(() => {
+            createRoomParticipant({
+                data: {
+                    name,
+                    passcode: params?.passcode as string,
+                },
+            }).then(() => {
+                setIsJoined(true)
+            })
+        })
+    }, [name, params?.passcode, setIsJoined])
 
     return (
         <div className="min-h-screen p-6">
-            <Header />
+            <div className="container m-auto">
+                <Header />
+            </div>
             <div className="lg:w-[1024px] mt-24 m-auto h-[calc(100vh-40px)]">
                 <Row align="middle" gutter={[24, 24]}>
                     <Col span={24} lg={12}>
@@ -206,11 +222,19 @@ export default function IndexPrepareMeeting() {
                                 </>
                             )}
                             {user ? (
-                                <ButtonIcon onClick={onJoinMeeting} block className="mt-4" type="primary" size="large">
+                                <ButtonIcon
+                                    loading={isPendingCreateRoomParticipant}
+                                    onClick={onJoinMeeting}
+                                    block
+                                    className="mt-4"
+                                    type="primary"
+                                    size="large"
+                                >
                                     Join now
                                 </ButtonIcon>
                             ) : (
                                 <ButtonIcon
+                                    loading={isPendingCreateRoomParticipant}
                                     onClick={onJoinMeeting}
                                     block
                                     className="mt-4"
