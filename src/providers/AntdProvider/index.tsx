@@ -4,13 +4,13 @@ import { ReactNode } from 'react'
 import '@/styles/globals.scss'
 
 type Props = {
-    children?: ReactNode
+  children?: ReactNode
 }
 
 export default function AntdProvider({ children }: Props) {
-    return (
-        <ConfigProvider locale={enUS} theme={{ token: { colorPrimary: '#2D8CFF' } }}>
-            <App>{children}</App>
-        </ConfigProvider>
-    )
+  return (
+    <ConfigProvider locale={enUS} theme={{ token: { colorPrimary: '#2D8CFF' } }}>
+      <App>{children}</App>
+    </ConfigProvider>
+  )
 }

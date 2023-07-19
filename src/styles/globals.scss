@@ -3,52 +3,52 @@
 *,
 ::before,
 ::after {
-    box-sizing: border-box;
-    border-width: 0;
-    border-style: solid;
-    border-color: theme('borderColor.DEFAULT');
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: theme('borderColor.DEFAULT');
 }
 
 ::before,
 ::after {
-    --tw-content: '';
+  --tw-content: '';
 }
 
 html,
 body {
-    color: #252528;
+  color: #252528;
 
-    .ant-form,
-    .ant-typography {
-        color: #252528;
-    }
+  .ant-form,
+  .ant-typography {
+    color: #252528;
+  }
 }
 
 body {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .ant-input-disabled,
 .ant-input[disabled] {
-    background-color: #f9f9fa !important;
-    color: #252528 !important;
-    border: none !important;
-    cursor: text !important;
+  background-color: #f9f9fa !important;
+  color: #252528 !important;
+  border: none !important;
+  cursor: text !important;
 }
 
 .ant-select-item {
-    &.ant-select-item-option {
-        margin-bottom: 4px !important;
-    }
-    &.ant-select-item-option:last-child {
-        margin-bottom: 0 !important;
-    }
+  &.ant-select-item-option {
+    margin-bottom: 4px !important;
+  }
+  &.ant-select-item-option:last-child {
+    margin-bottom: 0 !important;
+  }
 }
 
 .ant-form-item-label {
-    label {
-        font-weight: 500 !important;
-    }
+  label {
+    font-weight: 500 !important;
+  }
 }
 
 @tailwind base;
