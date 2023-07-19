@@ -124,7 +124,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
                           type="primary"
                           size="small"
                           className="w-fit"
-                          onClick={() => router.push(`/prepare-meeting/${record?.room?.passcode}`)}
+                          onClick={() => router.push(`/meeting/${record?.room?.passcode}`)}
                         >
                           Join
                         </ButtonIcon>

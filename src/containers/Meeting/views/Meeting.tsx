@@ -17,17 +17,18 @@ import { MeetingProvider } from '@/contexts'
 type Props = {
   userInvite: OneUserInvite[]
   room: (Room & {}) | null
+  participated: boolean
 }
 
-export const MeetingWrapped = ({ userInvite, room }: Props) => (
+export const MeetingWrapped = ({ userInvite, room, participated }: Props) => (
   <MeetingProvider room={room}>
-    <Meeting userInvite={userInvite} room={room} />
+    <Meeting userInvite={userInvite} room={room} participated={participated} />
   </MeetingProvider>
 )
 
-export const Meeting: React.FC<Props> = ({ userInvite, room }) => {
+export const Meeting: React.FC<Props> = ({ userInvite, room, participated }) => {
   const [name, setName] = useState('')
-  const [isJoined, setIsJoined] = useState(true)
+  const [isJoined, setIsJoined] = useState(false)
   return isJoined ? (
     <div className="bg-[#101826] h-screen">
       <div className="h-full flex items-center">

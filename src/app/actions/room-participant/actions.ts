@@ -15,7 +15,7 @@ export async function createRoomParticipant({ data }: { data: RoomParticipantInp
 
   const res = await prisma.roomParticipant.create({
     data: {
-      ...data,
+      name: data.name,
       roomId: room?.id as string,
       userId: (session?.id as string) || null,
     },

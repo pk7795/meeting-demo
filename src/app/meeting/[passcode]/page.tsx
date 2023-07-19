@@ -1,3 +1,4 @@
+import { useRouter } from 'next/navigation'
 import { UserRole, UserStatus } from '@prisma/client'
 import { MeetingWrapped } from '@/containers'
 import { getPrisma, getSessionUser } from '@/lib'
@@ -17,18 +18,37 @@ export type OneUserInvite = {
 export default async function IndexMeeting({ params }: { params: { passcode?: string } }) {
   const prisma = getPrisma()
   const session = await getSessionUser()
-  const userInvite = await prisma.user.findMany({
+  const usersToInvite = await prisma.user.findMany({
     where: {
       id: {
         not: session?.id,
       },
     },
   })
+  const userParticipated = await prisma.roomParticipant.findFirst({
+    where: {
+      userId: session?.id,
+    },
+  })
+
   const room = await prisma.room.findFirst({
     where: {
       passcode: params?.passcode,
     },
+    include: {
+      participants: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      },
+    },
   })
 
-  return <MeetingWrapped userInvite={userInvite} room={room} />
+  return <MeetingWrapped userInvite={usersToInvite} room={room} participated={!!userParticipated} />
 }
