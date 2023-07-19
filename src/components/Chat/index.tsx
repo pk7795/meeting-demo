@@ -1,42 +1,28 @@
 'use client'
 
-import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { Channel, ChannelList, SendBirdProvider, sendbirdSelectors } from '@sendbird/uikit-react'
-import '@sendbird/uikit-react/dist/index.css'
-import useSendbirdStateContext from '@sendbird/uikit-react/useSendbirdStateContext'
-
-const ChannelWapper = () => {
-    const params = useParams()
-    const globalStore = useSendbirdStateContext()
-    const sdkInstance = sendbirdSelectors.getSdk(globalStore)
-    const createChannel = sendbirdSelectors.getCreateGroupChannel(globalStore)
-    const leaveChannel = sendbirdSelectors.getLeaveGroupChannel(globalStore)
-    const [channelUrl, setChannelUrl] = useState('')
-
-    useEffect(() => {
-        if (params?.passcode) {
-            //
-        }
-
-        return () => {
-            leaveChannel(channelUrl)
-        }
-    }, [channelUrl, createChannel, leaveChannel, params?.passcode])
-    return <Channel channelUrl={channelUrl} renderChannelHeader={() => <></>} />
-}
-
-export default function Chat() {
-    return (
-        <>
-            <SendBirdProvider
-                appId="DF85682B-94D3-4296-9F5B-C75980C2FC23"
-                accessToken="5a56b4606c70744b601fac161d43c2486e481831"
-                userId="test-user-id"
-                theme="dark"
-            >
-                <ChannelWapper />
-            </SendBirdProvider>
-        </>
-    )
+export default function Chat({ messages }: any) {
+  return (
+    <div className="flex flex-col flex-1 h-full p-4">
+      <div className="flex-1 flex flex-col-reverse overflow-y-auto">
+        <div className="flex flex-col">
+          {messages.map((message: any) => (
+            <div key={message.id} className="flex flex-col mb-2">
+              <div className="flex items-center">
+                <div className="flex items-center justify-center w-8 h-8 mr-2 rounded-full bg-[#F87171]">
+                  <div className="text-xs font-bold text-white">A</div>
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <div className="text-xs font-bold text-[#F87171]">Aldo</div>
+                    <div className="ml-2 text-xs text-[#9CA3AF]">10:00 AM</div>
+                  </div>
+                  <div className="text-sm text-[#9CA3AF]">{message.content}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
 }

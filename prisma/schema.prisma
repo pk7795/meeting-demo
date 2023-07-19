@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider          = "mysql"
+  provider          = "postgresql"
   url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // Only needed when using a cloud provider that doesn't support the creation of new databases, like Heroku. Learn more: https://pris.ly/d/migrate-shadow
   relationMode      = "prisma"
@@ -67,10 +67,11 @@ model User {
 
   accounts Account[]
   sessions Session[]
-  
-  roomInvites RoomInvite[]
+
+  roomInvites      RoomInvite[]
   roomParticipants RoomParticipant[]
-  rooms Room[]
+  rooms            Room[]
+  messages         Messages[]
 }
 
 model VerificationToken {
@@ -84,50 +85,77 @@ model VerificationToken {
 // For room manager
 
 model Room {
-  id           String   @id @default(cuid())
-  name         String
-  passcode     String?
-  record       Boolean  @default(false)
-  ownerId      String
+  id       String  @id @default(cuid())
+  name     String
+  passcode String?
+  record   Boolean @default(false)
+  ownerId  String
 
-  owner        User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  active Boolean @default(true)
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   invites      RoomInvite[]
   participants RoomParticipant[]
+  messages     Messages[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([ownerId])
 }
 
 model RoomInvite {
-  id          String   @id @default(cuid())
-  roomId      String
-  email       String
+  id     String @id @default(cuid())
+  roomId String
+  email  String
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  validUntil  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  validUntil DateTime
 
-  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user        User?    @relation(fields: [email], references: [email], onDelete: Cascade)
+  room Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [email], references: [email], onDelete: Cascade)
 
   @@unique([roomId, email])
   @@index([email, validUntil])
 }
 
 model RoomParticipant {
-  id          String   @id @default(cuid())
-  roomId      String
-  name        String
-  userId      String?
-  joinedAt    DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  roomId    String
+  name      String
+  userId    String?
+  joinedAt  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  room        Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@index([userId])
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  FILE
+}
+
+model Messages {
+  id        String      @id @default(cuid())
+  roomId    String
+  userId    String
+  content   String
+  type      MessageType @default(TEXT)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([roomId])
   @@index([userId])
