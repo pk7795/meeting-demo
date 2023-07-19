@@ -8,4 +8,6 @@ export const env = {
     GITHUB_SECRET: process.env.GITHUB_SECRET as string,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+    CHAT_APP_ID: process.env.CHAT_APP_ID as string,
+    CHAT_APP_TOKEN: process.env.CHAT_APP_TOKEN as string,
 } as const

@@ -1,8 +1,6 @@
 import dayjs from 'dayjs'
+import { v4 } from 'uuid'
 
 export const formatDate = (date: any) => (date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '')
 
-export const genPasscode = () =>
-    Math.floor(Math.random() * 10000)
-        .toString()
-        .padStart(4, '0')
+export const genPasscode = () => v4()

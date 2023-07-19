@@ -26,6 +26,9 @@ dependencies:
   '@sendbird/chat':
     specifier: ^4.9.3
     version: 4.9.3
+  '@sendbird/uikit-react':
+    specifier: ^3.6.3
+    version: 3.6.3(react-dom@18.2.0)(react@18.2.0)
   '@tabler/icons-react':
     specifier: ^2.25.0
     version: 2.25.0(react@18.2.0)
@@ -232,6 +235,9 @@ devDependencies:
   ts-node:
     specifier: ^10.9.1
     version: 10.9.1(@types/node@20.3.2)(typescript@5.1.6)
+  uikit-react:
+    specifier: link:@types/@sendbird/uikit-react
+    version: link:@types/@sendbird/uikit-react
 
 packages:
 
@@ -1621,6 +1627,34 @@ packages:
     peerDependenciesMeta:
       '@react-native-async-storage/async-storage':
         optional: true
+    dev: false
+
+  /@sendbird/uikit-react@3.6.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-aNIJKTS2ljh7GJearkBMZEIuL/GoR0BgqVfjt0i6DWI841n9kHaSMwN2w7MImsVYp26hZHNSMJ4oMS/CXg9Asw==}
+    peerDependencies:
+      react: ^16.8.6 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.6 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@sendbird/chat': 4.9.3
+      '@sendbird/uikit-tools': 0.0.1-alpha.40(@sendbird/chat@4.9.3)(react@18.2.0)
+      css-vars-ponyfill: 2.4.8
+      date-fns: 2.30.0
+      dompurify: 3.0.5
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    transitivePeerDependencies:
+      - '@react-native-async-storage/async-storage'
+    dev: false
+
+  /@sendbird/uikit-tools@0.0.1-alpha.40(@sendbird/chat@4.9.3)(react@18.2.0):
+    resolution: {integrity: sha512-Ld23LpXxN6XJayNayD/wcOa6mRKvR2cy1Qk+QHt9SLO/z3K1uglPI+x89JHOmaPzu3vbUkosM7iTjFJ0ab6LeQ==}
+    peerDependencies:
+      '@sendbird/chat': ^4.9.2
+      react: '>=16.8.6'
+    dependencies:
+      '@sendbird/chat': 4.9.3
+      react: 18.2.0
     dev: false
 
   /@sinclair/typebox@0.27.8:
@@ -3140,6 +3174,13 @@ packages:
       nth-check: 2.1.1
     dev: false
 
+  /css-vars-ponyfill@2.4.8:
+    resolution: {integrity: sha512-4/j4AX4htytYHWyHVZ2BFQ+NoCGZEcOH2h4/2mmgE4SkrFg4Xq6tGYR77DtvvUIDsaXuJN+sj41bbgauA0Gfmg==}
+    dependencies:
+      balanced-match: 1.0.2
+      get-css-data: 2.1.0
+    dev: false
+
   /css-what@6.1.0:
     resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
     engines: {node: '>= 6'}
@@ -3177,6 +3218,13 @@ packages:
   /data-uri-to-buffer@4.0.1:
     resolution: {integrity: sha512-0R9ikRb668HB7QDxT1vkpuUBtqc53YyAwMwGeUFKRojY/NWKvdZ+9UYtRfGmhqNbRkTSVpMbmyhXipFFv2cb/A==}
     engines: {node: '>= 12'}
+    dev: false
+
+  /date-fns@2.30.0:
+    resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}
+    engines: {node: '>=0.11'}
+    dependencies:
+      '@babel/runtime': 7.22.6
     dev: false
 
   /dayjs@1.11.8:
@@ -3372,6 +3420,10 @@ packages:
     engines: {node: '>= 4'}
     dependencies:
       domelementtype: 2.3.0
+    dev: false
+
+  /dompurify@3.0.5:
+    resolution: {integrity: sha512-F9e6wPGtY+8KNMRAVfxeCOHU0/NPWMSENNq4pQctuXRqqdEPW7q3CrLbR5Nse044WwacyjHGOMlvNsBe1y6z9A==}
     dev: false
 
   /domutils@2.8.0:
@@ -4167,6 +4219,10 @@ packages:
   /get-caller-file@2.0.5:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}
     engines: {node: 6.* || 8.* || >= 10.*}
+
+  /get-css-data@2.1.0:
+    resolution: {integrity: sha512-HtPrzGk8aBF9rLeQNuImcXci7YVqsMEKzVflEWaCJu25ehxyDNiZRWoSxqSFUBfma8LERqKo70t/TcaGjIsM9g==}
+    dev: false
 
   /get-intrinsic@1.2.1:
     resolution: {integrity: sha512-2DcsyfABl+gVHEfCOaTrWgyt+tb6MSEGmKq+kI5HwLbIYgjgmMcV8KQ41uaKz1xxUcn9tJtgFbQUEVcEbd0FYw==}

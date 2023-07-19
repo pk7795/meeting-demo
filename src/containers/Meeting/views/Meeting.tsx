@@ -1,6 +1,6 @@
 'use client'
 
-import { Actions, Chat, Prepare } from '../components'
+import { Actions, ChatLayout, Prepare } from '../components'
 import { Space } from 'antd'
 import classNames from 'classnames'
 import { map, times } from 'lodash'
@@ -88,7 +88,7 @@ export const Meeting: React.FC<Props> = ({ userInvite }) => {
                     <Actions userInvite={userInvite} />
                 </div>
                 <div className="w-full h-full bg-[#17202E] border-l border-l-[#232C3C]">
-                    <Chat />
+                    <ChatLayout />
                 </div>
             </div>
         </div>
