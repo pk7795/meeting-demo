@@ -14,7 +14,9 @@ export const Copy: React.FC<Props> = ({ children, text = '' }) => {
   const { message } = useApp()
   return (
     <CopyToClipboard text={text} onCopy={() => message.info('Copied')}>
-      <Tooltip title="Click to copy">{children}</Tooltip>
+      <Tooltip title="Click to copy">
+        <span className="cursor-pointer">{children}</span>
+      </Tooltip>
     </CopyToClipboard>
   )
 }

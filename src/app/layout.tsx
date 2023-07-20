@@ -1,7 +1,6 @@
-import { Inter } from 'next/font/google'
+import './global.scss'
+import 'antd/dist/reset.css'
 import { AppProvider } from '@/providers'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'Bluesea Meet',
@@ -11,7 +10,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <AppProvider>{children}</AppProvider>
       </body>
     </html>
