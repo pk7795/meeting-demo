@@ -38,6 +38,20 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
     })
   }, [input, room])
 
+  // TODO: add type
+  const renderUserStatus = useCallback((user: any) => {
+    if (user.meetingStatus?.online) {
+      if (user.meetingStatus?.joining === 'prepare-meeting') {
+        return <div className="ml-2 w-2 h-2 rounded-full bg-[#FBBF24]" />
+      }
+      if (user.meetingStatus?.joining === 'meeting') {
+        return <div className="ml-2 w-2 h-2 rounded-full bg-[#10B981]" />
+      }
+    } else {
+      return <div className="ml-2 w-2 h-2 rounded-full bg-[#F87171]" />
+    }
+  }, [])
+
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 bg-[#1B2432]">
@@ -47,18 +61,14 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
           <div className="flex items-center mt-2" key={user.id}>
             <img src={user.image} alt="" className="w-8 h-8 rounded-full" />
             <div className="ml-2 text-[#9CA3AF]">{user.name}</div>
-            {user.active ? (
-              <div className="ml-2 w-2 h-2 rounded-full bg-[#10B981]" />
-            ) : (
-              <div className="ml-2 w-2 h-2 rounded-full bg-[#F87171]" />
-            )}
+            {renderUserStatus(user)}
           </div>
         ))}
       </div>
 
       <div className="flex-1 flex flex-col">
         <div className="px-4 py-3 bg-[#1B2432]">
-          <div className="text-lg text-[#9CA3AF]">Chat (3)</div>
+          <div className="text-lg text-[#9CA3AF]">Chat</div>
         </div>
         <Chat messages={messages} />
       </div>

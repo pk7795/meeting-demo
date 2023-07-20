@@ -1,3 +1,4 @@
+import { Room } from '@prisma/client'
 import { JoinMeeting } from '@/containers'
 import { getPrisma, getSessionUser } from '@/lib'
 
@@ -22,16 +23,27 @@ export type OneRoomInvite = {
 export default async function IndexJoinMeeting() {
   const prisma = getPrisma()
   const session = await getSessionUser()
-  const roomInvite = await prisma.roomInvite.findMany({
-    where: {
-      email: {
-        equals: session?.email,
-      },
-    },
-    include: {
-      room: true,
-    },
-  })
 
-  return <JoinMeeting roomInvite={roomInvite} />
+  let roomInvite: OneRoomInvite[] | null = null
+  let myRooms: Room[] | null = null
+  if (session?.id) {
+    roomInvite = await prisma.roomInvite.findMany({
+      where: {
+        email: {
+          equals: session?.email,
+        },
+      },
+      include: {
+        room: true,
+      },
+    })
+
+    myRooms = await prisma.room.findMany({
+      where: {
+        ownerId: session?.id,
+      },
+    })
+  }
+
+  return <JoinMeeting roomInvite={roomInvite} myRooms={myRooms} />
 }

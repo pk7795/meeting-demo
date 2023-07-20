@@ -6,17 +6,17 @@ import classNames from 'classnames'
 import { map, times } from 'lodash'
 import { LayoutGridIcon, LayoutPanelTop, MaximizeIcon, MicIcon, MicOffIcon, RadioIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
-import { Room } from '@prisma/client'
+import { useEffect, useState } from 'react'
 import { LOGO_WHITE_LONG } from '@public'
 import { IconPlayerRecordFilled } from '@tabler/icons-react'
 import { OneUserInvite } from '@/app/meeting/[passcode]/page'
 import { ButtonIcon, Icon } from '@/components'
-import { MeetingProvider } from '@/contexts'
+import { MeetingProvider, useMeetingUserState } from '@/contexts'
+import { RoomPopulated } from '@/types/types'
 
 type Props = {
   userInvite: OneUserInvite[]
-  room: (Room & {}) | null
+  room: RoomPopulated | null
   participated: boolean
 }
 
@@ -29,6 +29,17 @@ export const MeetingWrapped = ({ userInvite, room, participated }: Props) => (
 export const Meeting: React.FC<Props> = ({ userInvite, room, participated }) => {
   const [name, setName] = useState('')
   const [isJoined, setIsJoined] = useState(false)
+
+  const [_, setState] = useMeetingUserState()
+
+  useEffect(() => {
+    if (isJoined) {
+      setState({ online: true, joining: 'meeting' })
+    } else {
+      setState({ online: true, joining: 'prepare-meeting' })
+    }
+  }, [isJoined, setState])
+
   return isJoined ? (
     <div className="bg-[#101826] h-screen">
       <div className="h-full flex items-center">

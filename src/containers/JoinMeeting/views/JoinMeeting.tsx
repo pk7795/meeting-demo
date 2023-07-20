@@ -6,18 +6,21 @@ import { HashIcon, LogInIcon, TextIcon, VideoIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState, useTransition } from 'react'
+import { Room } from '@prisma/client'
 import { SCREEN } from '@public'
 import { OneRoomInvite } from '@/app/(join-meeting)/page'
 import { createRoom } from '@/app/actions'
 import { ButtonIcon, CardPrimary, Header, useApp } from '@/components'
 
 type Props = {
-  roomInvite: OneRoomInvite[]
+  roomInvite: OneRoomInvite[] | null
+  myRooms: Room[] | null
 }
 
-export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
+export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
   const { message } = useApp()
   const router = useRouter()
+
   const [passcode, setPasscode] = useState('')
   const [roomName, setRoomName] = useState('')
   const [openCreateRoomModal, setOpenCreateRoomModal] = useState(false)
@@ -40,7 +43,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
 
   const onJoinRoom = useCallback(() => {
     if (!passcode) return message.error('Please enter passcode')
-    router.push(`/prepare-meeting/${passcode}`)
+    router.push(`/meeting/${passcode}`)
   }, [message, passcode, router])
 
   return (
@@ -91,55 +94,106 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
             <img src={SCREEN} alt="" className="w-full" />
           </Col>
         </Row>
-        <Row className="mt-6">
-          <Col span={24}>
-            <Typography.Title level={2} className="font-semibold text-3xl">
-              {roomInvite.length > 0 ? 'Your meetings' : 'No meetings'}
-            </Typography.Title>
-            <CardPrimary>
-              <Table
-                dataSource={map(roomInvite, (r) => ({
-                  ...r,
-                  key: r.id,
-                }))}
-                columns={[
-                  {
-                    title: 'Room name',
-                    dataIndex: 'room',
-                    key: 'room',
-                    render: (room) => room?.name,
-                  },
-                  {
-                    title: 'Passcode',
-                    dataIndex: 'room',
-                    key: 'room',
-                    render: (room) => room?.passcode,
-                  },
-                  {
-                    title: 'Action',
-                    dataIndex: 'action',
-                    render: (_, record) => (
-                      <div className="flex justify-end">
-                        <ButtonIcon
-                          type="primary"
-                          size="small"
-                          className="w-fit"
-                          onClick={() => router.push(`/meeting/${record?.room?.passcode}`)}
-                        >
-                          Join
-                        </ButtonIcon>
-                      </div>
-                    ),
-                    width: 100,
-                    fixed: 'right',
-                    align: 'right',
-                  },
-                ]}
-                pagination={false}
-              />
-            </CardPrimary>
-          </Col>
-        </Row>
+        {myRooms && (
+          <Row className="mt-6">
+            <Col span={24}>
+              <Typography.Title level={2} className="font-semibold text-3xl">
+                {roomInvite!.length > 0 ? 'Your meetings' : 'No meetings'}
+              </Typography.Title>
+              <CardPrimary>
+                <Table
+                  dataSource={map(myRooms, (r) => ({
+                    ...r,
+                    key: r.id,
+                  }))}
+                  columns={[
+                    {
+                      title: 'Room name',
+                      dataIndex: 'name',
+                      key: 'name',
+                    },
+                    {
+                      title: 'Passcode',
+                      dataIndex: 'passcode',
+                      key: 'passcode',
+                    },
+                    {
+                      title: 'Action',
+                      dataIndex: 'action',
+                      render: (_, record) => (
+                        <div className="flex justify-end">
+                          <ButtonIcon
+                            type="primary"
+                            size="small"
+                            className="w-fit"
+                            onClick={() => router.push(`/meeting/${record?.passcode}`)}
+                          >
+                            Join
+                          </ButtonIcon>
+                        </div>
+                      ),
+                      width: 100,
+                      fixed: 'right',
+                      align: 'right',
+                    },
+                  ]}
+                  pagination={false}
+                />
+              </CardPrimary>
+            </Col>
+          </Row>
+        )}
+        {roomInvite && (
+          <Row className="mt-6">
+            <Col span={24}>
+              <Typography.Title level={2} className="font-semibold text-3xl">
+                {roomInvite!.length > 0 ? 'Your invites' : 'No invites'}
+              </Typography.Title>
+              <CardPrimary>
+                <Table
+                  dataSource={map(roomInvite, (r) => ({
+                    ...r,
+                    key: r.id,
+                  }))}
+                  columns={[
+                    {
+                      title: 'Room name',
+                      dataIndex: 'room',
+                      key: 'room',
+                      render: (room) => room?.name,
+                    },
+                    {
+                      title: 'Passcode',
+                      dataIndex: 'room',
+                      key: 'room',
+                      render: (room) => room?.passcode,
+                    },
+                    {
+                      title: 'Action',
+                      dataIndex: 'action',
+                      render: (_, record) => (
+                        <div className="flex justify-end">
+                          <ButtonIcon
+                            type="primary"
+                            size="small"
+                            className="w-fit"
+                            onClick={() => router.push(`/meeting/${record?.room?.passcode}`)}
+                          >
+                            Join
+                          </ButtonIcon>
+                        </div>
+                      ),
+                      width: 100,
+                      fixed: 'right',
+                      align: 'right',
+                    },
+                  ]}
+                  pagination={false}
+                />
+              </CardPrimary>
+            </Col>
+          </Row>
+        )}
       </div>
       <Modal
         open={openCreateRoomModal}

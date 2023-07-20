@@ -1,4 +1,3 @@
-import { useRouter } from 'next/navigation'
 import { UserRole, UserStatus } from '@prisma/client'
 import { MeetingWrapped } from '@/containers'
 import { getPrisma, getSessionUser } from '@/lib'
@@ -38,6 +37,22 @@ export default async function IndexMeeting({ params }: { params: { passcode?: st
     include: {
       participants: {
         include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      },
+      messages: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          userId: true,
           user: {
             select: {
               id: true,
