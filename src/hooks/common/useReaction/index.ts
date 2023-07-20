@@ -9,6 +9,7 @@ export class MapContainer<K, T> extends EventEmitter {
     super()
   }
 
+  // TODO: Set Batch
   set(key: K, value: T) {
     this.map.set(key, value)
     this.list = Array.from(this.map.values())
