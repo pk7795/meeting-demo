@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
+import { Scrollbars } from 'react-custom-scrollbars-2'
 import { useMeetingUsers } from '@/contexts'
 import { formatDateChat } from '@/utils'
 
@@ -20,25 +21,23 @@ export default function Chat({ messages }: any) {
   )
 
   return (
-    <div className="flex flex-col flex-1 h-full p-4">
-      <div className="flex-1 flex flex-col-reverse overflow-y-auto">
-        <div className="flex flex-col">
-          {messages.map((message: any) => (
-            <div key={message.id} className="flex flex-col mb-2">
-              <div className="flex items-center">
-                <img src={getMessageUser(message).image} alt="" className="w-8 h-8 rounded-full" />
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <div className="text-xs font-bold text-[#F87171]">{getMessageUser(message).name}</div>
-                    <div className="ml-2 text-xs text-[#9CA3AF]">{formatDateChat(message.createdAt)}</div>
-                  </div>
-                  <div className="text-sm text-[#9CA3AF]">{message.content}</div>
+    <Scrollbars>
+      <div className="p-2">
+        {messages.map((message: any) => (
+          <div key={message.id} className="mb-2">
+            <div className="flex items-center">
+              <img src={getMessageUser(message).image} alt="" className="w-8 h-8 rounded-full mr-2" />
+              <div>
+                <div className="flex items-center">
+                  <div className="text-xs font-bold text-[#F87171]">{getMessageUser(message).name}</div>
+                  <div className="ml-2 text-xs text-[#9CA3AF]">{formatDateChat(message.createdAt)}</div>
                 </div>
+                <div className="text-sm text-[#9CA3AF]">{message.content}</div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-    </div>
+    </Scrollbars>
   )
 }
