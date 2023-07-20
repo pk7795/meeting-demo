@@ -10,11 +10,11 @@ const AntdProvider = dynamic(() => import('@/providers/AntdProvider'), {
   ssr: false,
 })
 
-type AppProviderProps = {
+type Props = {
   children?: ReactNode
 }
 
-export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+export const AppProvider: React.FC<Props> = ({ children }) => {
   const [queryClient] = useState(() => new QueryClient())
 
   return (

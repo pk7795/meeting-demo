@@ -9,7 +9,8 @@ import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import Webcam from 'react-webcam'
 import { createRoomParticipant } from '@/app/actions'
-import { ButtonIcon, Header, Icon } from '@/components'
+import { ButtonIcon, Icon } from '@/components'
+import { MainLayout } from '@/layouts'
 
 type Props = {
   setIsJoined: (isJoined: boolean) => void
@@ -74,10 +75,7 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
   }, [name, params?.passcode, setIsJoined])
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="container m-auto">
-        <Header />
-      </div>
+    <MainLayout>
       <div className="lg:w-[1024px] mt-24 m-auto h-[calc(100vh-40px)]">
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
@@ -216,6 +214,6 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
           </Col>
         </Row>
       </div>
-    </div>
+    </MainLayout>
   )
 }

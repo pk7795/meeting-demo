@@ -1,7 +1,6 @@
 import { App, ConfigProvider } from 'antd'
 import enUS from 'antd/locale/en_US'
 import { ReactNode } from 'react'
-import '@/styles/globals.scss'
 
 type Props = {
   children?: ReactNode

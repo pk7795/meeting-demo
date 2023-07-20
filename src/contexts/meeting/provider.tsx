@@ -93,7 +93,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
         .on('presence', { event: 'join' }, ({ key, newPresences }) => {
           console.log('join', key, newPresences)
         })
-        .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+        .on('presence', { event: 'leave' }, ({ key }) => {
           const user = users.get(key)
           if (user) {
             users.set(key, {
@@ -119,7 +119,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
         }
       })
 
-      userState.addChangeListener((state) => {
+      userState.addChangeListener(() => {
         presenceChannel.track({
           user: userPresenceKey,
           online_at: new Date().toISOString(),

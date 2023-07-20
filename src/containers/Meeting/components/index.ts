@@ -1,3 +1,5 @@
 export * from './ChatLayout'
 export * from './Actions'
 export * from './Prepare'
+export * from './ViewGrid'
+export * from './ViewLeft'

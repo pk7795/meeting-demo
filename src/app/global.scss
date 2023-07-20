@@ -1,5 +1,3 @@
-@import 'antd/dist/reset.css';
-
 *,
 ::before,
 ::after {
@@ -24,6 +22,11 @@ body {
   }
 }
 
+body {
+  width: '100%';
+  height: '100%';
+}
+
 .ant-input-disabled,
 .ant-input[disabled] {
   background-color: #f9f9fa !important;
@@ -32,19 +35,19 @@ body {
   cursor: text !important;
 }
 
-.ant-select-item {
-  &.ant-select-item-option {
-    margin-bottom: 4px !important;
-  }
-  &.ant-select-item-option:last-child {
-    margin-bottom: 0 !important;
-  }
+.ant-select-item.ant-select-item-option {
+  margin-bottom: 4px !important;
+}
+.ant-select-item.ant-select-item-option:last-child {
+  margin-bottom: 0 !important;
 }
 
-.ant-form-item-label {
-  label {
-    font-weight: 500 !important;
-  }
+.ant-form-item-label label {
+  font-weight: 500 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  border-bottom: none !important;
 }
 
 @tailwind base;
