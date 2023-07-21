@@ -7,21 +7,37 @@ import { genPasscode } from '@/utils'
 export async function createRoom({ data }: { data: RoomInput }) {
   const prisma = getPrisma()
   const session = await getSessionUser()
+  let passcode = genPasscode()
+  let findRoom = await prisma.room.findFirst({
+    where: {
+      passcode,
+    },
+  })
 
-  const res = await prisma.room.create({
-    data: {
-      ...data,
-      // TODO: Generate Shorter Password like google meet
-      passcode: genPasscode(),
-      ownerId: session?.id as string,
-    },
-  })
-  await prisma.roomParticipant.create({
-    data: {
-      ...data,
-      roomId: res?.id as string,
-      userId: session?.id as string,
-    },
-  })
-  return res
+  while (findRoom) {
+    passcode = genPasscode()
+    findRoom = await prisma.room.findFirst({
+      where: {
+        passcode,
+      },
+    })
+  }
+
+  if (!findRoom) {
+    const res = await prisma.room.create({
+      data: {
+        ...data,
+        passcode,
+        ownerId: session?.id as string,
+      },
+    })
+    await prisma.roomParticipant.create({
+      data: {
+        ...data,
+        roomId: res?.id as string,
+        userId: session?.id as string,
+      },
+    })
+    return res
+  }
 }
