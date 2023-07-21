@@ -27,10 +27,12 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const users = new MapContainer<string, ParticipatingUser>()
     const messages = new MapContainer<string, RoomMessageWithUser>()
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
+
     const selectedMic = new DataContainer<MediaDeviceInfo | null>(null)
     const selectedCam = new DataContainer<MediaDeviceInfo | null>(null)
     const videoInput = new DataContainer<MediaDeviceInfo[]>([])
     const audioInput = new DataContainer<MediaDeviceInfo[]>([])
+
     const pinnedUser = new DataContainer<ParticipatingUser | null>(null)
 
     const messagesMap = room!.messages.reduce((acc, message) => {
@@ -152,6 +154,8 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
       userState,
       selectedMic,
       selectedCam,
+      videoInput,
+      audioInput,
       destroy,
     }
   }, [room, session?.user.id, session?.user.image, session?.user.name])
@@ -218,6 +222,18 @@ export const useSelectedCam = () => {
   const context = useMeeting()
   const state = useReactionData<MediaDeviceInfo | null>(context.data.selectedCam)
   return [state, context.data.selectedCam.change] as const
+}
+
+export const useVideoInput = () => {
+  const context = useMeeting()
+  const state = useReactionData<MediaDeviceInfo[]>(context.data.videoInput)
+  return [state, context.data.videoInput.change] as const
+}
+
+export const useAudioInput = () => {
+  const context = useMeeting()
+  const state = useReactionData<MediaDeviceInfo[]>(context.data.audioInput)
+  return [state, context.data.audioInput.change] as const
 }
 
 export const usePinnedUser = () => {
