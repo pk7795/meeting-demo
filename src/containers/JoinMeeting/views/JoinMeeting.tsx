@@ -64,7 +64,11 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
             name: room_name,
           },
         }).then((room) => {
-          router.push(`/meeting/${room.passcode}`)
+          if (room?.passcode) {
+            router.push(`/meeting/${room?.passcode}`)
+          } else {
+            message.error('Error while creating room. Please try again later.')
+          }
         })
       })
     },
@@ -270,9 +274,8 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                       render: (_, record) => (
                         <div className="flex justify-end">
                           <ButtonIcon
-                            type="primary"
                             size="small"
-                            className="w-fit"
+                            className="font-bold"
                             onClick={() => router.push(`/meeting/${record?.room?.passcode}`)}
                           >
                             Join
