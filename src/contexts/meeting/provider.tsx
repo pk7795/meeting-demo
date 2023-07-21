@@ -11,14 +11,25 @@ export const MeetingContext = createContext({} as any)
 export interface MeetingUserStatus {
   online: boolean
   joining: string
+  audio?: boolean
+  video?: boolean
+}
+
+export type ParticipatingUser = Partial<User> & {
+  is_me: boolean
+  online_at?: string
+  meetingStatus?: MeetingUserStatus
 }
 
 export const MeetingProvider = ({ children, room }: { children: React.ReactNode; room: RoomPopulated | null }) => {
   const { data: session } = useSession()
   const data = useMemo(() => {
-    const users = new MapContainer<string, Partial<User> & { online_at?: string; meetingStatus?: MeetingUserStatus }>()
+    const users = new MapContainer<string, ParticipatingUser>()
     const messages = new MapContainer<string, RoomMessageWithUser>()
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
+    const selectedMic = new DataContainer<MediaDeviceInfo | null>(null)
+    const selectedCam = new DataContainer<MediaDeviceInfo | null>(null)
+    const pinnedUser = new DataContainer<ParticipatingUser | null>(null)
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -70,11 +81,12 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
       presenceChannel
         .on('presence', { event: 'sync' }, () => {
           const newState = presenceChannel.presenceState()
-          const map = new Map<string, Partial<User> & { online_at?: string; meetingStatus?: MeetingUserStatus }>()
+          const map = new Map<string, ParticipatingUser>()
           for (const key in newState) {
             const userId = (newState[key] as any)[0].id
             if (userId) {
               map.set(userId, {
+                is_me: userId === session?.user.id,
                 online_at: (newState[key] as any)[0].online_at,
                 id: userId,
                 name: (newState[key] as any)[0].name,
@@ -133,8 +145,11 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
 
     return {
       users,
+      pinnedUser,
       messages,
       userState,
+      selectedMic,
+      selectedCam,
       destroy,
     }
   }, [room, session?.user.id, session?.user.image, session?.user.name])
@@ -150,7 +165,14 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     [data.userState]
   )
 
-  return <MeetingContext.Provider value={{ data, setUserState }}>{children}</MeetingContext.Provider>
+  const setPinnedUser = useCallback(
+    (user: ParticipatingUser | null) => {
+      data.pinnedUser.change(user)
+    },
+    [data.pinnedUser]
+  )
+
+  return <MeetingContext.Provider value={{ data, setUserState, setPinnedUser }}>{children}</MeetingContext.Provider>
 }
 
 export const useMeeting = () => {
@@ -163,9 +185,14 @@ export const useMeetingMessages = () => {
   return useReactionList(context.data.messages)
 }
 
-export const useMeetingUsersList = () => {
+export const useMeetingUsersList = (): ParticipatingUser[] => {
   const context = useMeeting()
   return useReactionList(context.data.users)
+}
+
+export const useOnlineMeetingUsersList = (): ParticipatingUser[] => {
+  const users = useMeetingUsersList()
+  return users.filter((user) => (user as ParticipatingUser).meetingStatus?.online)
 }
 
 export const useMeetingUsers = () => {
@@ -175,6 +202,24 @@ export const useMeetingUsers = () => {
 
 export const useMeetingUserState = () => {
   const context = useMeeting()
-  const state = useReactionData<DataContainer<MeetingUserStatus>>(context.data.userState)
+  const state = useReactionData<MeetingUserStatus>(context.data.userState)
   return [state, context.setUserState] as const
+}
+
+export const useSelectedMic = () => {
+  const context = useMeeting()
+  const state = useReactionData<MediaDeviceInfo | null>(context.data.selectedMic)
+  return [state, context.data.selectedMic.change] as const
+}
+
+export const useSelectedCam = () => {
+  const context = useMeeting()
+  const state = useReactionData<MediaDeviceInfo | null>(context.data.selectedCam)
+  return [state, context.data.selectedCam.change] as const
+}
+
+export const usePinnedUser = () => {
+  const context = useMeeting()
+  const pinnedUser = useReactionData<ParticipatingUser | null>(context.data.pinnedUser)
+  return [pinnedUser, context.setPinnedUser] as const
 }

@@ -3,13 +3,8 @@ import { recoilPersist } from 'recoil-persist'
 
 const { persistAtom } = recoilPersist()
 
-export const openCmdkState = atom({
-  key: 'openCmdk',
-  default: false,
-})
-
-export const collapsedSidebarState = atom({
-  key: 'collapsedSidebar',
-  default: false,
+export const themeState = atom<'light' | 'dark'>({
+  key: 'theme',
+  default: 'dark',
   effects_UNSTABLE: [persistAtom],
 })

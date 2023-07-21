@@ -3,6 +3,7 @@
 import { RoomParticipantInput } from './types'
 import { getPrisma, getSessionUser } from '@/lib'
 
+//TODO add more user_id checks
 export async function createRoomParticipant({ data }: { data: RoomParticipantInput }) {
   const prisma = getPrisma()
   const session = await getSessionUser()

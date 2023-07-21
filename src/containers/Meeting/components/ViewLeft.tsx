@@ -1,64 +1,60 @@
 'use client'
 
+import { LocalUser } from './LocalUser'
+import { RemoteUser } from './RemoteUser'
 import { Col, Row } from 'antd'
 import { map, times } from 'lodash'
 import { MicIcon, MicOffIcon } from 'lucide-react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Icon } from '@/components'
+import { useOnlineMeetingUsersList, usePinnedUser } from '@/contexts/meeting'
+import { BlueseaStreamPriority } from '@/lib/consts'
 
 type Props = {}
 
 export const ViewLeft: React.FC<Props> = () => {
+  const users = useOnlineMeetingUsersList()
+  const [pinnedUser, setPinnedUser] = usePinnedUser()
+
+  const renderPinnedUser = () => {
+    // if no user pinned then render a placeholder image
+    // indicating that the user can pin a user
+    if (!pinnedUser) {
+      return (
+        <div
+          className="rounded-lg w-full h-full"
+          style={{
+            backgroundImage: `url(https://picsum.photos/id/237/400)`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )
+    } else {
+      if (pinnedUser.is_me) {
+        return <LocalUser user={pinnedUser} />
+      } else {
+        return <RemoteUser user={pinnedUser} priority={BlueseaStreamPriority.BigVideo} />
+      }
+    }
+  }
   return (
     <Row gutter={[16, 16]} className="h-full">
       <Col span={18}>
-        <div className="w-full h-full relative">
-          <div
-            className="rounded-lg w-full h-full"
-            style={{
-              backgroundImage: `url(https://picsum.photos/id/237/400)`,
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
-          <div className="absolute bottom-0 left-0 px-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tr-lg rounded-bl-lg text-xs">
-            Cao Havan
-          </div>
-          <div className="absolute bottom-0 right-0 px-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tl-lg rounded-br-lg">
-            <Icon icon={<MicIcon size={12} />} />
-          </div>
-        </div>
+        <div className="w-full h-full relative">{renderPinnedUser()}</div>
       </Col>
+
       <Col span={6}>
         <Scrollbars>
-          {map(
-            map(times(5), (i) => ({
-              key: i,
-              name: `Name ${i}`,
-              mic: true,
-              camera: true,
-            })),
-            (i) => (
-              <div className="w-full h-44 relative mb-4 last:mb-0" key={i?.name}>
-                <div
-                  className="rounded-lg w-full h-full"
-                  style={{
-                    backgroundImage: `url(https://picsum.photos/id/237/1500)`,
-                    backgroundRepeat: 'no-repeat',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
-                />
-                <div className="absolute bottom-0 left-0 px-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tr-lg rounded-bl-lg text-xs">
-                  {i?.name}
-                </div>
-                <div className="absolute bottom-0 right-0 px-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tl-lg rounded-br-lg">
-                  <Icon icon={i?.mic ? <MicIcon size={12} /> : <MicOffIcon size={12} />} />
-                </div>
-              </div>
-            )
-          )}
+          {map(users, (u) => (
+            <div
+              onClick={() => setPinnedUser(u)}
+              className={u.id === pinnedUser?.id ? 'border-4 border-lime-800' : undefined}
+            >
+              {u.is_me ? <LocalUser key={u.id} user={u} /> : <RemoteUser key={u.id} user={u} />}
+            </div>
+          ))}
         </Scrollbars>
       </Col>
     </Row>
