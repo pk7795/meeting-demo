@@ -9,6 +9,7 @@ import {
   StreamKinds,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
+import dayjs from 'dayjs'
 import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
@@ -94,6 +95,14 @@ export const Meeting: React.FC<Omit<Props, 'bluesea'>> = ({ room }) => {
   const [openChat, setOpenChat] = useState(false)
   const { isMobile } = useDevice()
   const theme = useRecoilValue(themeState)
+  const [date, setDate] = useState(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDate(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   useSharedUserMedia('mic_device')
   useSharedUserMedia('camera_device')
@@ -131,26 +140,32 @@ export const Meeting: React.FC<Omit<Props, 'bluesea'>> = ({ room }) => {
       <div className="h-full flex items-center">
         <div className="flex-1 h-full flex flex-col">
           <div className="flex items-center justify-between border-b dark:border-b-[#232C3C] h-16 px-4 bg-white dark:bg-[#17202E]">
-            <Link href="/">
-              <img src={theme === 'dark' ? LOGO_WHITE_LONG : LOGO_BLACK_LONG} alt="" className="h-8" />
-            </Link>
+            <Space>
+              <Link href="/">
+                <img src={theme === 'dark' ? LOGO_WHITE_LONG : LOGO_BLACK_LONG} alt="" className="h-8" />
+              </Link>
+              <div className="border-l dark:border-l-[#232C3C] ml-6 pl-6">
+                <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
+                <div className="dark:text-gray-400">{date}</div>
+              </div>
+            </Space>
             {!isMobile && (
               <Space>
                 <ButtonIcon
                   onClick={() => setLayout(Layout.GRID)}
-                  icon={<LayoutGridIcon size={16} color={layout === Layout.GRID ? '#2D8CFF' : '#525861'} />}
+                  icon={<LayoutGridIcon size={16} color={layout === Layout.GRID ? '#2D8CFF' : '#9ca3af'} />}
                 />
                 <ButtonIcon
                   onClick={() => setLayout(Layout.LEFT)}
-                  icon={<LayoutPanelLeftIcon size={16} color={layout === Layout.LEFT ? '#2D8CFF' : '#525861'} />}
+                  icon={<LayoutPanelLeftIcon size={16} color={layout === Layout.LEFT ? '#2D8CFF' : '#9ca3af'} />}
                 />
                 <ButtonIcon
                   onClick={() => onOpenFullScreen()}
                   icon={
                     !isMaximize ? (
-                      <MaximizeIcon size={16} color="#525861" />
+                      <MaximizeIcon size={16} color="#9ca3af" />
                     ) : (
-                      <MinimizeIcon size={16} color="#525861" />
+                      <MinimizeIcon size={16} color="#9ca3af" />
                     )
                   }
                   className="__bluesea_video_viewer_fullscreen_button"
