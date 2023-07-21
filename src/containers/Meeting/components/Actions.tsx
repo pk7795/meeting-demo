@@ -202,14 +202,13 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             type="primary"
             className={classNames(
               'shadow-none border border-[#3A4250]',
-              micPublisherStream ? 'bg-primary' : 'bg-red-500'
+              micPublisherStream ? 'bg-primary' : 'bg-red-500',
+              typeof audioLevel === 'number' && audioLevel > -70 && 'ring-2 ring-primary'
             )}
             onClick={toggleMic}
             icon={micPublisherStream ? <MicIcon size={16} color="#FFFFFF" /> : <MicOffIcon size={16} color="#FFFFFF" />}
             tooltip="Mute/Unmute"
-          >
-            {audioLevel}
-          </ButtonIcon>
+          />
           <ButtonIcon
             size="large"
             type="primary"
