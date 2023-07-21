@@ -3,7 +3,7 @@
 import { Input } from 'antd'
 import { map } from 'lodash'
 import { SendIcon } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
 import { createMessage } from '@/app/actions/chat'
@@ -16,6 +16,7 @@ type Props = {
 }
 
 export const ChatLayout: React.FC<Props> = ({ room }) => {
+  const ref = useRef<Scrollbars>(null)
   const [input, setInput] = useState('')
 
   const messages = useMeetingMessages()
@@ -31,6 +32,7 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
       },
     }).then(() => {
       setInput('')
+      ref.current?.scrollToBottom()
     })
   }, [input, room])
 
@@ -78,7 +80,7 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
         <div className="flex items-center border-b border-b-[#232C3C] h-16 px-4 bg-[#1D2431]">
           <div className="text-lg text-[#9CA3AF]">Chat</div>
         </div>
-        <Scrollbars>
+        <Scrollbars ref={ref}>
           <div className="p-2">
             {messages.map((message: any) => (
               <div key={message.id} className="mb-2">
