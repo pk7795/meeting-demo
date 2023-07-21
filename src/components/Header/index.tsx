@@ -25,7 +25,7 @@ export const Header: React.FC<Props> = () => {
   const [date, setDate] = useState(dayjs().format('hh:mm A • ddd, MMM DD'))
   const [form] = Form.useForm()
 
-  const onFinish = useCallback((values: any) => {
+  const onFinish = useCallback(() => {
     //
   }, [])
 

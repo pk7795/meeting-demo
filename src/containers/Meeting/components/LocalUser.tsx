@@ -1,9 +1,10 @@
 import { VideoViewerWrapper } from './VideoViewerWrapper'
 import { usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
+import { isEmpty } from 'lodash'
 import { MicIcon, MicOffIcon } from 'lucide-react'
 import { Icon } from '@/components'
 import { ParticipatingUser } from '@/contexts'
-import { BlueseaSenders, BlueseaStreamPriority } from '@/lib/consts'
+import { BlueseaSenders } from '@/lib/consts'
 
 type Props = {
   user: ParticipatingUser
@@ -12,12 +13,17 @@ type Props = {
 export const LocalUser = ({ user }: Props) => {
   const camPublisher = usePublisher(BlueseaSenders.video)
   const micPublisher = usePublisher(BlueseaSenders.audio)
-  const [_camPubState, camPublisherStream] = usePublisherState(camPublisher)
-  const [_micPubState, micPublisherStream] = usePublisherState(micPublisher)
+  const [, camPublisherStream] = usePublisherState(camPublisher)
+  const [, micPublisherStream] = usePublisherState(micPublisher)
 
   return (
-    <div className="w-full h-44 relative">
-      <VideoViewerWrapper stream={camPublisherStream} priority={100} />
+    <div className="w-full aspect-video relative bg-black rounded-lg overflow-hidden">
+      <VideoViewerWrapper
+        stream={camPublisherStream}
+        priority={100}
+        user={user}
+        openMic={!isEmpty(micPublisherStream)}
+      />
       <div className="absolute bottom-0 left-0 px-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tr-lg rounded-bl-lg text-xs">
         {user.name}
       </div>

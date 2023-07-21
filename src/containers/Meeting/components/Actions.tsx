@@ -1,7 +1,7 @@
 'use client'
 
 import { Modal, Popover, Select, Space, Typography } from 'antd'
-import { StreamKinds, usePublisher, usePublisherState, useSharedUserMedia } from 'bluesea-media-react-sdk'
+import { usePublisher, usePublisherState, useSharedUserMedia } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { map } from 'lodash'
 import {
@@ -18,6 +18,7 @@ import {
   VideoIcon,
   VideoOffIcon,
 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import { css } from '@emotion/css'
@@ -36,10 +37,11 @@ type Props = {
 }
 
 export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
+  const { data: user } = useSession()
   const camPublisher = usePublisher(BlueseaSenders.video)
   const micPublisher = usePublisher(BlueseaSenders.audio)
-  const [micPubState, micPublisherStream] = usePublisherState(micPublisher)
-  const [camPubState, camPublisherStream] = usePublisherState(camPublisher)
+  const [, micPublisherStream] = usePublisherState(micPublisher)
+  const [, camPublisherStream] = usePublisherState(camPublisher)
 
   const [micStream, , micStreamChanger] = useSharedUserMedia('mic_device')
   const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
@@ -67,17 +69,18 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const { isMobile } = useDevice()
 
   // TODO: refactor or move to actions
-  const getAvailableInvites = async () => {
+  const getAvailableInvites = useCallback(async () => {
     const users = supabase
       .from('User')
       .select('id, name, email, emailVerified, image, role, status, createdAt, updatedAt')
+      .not('id', 'eq', user?.user?.id)
     const { data, error } = await users
     if (error) {
       console.log(error)
       return []
     }
     return data
-  }
+  }, [user?.user?.id])
 
   useEffect(() => {
     if (openModal) {
@@ -87,7 +90,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
         })
       })
     }
-  }, [openModal])
+  }, [getAvailableInvites, openModal])
 
   const toggleMic = useCallback(() => {
     if (micPublisherStream) {
@@ -210,7 +213,14 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             }
             tooltip="Start/Stop Camera"
           />
-          {!isMobile && (
+          <ButtonIcon
+            size="large"
+            type="primary"
+            className={classNames('shadow-none border border-[#3A4250]')}
+            icon={<VideoIcon size={16} color="#FFFFFF" />}
+            tooltip="Start/Stop Camera"
+          />
+          {/* {!isMobile && (
             <ButtonIcon
               size="large"
               type="primary"
@@ -222,8 +232,8 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
               icon={<ScreenShareIcon size={16} color="#FFFFFF" />}
               tooltip="Share Screen"
             />
-          )}
-          <ButtonIcon
+          )} */}
+          {/* <ButtonIcon
             size="large"
             type="primary"
             className={classNames(
@@ -233,7 +243,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             onClick={() => setRecording(!recording)}
             icon={<IconPlayerRecordFilled size={16} className={!recording ? 'text-white' : 'text-red-500'} />}
             tooltip="Record"
-          />
+          /> */}
           <ButtonIcon
             size="large"
             type="primary"
