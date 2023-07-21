@@ -1,7 +1,7 @@
 'use server'
 
 import { MessageInput } from './types'
-import { getPrisma, getSessionUser, getSupabase } from '@/lib'
+import { getPrisma, getSessionUser } from '@/lib'
 
 export async function fetchMessages({ passcode }: { passcode: string }) {
   const prisma = getPrisma()

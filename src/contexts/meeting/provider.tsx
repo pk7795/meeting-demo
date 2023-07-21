@@ -2,8 +2,8 @@ import { useSession } from 'next-auth/react'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { User } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
+import { supabase } from '@/config'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
-import { getSupabase } from '@/lib/supabase'
 import { RoomMessageWithUser, RoomPopulated } from '@/types/types'
 
 export const MeetingContext = createContext({} as any)
@@ -14,8 +14,6 @@ export interface MeetingUserStatus {
 }
 
 export const MeetingProvider = ({ children, room }: { children: React.ReactNode; room: RoomPopulated | null }) => {
-  const supabase = getSupabase()
-
   const { data: session } = useSession()
   const data = useMemo(() => {
     const users = new MapContainer<string, Partial<User> & { online_at?: string; meetingStatus?: MeetingUserStatus }>()
@@ -142,7 +140,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
       userState,
       destroy,
     }
-  }, [room, session?.user.id, session?.user.image, session?.user.name, supabase])
+  }, [room, session?.user.id, session?.user.image, session?.user.name])
 
   useEffect(() => {
     return data.destroy

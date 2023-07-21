@@ -6,6 +6,7 @@ import { map } from 'lodash'
 import {
   CopyIcon,
   MailPlusIcon,
+  MessageCircleIcon,
   MicIcon,
   MicOffIcon,
   PlusIcon,
@@ -23,9 +24,11 @@ import { ButtonIcon, Copy, useApp } from '@/components'
 
 type Props = {
   userInvite: OneUserInvite[]
+  openChat: boolean
+  setOpenChat: (open: boolean) => void
 }
 
-export const Actions: React.FC<Props> = ({ userInvite }) => {
+export const Actions: React.FC<Props> = ({ userInvite, openChat, setOpenChat }) => {
   const params = useParams()
   const { modal, message } = useApp()
   const router = useRouter()
@@ -143,6 +146,14 @@ export const Actions: React.FC<Props> = ({ userInvite }) => {
             onClick={() => setRecording(!recording)}
             icon={<IconPlayerRecordFilled size={16} className={!recording ? 'text-white' : 'text-red-500'} />}
             tooltip="Record"
+          />
+          <ButtonIcon
+            size="large"
+            type="primary"
+            className={classNames('shadow-none border border-[#3A4250]', !openChat ? 'bg-[#28303E]' : 'bg-primary')}
+            onClick={() => setOpenChat(!openChat)}
+            icon={<MessageCircleIcon size={16} color="#FFFFFF" />}
+            tooltip="Chat"
           />
         </Space>
         <div>

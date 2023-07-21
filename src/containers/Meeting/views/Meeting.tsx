@@ -34,6 +34,7 @@ export const Meeting: React.FC<Props> = ({ userInvite, room }) => {
   const [isJoined, setIsJoined] = useState(false)
   const [isMaximize, setIsMaximize] = useState(false)
   const [layout, setLayout] = useState<Layout>(Layout.GRID)
+  const [openChat, setOpenChat] = useState(false)
 
   const [, setMeetingUserState] = useMeetingUserState()
 
@@ -98,11 +99,13 @@ export const Meeting: React.FC<Props> = ({ userInvite, room }) => {
               {layout === Layout.GRID && <ViewGrid />}
               {layout === Layout.LEFT && <ViewLeft />}
             </div>
-            <Actions userInvite={userInvite} />
+            <Actions userInvite={userInvite} openChat={openChat} setOpenChat={setOpenChat} />
           </div>
-          <div className="w-80 h-full bg-[#17202E] border-l border-l-[#232C3C]">
-            <ChatLayout room={room} />
-          </div>
+          {openChat && (
+            <div className="w-80 h-full bg-[#17202E] border-l border-l-[#232C3C]">
+              <ChatLayout room={room} />
+            </div>
+          )}
         </div>
       </div>
     </ConfigProvider>
