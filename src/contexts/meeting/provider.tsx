@@ -15,7 +15,11 @@ export interface MeetingUserStatus {
   video?: boolean
 }
 
-export type ParticipatingUser = Partial<User> & { online_at?: string; meetingStatus?: MeetingUserStatus }
+export type ParticipatingUser = Partial<User> & {
+  is_me: boolean
+  online_at?: string
+  meetingStatus?: MeetingUserStatus
+}
 
 export const MeetingProvider = ({ children, room }: { children: React.ReactNode; room: RoomPopulated | null }) => {
   const { data: session } = useSession()
@@ -79,6 +83,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
             const userId = (newState[key] as any)[0].id
             if (userId) {
               map.set(userId, {
+                is_me: userId === session?.user.id,
                 online_at: (newState[key] as any)[0].online_at,
                 id: userId,
                 name: (newState[key] as any)[0].name,
@@ -167,12 +172,12 @@ export const useMeetingMessages = () => {
   return useReactionList(context.data.messages)
 }
 
-export const useMeetingUsersList = () => {
+export const useMeetingUsersList = (): ParticipatingUser[] => {
   const context = useMeeting()
   return useReactionList(context.data.users)
 }
 
-export const useOnlineMeetingUsersList = () => {
+export const useOnlineMeetingUsersList = (): ParticipatingUser[] => {
   const users = useMeetingUsersList()
   return users.filter((user) => (user as ParticipatingUser).meetingStatus?.online)
 }

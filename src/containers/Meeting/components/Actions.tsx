@@ -1,6 +1,7 @@
 'use client'
 
 import { Modal, Popover, Select, Space, Typography } from 'antd'
+import { StreamKinds, usePublisher, usePublisherState, useSharedUserMedia } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { map } from 'lodash'
 import {
@@ -26,6 +27,7 @@ import { OneUserInvite } from '@/app/meeting/[passcode]/page'
 import { ButtonIcon, Copy, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
 import { useDevice } from '@/hooks'
+import { BlueseaSenders } from '@/lib/consts'
 
 type Props = {
   openChat: boolean
@@ -33,12 +35,31 @@ type Props = {
 }
 
 export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
+  const camPublisher = usePublisher(BlueseaSenders.video)
+  const micPublisher = usePublisher(BlueseaSenders.audio)
+  const [micPubState, micPublisherStream] = usePublisherState(micPublisher)
+  const [camPubState, camPublisherStream] = usePublisherState(camPublisher)
+
+  const [micStream, micError, micStreamChanger] = useSharedUserMedia('mic_device')
+  const [camStream, camError, camStreamChanger] = useSharedUserMedia('camera_device')
+
+  useEffect(() => {
+    micStreamChanger({ audio: true })
+    camStreamChanger({ video: true })
+  }, [])
+
+  useEffect(() => {
+    micPublisher.switchStream(micStream)
+  }, [micStream])
+
+  useEffect(() => {
+    camPublisher.switchStream(camStream)
+  }, [camStream])
+
   const params = useParams()
   const { modal, message } = useApp()
   const router = useRouter()
   const [openModal, setOpenModal] = useState(false)
-  const [mic, setMic] = useState(true)
-  const [camera, setCamera] = useState(true)
   const [shareScreen, setShareScreen] = useState(false)
   const [recording, setRecording] = useState(false)
   const [inviteEmail, setInviteEmail] = useState<string[]>([])
@@ -69,6 +90,22 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
       })
     }
   }, [openModal])
+
+  const toggleMic = useCallback(() => {
+    if (micPublisherStream) {
+      micStreamChanger(undefined)
+    } else {
+      micStreamChanger({ audio: true })
+    }
+  }, [micPublisherStream])
+
+  const toggleCam = useCallback(() => {
+    if (camPublisherStream) {
+      camStreamChanger(undefined)
+    } else {
+      camStreamChanger({ video: true })
+    }
+  }, [camPublisherStream])
 
   const onInvite = useCallback(() => {
     startTransitionInviteToRoom(() => {
@@ -146,17 +183,25 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
           <ButtonIcon
             size="large"
             type="primary"
-            className={classNames('shadow-none border border-[#3A4250]', mic ? 'bg-primary' : 'bg-red-500')}
-            onClick={() => setMic(!mic)}
-            icon={mic ? <MicIcon size={16} color="#FFFFFF" /> : <MicOffIcon size={16} color="#FFFFFF" />}
+            className={classNames(
+              'shadow-none border border-[#3A4250]',
+              micPublisherStream ? 'bg-primary' : 'bg-red-500'
+            )}
+            onClick={toggleMic}
+            icon={micPublisherStream ? <MicIcon size={16} color="#FFFFFF" /> : <MicOffIcon size={16} color="#FFFFFF" />}
             tooltip="Mute/Unmute"
           />
           <ButtonIcon
             size="large"
             type="primary"
-            className={classNames('shadow-none border border-[#3A4250]', camera ? 'bg-primary' : 'bg-red-500')}
-            onClick={() => setCamera(!camera)}
-            icon={camera ? <VideoIcon size={16} color="#FFFFFF" /> : <VideoOffIcon size={16} color="#FFFFFF" />}
+            className={classNames(
+              'shadow-none border border-[#3A4250]',
+              camPublisherStream ? 'bg-primary' : 'bg-red-500'
+            )}
+            onClick={toggleCam}
+            icon={
+              camPublisherStream ? <VideoIcon size={16} color="#FFFFFF" /> : <VideoOffIcon size={16} color="#FFFFFF" />
+            }
             tooltip="Start/Stop Camera"
           />
           {!isMobile && (
