@@ -29,6 +29,8 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
     const selectedMic = new DataContainer<MediaDeviceInfo | null>(null)
     const selectedCam = new DataContainer<MediaDeviceInfo | null>(null)
+    const videoInput = new DataContainer<MediaDeviceInfo[]>([])
+    const audioInput = new DataContainer<MediaDeviceInfo[]>([])
     const pinnedUser = new DataContainer<ParticipatingUser | null>(null)
 
     const messagesMap = room!.messages.reduce((acc, message) => {

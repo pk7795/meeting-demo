@@ -1,4 +1,5 @@
 import { VideoViewerWrapper } from './VideoViewerWrapper'
+import { isEmpty } from 'lodash'
 import { MicIcon, MicOffIcon } from 'lucide-react'
 import { Icon } from '@/components'
 import { ParticipatingUser } from '@/contexts'
@@ -15,8 +16,8 @@ export const RemoteUser = ({ user, priority = BlueseaStreamPriority.SmallVideo }
   const videoStream = usePeerRemoteStreamActive(user.id!, BlueseaSenders.video.name)
 
   return (
-    <div className="w-full h-44 relative">
-      <VideoViewerWrapper stream={videoStream} priority={priority} />
+    <div className="w-full aspect-video relative bg-black rounded-lg overflow-hidden">
+      <VideoViewerWrapper stream={videoStream} priority={priority} user={user} openMic={!isEmpty(audioStream)} />
       <div className="absolute bottom-0 left-0 px-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tr-lg rounded-bl-lg text-xs">
         {user.name}
       </div>
