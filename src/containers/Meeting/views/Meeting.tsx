@@ -74,7 +74,7 @@ export const MeetingWrapped = ({ room, participated, bluesea }: Props) => {
       peer={bluesea.peer}
       token={bluesea.token}
       autoConnect={false}
-      mixMinusAudio={{ mode: MixMinusMode.AllAudioStreams }}
+      mixMinusAudio={{ mode: MixMinusMode.AllAudioStreams, elements: createAudio }}
       senders={senders}
       receivers={{ audio: 0, video: 5 }}
     >
