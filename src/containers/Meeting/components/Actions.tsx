@@ -1,7 +1,7 @@
 'use client'
 
 import { Modal, Popover, Select, Space, Typography } from 'antd'
-import { usePublisher, usePublisherState, useSharedUserMedia } from 'bluesea-media-react-sdk'
+import { useAudioLevelProducer, usePublisher, usePublisherState, useSharedUserMedia } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { find, map } from 'lodash'
 import {
@@ -61,6 +61,8 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
 
   const [audioInput] = useAudioInput()
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
+
+  const audioLevel = useAudioLevelProducer(micPublisher)
 
   useEffect(() => {
     if (selectedVideoInput) {
@@ -196,7 +198,8 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             type="primary"
             className={classNames(
               'shadow-none border border-[#3A4250]',
-              micPublisherStream ? 'bg-primary' : 'bg-red-500'
+              micPublisherStream ? 'bg-primary' : 'bg-red-500',
+              typeof audioLevel === 'number' && audioLevel > -40 && 'ring-2 ring-primary'
             )}
             onClick={toggleMic}
             icon={micPublisherStream ? <MicIcon size={16} color="#FFFFFF" /> : <MicOffIcon size={16} color="#FFFFFF" />}

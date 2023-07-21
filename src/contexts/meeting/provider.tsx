@@ -1,3 +1,4 @@
+import { useAudioSlotMix } from 'bluesea-media-react-sdk'
 import { useSession } from 'next-auth/react'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { User } from '@prisma/client'
@@ -34,6 +35,14 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const audioInput = new DataContainer<MediaDeviceInfo[]>([])
 
     const pinnedUser = new DataContainer<ParticipatingUser | null>(null)
+    const talkingUserId = new DataContainer<string>('')
+
+    talkingUserId.addChangeListener((userId) => {
+      const user = users.get(userId)
+      if (user) {
+        pinnedUser.change(user)
+      }
+    })
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -150,6 +159,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     return {
       users,
       pinnedUser,
+      talkingUserId,
       messages,
       userState,
       selectedMic,
@@ -171,12 +181,49 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     [data.userState]
   )
 
+  const setTalkingUserId = useCallback(
+    (userId: string) => {
+      if (data.talkingUserId.data === userId) return
+      data.talkingUserId.change(userId)
+    },
+    [data.talkingUserId]
+  )
+
   const setPinnedUser = useCallback(
     (user: ParticipatingUser | null) => {
       data.pinnedUser.change(user)
     },
     [data.pinnedUser]
   )
+
+  const audioSlot0 = useAudioSlotMix(0)
+  const audioSlot1 = useAudioSlotMix(1)
+  const audioSlot2 = useAudioSlotMix(2)
+
+  useEffect(() => {
+    //find loudest user slot from audioSlot0, audioSlot1, audioSlot2
+    const audioSlot0Level = audioSlot0?.audio_level ?? -Infinity
+    const audioSlot1Level = audioSlot1?.audio_level ?? -Infinity
+    const audioSlot2Level = audioSlot2?.audio_level ?? -Infinity
+
+    const minAudioLevel = -50
+
+    if (audioSlot0Level > minAudioLevel && audioSlot0Level > audioSlot1Level && audioSlot0Level > audioSlot2Level) {
+      setTalkingUserId(audioSlot0?.peer_id ?? '')
+    } else if (
+      audioSlot1Level > minAudioLevel &&
+      audioSlot1Level > audioSlot0Level &&
+      audioSlot1Level > audioSlot2Level
+    ) {
+      setTalkingUserId(audioSlot1?.peer_id ?? '')
+    } else if (
+      audioSlot2Level > minAudioLevel &&
+      audioSlot2Level > audioSlot0Level &&
+      audioSlot2Level > audioSlot1Level
+    ) {
+      setTalkingUserId(audioSlot2?.peer_id ?? '')
+    }
+  }, [audioSlot0, audioSlot1, audioSlot2, setTalkingUserId])
 
   return <MeetingContext.Provider value={{ data, setUserState, setPinnedUser }}>{children}</MeetingContext.Provider>
 }
@@ -240,4 +287,10 @@ export const usePinnedUser = () => {
   const context = useMeeting()
   const pinnedUser = useReactionData<ParticipatingUser | null>(context.data.pinnedUser)
   return [pinnedUser, context.setPinnedUser] as const
+}
+
+export const useTalkingUserId = () => {
+  const context = useMeeting()
+  const talkingUserId = useReactionData<string>(context.data.talkingUserId)
+  return talkingUserId
 }
