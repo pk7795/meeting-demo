@@ -27,6 +27,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const users = new MapContainer<string, ParticipatingUser>()
     const messages = new MapContainer<string, RoomMessageWithUser>()
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
+    const pinnedUser = new DataContainer<ParticipatingUser | null>(null)
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -142,6 +143,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
 
     return {
       users,
+      pinnedUser,
       messages,
       userState,
       destroy,
@@ -159,7 +161,14 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     [data.userState]
   )
 
-  return <MeetingContext.Provider value={{ data, setUserState }}>{children}</MeetingContext.Provider>
+  const setPinnedUser = useCallback(
+    (user: ParticipatingUser | null) => {
+      data.pinnedUser.change(user)
+    },
+    [data.pinnedUser]
+  )
+
+  return <MeetingContext.Provider value={{ data, setUserState, setPinnedUser }}>{children}</MeetingContext.Provider>
 }
 
 export const useMeeting = () => {
@@ -189,6 +198,12 @@ export const useMeetingUsers = () => {
 
 export const useMeetingUserState = () => {
   const context = useMeeting()
-  const state = useReactionData<DataContainer<MeetingUserStatus>>(context.data.userState)
+  const state = useReactionData<MeetingUserStatus>(context.data.userState)
   return [state, context.setUserState] as const
+}
+
+export const usePinnedUser = () => {
+  const context = useMeeting()
+  const pinnedUser = useReactionData<ParticipatingUser | null>(context.data.pinnedUser)
+  return [pinnedUser, context.setPinnedUser] as const
 }
