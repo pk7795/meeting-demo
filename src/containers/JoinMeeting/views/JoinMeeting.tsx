@@ -135,7 +135,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                     <div>
                       <div
                         className={classNames(
-                          'hover:bg-gray_2 h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 text-primary_text'
+                          'hover:bg-gray-100 dark:hover:bg-gray-800 h-8 px-2 rounded-lg flex items-center cursor-pointer text-primary_text dark:text-gray-100 mb-1'
                         )}
                         onClick={() => signIn('google', { callbackUrl: '/' })}
                       >
@@ -144,7 +144,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                       </div>
                       <div
                         className={classNames(
-                          'hover:bg-gray_2 h-8 px-2 rounded-lg flex items-center cursor-pointer text-primary_text'
+                          'hover:bg-gray-100 dark:hover:bg-gray-800 h-8 px-2 rounded-lg flex items-center cursor-pointer text-primary_text dark:text-gray-100'
                         )}
                         onClick={() => signIn('github', { callbackUrl: '/' })}
                       >
@@ -223,6 +223,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                           <ButtonIcon
                             size="small"
                             className="font-bold"
+                            type="primary"
                             onClick={() => router.push(`/meeting/${record?.passcode}`)}
                           >
                             Join
@@ -276,6 +277,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                           <ButtonIcon
                             size="small"
                             className="font-bold"
+                            type="primary"
                             onClick={() => router.push(`/meeting/${record?.room?.passcode}`)}
                           >
                             Join

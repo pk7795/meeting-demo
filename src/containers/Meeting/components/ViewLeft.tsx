@@ -3,6 +3,7 @@
 import { LocalUser } from './LocalUser'
 import { RemoteUser } from './RemoteUser'
 import { Col, Row } from 'antd'
+import classNames from 'classnames'
 import { map } from 'lodash'
 import { useEffect } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
@@ -46,16 +47,18 @@ export const ViewLeft: React.FC<Props> = () => {
   }
   return (
     <Row gutter={[16, 16]} className="h-full">
-      <Col span={18}>
-        <div className="w-full h-full relative">{renderPinnedUser()}</div>
+      <Col span={24} lg={16}>
+        <div className="w-full h-full relative flex items-center bg-black rounded-lg p-4">{renderPinnedUser()}</div>
       </Col>
-
-      <Col span={6}>
+      <Col span={24} lg={8}>
         <Scrollbars>
           {map(users, (u) => (
             <div
               onClick={() => setPinnedUser(u)}
-              className={u.id === pinnedUser?.id ? 'border-4 border-lime-800' : undefined}
+              className={classNames(
+                'mb-4 border-2 rounded-lg',
+                u.id === pinnedUser?.id ? 'border-primary' : 'border-transparent'
+              )}
             >
               {u.is_me ? <LocalUser key={u.id} user={u} /> : <RemoteUser key={u.id} user={u} />}
             </div>

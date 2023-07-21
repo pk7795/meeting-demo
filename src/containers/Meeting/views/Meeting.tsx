@@ -9,7 +9,7 @@ import {
   StreamKinds,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
-import { LayoutGridIcon, LayoutPanelTop, MaximizeIcon, MinimizeIcon } from 'lucide-react'
+import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
@@ -70,6 +70,12 @@ export const Meeting: React.FC<Omit<Props, 'bluesea'>> = ({ room }) => {
   const [, setMeetingUserState] = useMeetingUserState()
 
   useEffect(() => {
+    if (isMobile) {
+      setLayout(Layout.GRID)
+    }
+  }, [isMobile])
+
+  useEffect(() => {
     if (isJoined) {
       setMeetingUserState({ online: true, joining: 'meeting' })
     } else {
@@ -106,7 +112,7 @@ export const Meeting: React.FC<Omit<Props, 'bluesea'>> = ({ room }) => {
                   />
                   <ButtonIcon
                     onClick={() => setLayout(Layout.LEFT)}
-                    icon={<LayoutPanelTop size={16} color={layout === Layout.LEFT ? '#fff' : '#525861'} />}
+                    icon={<LayoutPanelLeftIcon size={16} color={layout === Layout.LEFT ? '#fff' : '#525861'} />}
                   />
                   <ButtonIcon
                     onClick={() => onOpenFullScreen()}
@@ -131,7 +137,7 @@ export const Meeting: React.FC<Omit<Props, 'bluesea'>> = ({ room }) => {
             </div>
             <div className="flex-1 flex flex-col p-4 overflow-y-auto">
               {layout === Layout.GRID && <ViewGrid />}
-              {layout === Layout.LEFT && <ViewLeft />}
+              {layout === Layout.LEFT && !isMobile && <ViewLeft />}
             </div>
             <Actions openChat={openChat} setOpenChat={setOpenChat} />
           </div>
