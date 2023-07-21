@@ -1,7 +1,13 @@
 'use client'
 
 import { Modal, Popover, Select, Space, Typography } from 'antd'
-import { useAudioLevelProducer, usePublisher, usePublisherState, useSharedUserMedia } from 'bluesea-media-react-sdk'
+import {
+  useActions,
+  useAudioLevelProducer,
+  usePublisher,
+  usePublisherState,
+  useSharedUserMedia,
+} from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { find, map } from 'lodash'
 import {
@@ -37,6 +43,7 @@ type Props = {
 
 export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const { data: user } = useSession()
+  const actions = useActions()
   const params = useParams()
   const { modal, message } = useApp()
   const router = useRouter()
@@ -63,7 +70,9 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
   const audioLevel = useAudioLevelProducer(micPublisher)
-
+  useEffect(() => {
+    actions.connect()
+  }, [actions])
   useEffect(() => {
     micPublisher.switchStream(micStream)
   }, [micPublisher, micStream])
