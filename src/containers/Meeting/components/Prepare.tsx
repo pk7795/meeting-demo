@@ -10,7 +10,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import { createRoomParticipant } from '@/app/actions'
 import { ButtonIcon, Icon } from '@/components'
-import { useSelectedCam, useSelectedMic } from '@/contexts'
+import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '@/contexts'
 import { MainLayout } from '@/layouts'
 
 type Props = {
@@ -24,10 +24,11 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
   const router = useRouter()
   const params = useParams()
   const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
-  const [videoInput, setVideoInput] = useState<MediaDeviceInfo[]>([])
+
+  const [videoInput, setVideoInput] = useVideoInput()
   const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
 
-  const [audioInput, setAudioInput] = useState<MediaDeviceInfo[]>([])
+  const [audioInput, setAudioInput] = useAudioInput()
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
   const [error, setError] = useState(false)
@@ -72,7 +73,7 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
       setAudioInput(audioInput)
       setSelectedAudioInput(audioInput[0])
     },
-    [setSelectedAudioInput, setSelectedVideoInput]
+    [setAudioInput, setSelectedAudioInput, setSelectedVideoInput, setVideoInput]
   )
 
   useEffect(() => {

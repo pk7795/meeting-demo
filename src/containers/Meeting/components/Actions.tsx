@@ -2,7 +2,6 @@
 
 import { Modal, Popover, Select, Space, Typography } from 'antd'
 import {
-  StreamKinds,
   useActions,
   useAudioLevelProducer,
   usePublisher,
@@ -10,8 +9,9 @@ import {
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
-import { map } from 'lodash'
+import { find, map } from 'lodash'
 import {
+  CameraIcon,
   CopyIcon,
   HashIcon,
   MailPlusIcon,
@@ -21,20 +21,18 @@ import {
   MoreHorizontalIcon,
   PhoneOffIcon,
   PlusIcon,
-  ScreenShareIcon,
+  Settings2Icon,
   VideoIcon,
   VideoOffIcon,
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
-import { css } from '@emotion/css'
-import { IconPlayerRecordFilled } from '@tabler/icons-react'
 import { inviteToRoom } from '@/app/actions'
 import { OneUserInvite } from '@/app/meeting/[passcode]/page'
-import { ButtonIcon, Copy, useApp } from '@/components'
+import { ButtonIcon, Copy, Icon, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
-import { useSelectedCam, useSelectedMic } from '@/contexts'
+import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '@/contexts'
 import { useDevice } from '@/hooks'
 import { BlueseaSenders } from '@/lib/consts'
 
@@ -46,6 +44,17 @@ type Props = {
 export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const { data: user } = useSession()
   const actions = useActions()
+  const params = useParams()
+  const { modal, message } = useApp()
+  const router = useRouter()
+  const [openModalInvites, setOpenModalInvites] = useState(false)
+  const [openModalSettings, setOpenModalSettings] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState<string[]>([])
+  const [isPendingInviteToRoom, startTransitionInviteToRoom] = useTransition()
+  const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
+  const [inviteOptions, setInviteOptions] = useState<OneUserInvite[]>([])
+  const { isMobile } = useDevice()
+
   const camPublisher = usePublisher(BlueseaSenders.video)
   const micPublisher = usePublisher(BlueseaSenders.audio)
   const [, micPublisherStream] = usePublisherState(micPublisher)
@@ -53,11 +62,17 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
 
   const [micStream, , micStreamChanger] = useSharedUserMedia('mic_device')
   const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
+
+  const [videoInput] = useVideoInput()
   const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
+
+  const [audioInput] = useAudioInput()
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
   const audioLevel = useAudioLevelProducer(micPublisher)
-
+  useEffect(() => {
+    actions.connect()
+  }, [actions])
   useEffect(() => {
     micPublisher.switchStream(micStream)
   }, [micPublisher, micStream])
@@ -65,22 +80,6 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   useEffect(() => {
     camPublisher.switchStream(camStream)
   }, [camPublisher, camStream])
-
-  const params = useParams()
-  const { modal, message } = useApp()
-  const router = useRouter()
-  const [openModal, setOpenModal] = useState(false)
-  const [shareScreen, setShareScreen] = useState(false)
-  const [recording, setRecording] = useState(false)
-  const [inviteEmail, setInviteEmail] = useState<string[]>([])
-  const [isPendingInviteToRoom, startTransitionInviteToRoom] = useTransition()
-  const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
-  const [inviteOptions, setInviteOptions] = useState<OneUserInvite[]>([])
-  const { isMobile } = useDevice()
-
-  useEffect(() => {
-    actions.connect()
-  }, [actions])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
@@ -97,14 +96,14 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   }, [user?.user?.id])
 
   useEffect(() => {
-    if (openModal) {
+    if (openModalInvites) {
       startTransitionAvailableInvites(() => {
         getAvailableInvites().then((res) => {
           setInviteOptions(res)
         })
       })
     }
-  }, [getAvailableInvites, openModal])
+  }, [getAvailableInvites, openModalInvites])
 
   const toggleMic = useCallback(() => {
     if (micPublisherStream) {
@@ -139,7 +138,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
         })),
       }).then(() => {
         message.success('Invite successfully')
-        setOpenModal(false)
+        setOpenModalInvites(false)
         setInviteEmail([])
       })
     })
@@ -157,26 +156,6 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
       },
     })
   }, [modal, router])
-
-  const classNameModal = css({
-    '.ant-modal-content': {
-      backgroundColor: '#121825',
-    },
-    '.ant-select-selector': {
-      backgroundColor: '#121825 !important',
-      borderColor: '#3A4250 !important',
-    },
-    '.ant-select-selection-placeholder': {
-      color: '#6B7280 !important',
-    },
-    '.ant-select-selection-item': {
-      color: '#D1D5DB !important',
-      backgroundColor: '#000 !important',
-    },
-    '.anticon.anticon-close svg': {
-      color: '#fff !important',
-    },
-  })
 
   return (
     <div className="flex items-center justify-center h-16 bg-[#17202E] border-t border-t-[#232C3C]">
@@ -196,7 +175,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
               size="middle"
               type="primary"
               className="border border-[#3A4250] bg-[#28303E] shadow-none text-xs px-6"
-              onClick={() => setOpenModal(true)}
+              onClick={() => setOpenModalInvites(true)}
             >
               Invite
             </ButtonIcon>
@@ -228,30 +207,6 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             }
             tooltip="Start/Stop Camera"
           />
-          {/* {!isMobile && (
-            <ButtonIcon
-              size="large"
-              type="primary"
-              className={classNames(
-                'shadow-none border border-[#3A4250]',
-                !shareScreen ? 'bg-[#28303E]' : 'bg-primary'
-              )}
-              onClick={() => setShareScreen(!shareScreen)}
-              icon={<ScreenShareIcon size={16} color="#FFFFFF" />}
-              tooltip="Share Screen"
-            />
-          )} */}
-          {/* <ButtonIcon
-            size="large"
-            type="primary"
-            className={classNames(
-              'shadow-none border border-[#3A4250]',
-              !recording ? 'bg-[#28303E]' : 'bg-red-500 bg-opacity-30'
-            )}
-            onClick={() => setRecording(!recording)}
-            icon={<IconPlayerRecordFilled size={16} className={!recording ? 'text-white' : 'text-red-500'} />}
-            tooltip="Record"
-          /> */}
           <ButtonIcon
             size="large"
             type="primary"
@@ -259,6 +214,14 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             onClick={() => setOpenChat(!openChat)}
             icon={<MessageCircleIcon size={16} color="#FFFFFF" />}
             tooltip="Chat"
+          />
+          <ButtonIcon
+            size="large"
+            type="primary"
+            className="shadow-none border border-[#3A4250] bg-[#28303E]"
+            onClick={() => setOpenModalSettings(true)}
+            icon={<Settings2Icon size={16} color="#FFFFFF" />}
+            tooltip="Settings"
           />
           {isMobile && (
             <Popover
@@ -275,7 +238,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
                     </div>
                   </Copy>
                   <div
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => setOpenModalInvites(true)}
                     className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 text-white')}
                   >
                     <PlusIcon size={16} />
@@ -301,21 +264,24 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
         </div>
       </div>
       <Modal
-        open={openModal}
-        onCancel={() => setOpenModal(false)}
+        title="Invite"
+        open={openModalInvites}
+        onCancel={() => {
+          setOpenModalInvites(false)
+          setInviteEmail([])
+        }}
         onOk={onInvite}
         maskClosable={false}
         closable={false}
-        className={classNameModal}
-        cancelButtonProps={{
-          className: 'bg-transparent border-none text-white',
-        }}
         okButtonProps={{
           loading: isPendingInviteToRoom,
         }}
         destroyOnClose
         centered
       >
+        <Typography.Paragraph className="dark:text-gray-400 mb-2">
+          Invite people to join this meeting
+        </Typography.Paragraph>
         <Select
           mode="tags"
           id="select"
@@ -332,6 +298,55 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
           value={inviteEmail}
           onChange={(value) => setInviteEmail(value)}
         />
+      </Modal>
+      <Modal
+        title="Settings"
+        open={openModalSettings}
+        onCancel={() => setOpenModalSettings(false)}
+        footer={false}
+        destroyOnClose
+        centered
+      >
+        <div className="mb-4">
+          <Select
+            size="large"
+            suffixIcon={<Icon icon={<CameraIcon color="#0060FF" />} />}
+            options={map(videoInput, (d) => ({
+              label: d.label,
+              value: d.deviceId,
+            }))}
+            value={selectedVideoInput?.deviceId}
+            onChange={(value) => {
+              setSelectedVideoInput(find(videoInput, (d) => d.deviceId === value))
+              camStreamChanger({
+                video: {
+                  deviceId: value,
+                },
+              })
+            }}
+            className="w-full"
+          />
+        </div>
+        <div className="mb-4">
+          <Select
+            size="large"
+            suffixIcon={<Icon icon={<MicIcon color="#0060FF" />} />}
+            options={map(audioInput, (d) => ({
+              label: d.label,
+              value: d.deviceId,
+            }))}
+            value={selectedAudioInput?.deviceId}
+            onChange={(value) => {
+              setSelectedAudioInput(find(audioInput, (d) => d.deviceId === value))
+              micStreamChanger({
+                audio: {
+                  deviceId: value,
+                },
+              })
+            }}
+            className="w-full"
+          />
+        </div>
       </Modal>
     </div>
   )

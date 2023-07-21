@@ -39,6 +39,33 @@ export const MeetingWrapped = ({ room, participated, bluesea }: Props) => {
       { kind: StreamKinds.VIDEO, name: 'video_screen', simulcast: true },
     ]
   }, [])
+  const createAudio: [HTMLAudioElement, HTMLAudioElement, HTMLAudioElement] = useMemo(() => {
+    const audio1 = document.createElement('audio')
+    audio1.id = 'id-audio-1'
+    audio1.autoplay = true
+    audio1.hidden = false
+    const audio2 = document.createElement('audio')
+    audio2.id = 'id-audio-2'
+    audio2.autoplay = true
+    audio2.hidden = false
+    const audio3 = document.createElement('audio')
+    audio3.id = 'id-audio-3'
+    audio3.autoplay = true
+    audio3.hidden = false
+
+    return [audio1, audio2, audio3]
+  }, [])
+
+  useEffect(() => {
+    document.body.appendChild(createAudio[0])
+    document.body.appendChild(createAudio[1])
+    document.body.appendChild(createAudio[2])
+    return () => {
+      document.getElementById('id-audio-1')?.remove()
+      document.getElementById('id-audio-2')?.remove()
+      document.getElementById('id-audio-3')?.remove()
+    }
+  }, [createAudio])
   return (
     <BlueseaSessionProvider
       logLevel={LogLevel.WARN}
