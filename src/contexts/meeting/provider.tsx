@@ -11,12 +11,16 @@ export const MeetingContext = createContext({} as any)
 export interface MeetingUserStatus {
   online: boolean
   joining: string
+  audio?: boolean
+  video?: boolean
 }
+
+export type ParticipatingUser = Partial<User> & { online_at?: string; meetingStatus?: MeetingUserStatus }
 
 export const MeetingProvider = ({ children, room }: { children: React.ReactNode; room: RoomPopulated | null }) => {
   const { data: session } = useSession()
   const data = useMemo(() => {
-    const users = new MapContainer<string, Partial<User> & { online_at?: string; meetingStatus?: MeetingUserStatus }>()
+    const users = new MapContainer<string, ParticipatingUser>()
     const messages = new MapContainer<string, RoomMessageWithUser>()
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
 
@@ -70,7 +74,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
       presenceChannel
         .on('presence', { event: 'sync' }, () => {
           const newState = presenceChannel.presenceState()
-          const map = new Map<string, Partial<User> & { online_at?: string; meetingStatus?: MeetingUserStatus }>()
+          const map = new Map<string, ParticipatingUser>()
           for (const key in newState) {
             const userId = (newState[key] as any)[0].id
             if (userId) {
@@ -166,6 +170,11 @@ export const useMeetingMessages = () => {
 export const useMeetingUsersList = () => {
   const context = useMeeting()
   return useReactionList(context.data.users)
+}
+
+export const useOnlineMeetingUsersList = () => {
+  const users = useMeetingUsersList()
+  return users.filter((user) => (user as ParticipatingUser).meetingStatus?.online)
 }
 
 export const useMeetingUsers = () => {
