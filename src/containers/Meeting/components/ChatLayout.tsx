@@ -71,21 +71,25 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center border-b border-b-[#232C3C] h-16 px-4 bg-[#1D2431]">
+      <div className="flex items-center border-b dark:border-b-[#232C3C] h-16 px-4 dark:bg-[#1D2431] bg-white">
         <div className="text-lg text-[#9CA3AF]">Participants ({usersList?.length})</div>
       </div>
-      <div className="p-2 border-b border-b-[#232C3C]">
-        {/* List participating user by name and image and active status*/}
-        {map(usersList, (user: any) => (
-          <div className="flex items-center mb-2 last:mb-0" key={user.id}>
-            <img src={user.image} alt="" className="w-8 h-8 rounded-full" />
-            <div className="ml-2 text-[#9CA3AF]">{user.name}</div>
-            {renderUserStatus(user)}
+      <div className="border-b dark:border-b-[#232C3C] max-h-[300px] min-h-[50px]">
+        <Scrollbars className="h-full">
+          <div className="p-2 h-full">
+            {/* List participating user by name and image and active status*/}
+            {map(usersList, (user: any) => (
+              <div className="flex items-center mb-2 last:mb-0" key={user.id}>
+                <img src={user.image} alt="" className="w-8 h-8 rounded-full" />
+                <div className="ml-2 text-[#9CA3AF]">{user.name}</div>
+                {renderUserStatus(user)}
+              </div>
+            ))}
           </div>
-        ))}
+        </Scrollbars>
       </div>
       <div className="flex-1 flex flex-col">
-        <div className="flex items-center border-b border-b-[#232C3C] h-16 px-4 bg-[#1D2431]">
+        <div className="flex items-center border-b dark:border-b-[#232C3C] h-16 px-4 dark:bg-[#1D2431] bg-white">
           <div className="text-lg text-[#9CA3AF]">Chat</div>
         </div>
         <Scrollbars ref={ref}>
@@ -108,7 +112,7 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
         </Scrollbars>
       </div>
       <Form form={form} onFinish={onSend}>
-        <div className="flex items-center justify-center h-16 border-t border-t-[#232C3C]">
+        <div className="flex items-center justify-center h-16 border-t dark:border-t-[#232C3C]">
           <div className="flex items-center justify-between w-full px-4">
             <Form.Item className="mb-0 flex-1 mr-2" name="input">
               <Input
