@@ -28,7 +28,7 @@ export const Header: React.FC<Props> = () => {
   }, [])
 
   return (
-    <div className="h-16 flex items-center w-full bg-white">
+    <div className="h-16 flex items-center w-full">
       <Row align="middle" justify="space-between" className="w-full">
         <Col>
           <img src={LOGO_BLACK_LONG} alt="" className="h-8" />
@@ -36,7 +36,7 @@ export const Header: React.FC<Props> = () => {
         <Col>
           {user ? (
             <Space>
-              <Typography.Paragraph className="mb-0 text-lg">{date}</Typography.Paragraph>
+              <Typography.Paragraph className="mb-0 hidden md:block lg:text-lg">{date}</Typography.Paragraph>
               <Popover
                 placement="bottomRight"
                 overlayInnerStyle={{

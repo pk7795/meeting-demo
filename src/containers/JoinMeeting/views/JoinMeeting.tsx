@@ -1,6 +1,6 @@
 'use client'
 
-import { Col, Form, Input, Modal, Popover, Row, Space, Table, Typography } from 'antd'
+import { Col, Form, Input, Modal, Popover, Row, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import { isEmpty, map } from 'lodash'
 import { HashIcon, LogInIcon, XIcon } from 'lucide-react'
@@ -12,7 +12,7 @@ import { SCREEN } from '@public'
 import { IconBrandGithub, IconBrandGoogle, IconLogin, IconVideoPlus } from '@tabler/icons-react'
 import { OneMyRooms, OneRoomInvite } from '@/app/(join-meeting)/page'
 import { createRoom } from '@/app/actions'
-import { ButtonIcon, CardPrimary, Copy, Icon, useApp } from '@/components'
+import { ButtonIcon, CardPrimary, Copy, Icon, Table, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
 import { GlobalContextProvider } from '@/contexts'
 import { MainLayout } from '@/layouts'
@@ -52,7 +52,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
         setInvites([roomInvite])
       }
     },
-    [invites, supabase]
+    [invites]
   )
 
   const onCreateRoom = useCallback(
@@ -106,7 +106,8 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
         roomInviteSubscription?.unsubscribe()
       }
     }
-  }, [onNewInvite, supabase, user])
+  }, [onNewInvite, user])
+
   return (
     <MainLayout>
       <div className="container p-6 m-auto">
@@ -150,8 +151,8 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                   }
                   trigger="hover"
                 >
-                  <ButtonIcon type="primary" size="large" className="mr-2 px-6 h-12" icon={<LogInIcon size={16} />}>
-                    Sign in to start meeting
+                  <ButtonIcon type="primary" size="large" className="mr-2 h-12" icon={<LogInIcon size={16} />}>
+                    Sign in <span className="hidden md:inline">to start meeting</span>
                   </ButtonIcon>
                 </Popover>
               ) : (
@@ -159,7 +160,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                   type="primary"
                   size="large"
                   onClick={() => setOpenCreateRoomModal(true)}
-                  className="mr-2 px-6 h-12"
+                  className="mr-2 h-12"
                   icon={<IconVideoPlus />}
                 >
                   New meeting
@@ -170,7 +171,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                 ghost
                 size="large"
                 onClick={() => setOpenJoinRoomModal(true)}
-                className="px-6 h-12"
+                className="h-12"
                 icon={<IconLogin />}
               >
                 Join meeting
@@ -204,7 +205,9 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                       render: (passcode) => (
                         <Space size="small">
                           <Icon icon={<HashIcon size={16} />} />
-                          <Copy text={passcode}>{passcode}</Copy>
+                          <Copy text={passcode}>
+                            <div className="whitespace-nowrap">{passcode}</div>
+                          </Copy>
                         </Space>
                       ),
                     },

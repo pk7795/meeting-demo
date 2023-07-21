@@ -21,7 +21,6 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
 
     const messagesMap = room!.messages.reduce((acc, message) => {
-      console.log('message', message)
       acc.set(message.id, {
         id: message.id,
         content: message.content,
@@ -58,7 +57,6 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     let presenceChannelSubscription: RealtimeChannel | null = null
     if (session?.user.id) {
       const userPresenceKey = session?.user.id
-      console.log('key', userPresenceKey)
 
       const presenceChannel = supabase.channel(`room:${room!.id}:presence`, {
         config: {
@@ -86,7 +84,6 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
             }
           }
           users.setBatch(map)
-          console.log('sync', newState)
         })
         .on('presence', { event: 'join' }, ({ key, newPresences }) => {
           console.log('join', key, newPresences)

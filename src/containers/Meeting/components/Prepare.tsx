@@ -76,7 +76,7 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
 
   return (
     <MainLayout>
-      <div className="lg:w-[1024px] mt-24 m-auto h-[calc(100vh-40px)]">
+      <div className="lg:w-[1024px] mt-24 m-auto h-[calc(100vh-40px)] px-4">
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
             <div className="h-[400px] bg-black rounded-xl overflow-hidden">
@@ -118,10 +118,10 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
                   </Space>
                 </>
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center">
+                <div className="w-full h-full flex flex-col items-center justify-center p-4">
                   <Icon icon={<CameraIcon color="#FFF" size={64} />} />
-                  <div className="text-white">Do you want people to see and hear you in the meeting?</div>
-                  <div className="text-gray-500 text-xs">
+                  <div className="text-white text-center">Do you want people to see and hear you in the meeting?</div>
+                  <div className="text-gray-500 text-xs text-center">
                     Allow access to your camera and microphone to start the meeting
                   </div>
                 </div>
