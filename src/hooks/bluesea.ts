@@ -25,6 +25,8 @@ export const usePeerRemoteStreamActive = (peer_id: string, name: string): Stream
       return () => {
         stream.off(StreamRemoteEvent.STATE, handler)
       }
+    } else {
+      setActiveStream(undefined)
     }
   }, [stream])
   return activeStream
