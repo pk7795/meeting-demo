@@ -1,9 +1,9 @@
 'use client'
 
-import { Input } from 'antd'
+import { Form, Input } from 'antd'
 import { map } from 'lodash'
 import { SendIcon } from 'lucide-react'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
 import { createMessage } from '@/app/actions/chat'
@@ -17,24 +17,32 @@ type Props = {
 
 export const ChatLayout: React.FC<Props> = ({ room }) => {
   const ref = useRef<Scrollbars>(null)
-  const [input, setInput] = useState('')
+  const refInput = useRef<any>(null)
+  const [form] = Form.useForm()
 
   const messages = useMeetingMessages()
   const usersList = useMeetingUsersList()
   const users = useMeetingUsers()
 
-  const onSend = useCallback(() => {
-    if (!input) return
-    createMessage({
-      data: {
-        content: input,
-        roomId: room!.id!,
-      },
-    }).then(() => {
-      setInput('')
-      ref.current?.scrollToBottom()
-    })
-  }, [input, room])
+  useEffect(() => {
+    ref.current?.scrollToBottom()
+  }, [messages])
+
+  const onSend = useCallback(
+    (values: { input: string }) => {
+      if (!values?.input) return
+      createMessage({
+        data: {
+          content: values?.input,
+          roomId: room!.id!,
+        },
+      }).then(() => {
+        form.setFieldValue('input', '')
+        refInput.current?.focus()
+      })
+    },
+    [form, room]
+  )
 
   // TODO: add type
   const renderUserStatus = useCallback((user: any) => {
@@ -82,7 +90,7 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
         </div>
         <Scrollbars ref={ref}>
           <div className="p-2">
-            {messages.map((message: any) => (
+            {map(messages, (message: any) => (
               <div key={message.id} className="mb-2">
                 <div className="flex items-center">
                   <img src={getMessageUser(message).image} alt="" className="w-8 h-8 rounded-full mr-2" />
@@ -99,19 +107,21 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
           </div>
         </Scrollbars>
       </div>
-      <div className="flex items-center justify-center h-16 border-t border-t-[#232C3C]">
-        <div className="flex items-center justify-between w-full px-4">
-          <Input
-            size="large"
-            className="bg-transparent border-transparent flex-1 mr-2 text-[#6B7280] placeholder:text-[#6B7280]"
-            placeholder="Type something..."
-            onPressEnter={onSend}
-            onChange={(e) => setInput(e.target.value)}
-            value={input}
-          />
-          <ButtonIcon size="large" type="primary" onClick={onSend} icon={<SendIcon size={16} />} />
+      <Form form={form} onFinish={onSend}>
+        <div className="flex items-center justify-center h-16 border-t border-t-[#232C3C]">
+          <div className="flex items-center justify-between w-full px-4">
+            <Form.Item className="mb-0 flex-1 mr-2" name="input">
+              <Input
+                ref={refInput}
+                size="large"
+                className="bg-transparent border-transparent flex-1 text-[#6B7280] placeholder:text-[#6B7280]"
+                placeholder="Type something..."
+              />
+            </Form.Item>
+            <ButtonIcon htmlType="submit" size="large" type="primary" icon={<SendIcon size={16} />} />
+          </div>
         </div>
-      </div>
+      </Form>
     </div>
   )
 }

@@ -105,9 +105,9 @@ export const Meeting: React.FC<Props> = ({ room, bluesea }) => {
     document.body.appendChild(createAudio[1])
     document.body.appendChild(createAudio[2])
     return () => {
-      document.body.removeChild(createAudio[0])
-      document.body.removeChild(createAudio[1])
-      document.body.removeChild(createAudio[2])
+      document.getElementById('id-audio-1')?.remove()
+      document.getElementById('id-audio-2')?.remove()
+      document.getElementById('id-audio-3')?.remove()
     }
   }, [createAudio])
 
