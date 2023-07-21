@@ -202,11 +202,21 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const audioSlot1Level = audioSlot1?.audio_level ?? -Infinity
     const audioSlot2Level = audioSlot2?.audio_level ?? -Infinity
 
-    if (audioSlot0Level > audioSlot1Level && audioSlot0Level > audioSlot2Level) {
+    const minAudioLevel = -50
+
+    if (audioSlot0Level > minAudioLevel && audioSlot0Level > audioSlot1Level && audioSlot0Level > audioSlot2Level) {
       setTalkingUserId(audioSlot0?.peer_id ?? '')
-    } else if (audioSlot1Level > audioSlot0Level && audioSlot1Level > audioSlot2Level) {
+    } else if (
+      audioSlot1Level > minAudioLevel &&
+      audioSlot1Level > audioSlot0Level &&
+      audioSlot1Level > audioSlot2Level
+    ) {
       setTalkingUserId(audioSlot1?.peer_id ?? '')
-    } else if (audioSlot2Level > audioSlot0Level && audioSlot2Level > audioSlot1Level) {
+    } else if (
+      audioSlot2Level > minAudioLevel &&
+      audioSlot2Level > audioSlot0Level &&
+      audioSlot2Level > audioSlot1Level
+    ) {
       setTalkingUserId(audioSlot2?.peer_id ?? '')
     }
   }, [audioSlot0, audioSlot1, audioSlot2, setTalkingUserId])
