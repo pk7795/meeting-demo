@@ -1,15 +1,17 @@
 'use client'
 
 import { Col, Divider, Input, Row, Select, Space, Typography } from 'antd'
+import { useSharedUserMedia, VideoViewer } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { filter, find, map } from 'lodash'
-import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon, Volume2Icon } from 'lucide-react'
+import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import Webcam from 'react-webcam'
 import { createRoomParticipant } from '@/app/actions'
 import { ButtonIcon, Icon } from '@/components'
+import { useSelectedCam, useSelectedMic } from '@/contexts'
 import { MainLayout } from '@/layouts'
 
 type Props = {
@@ -24,32 +26,55 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
   const params = useParams()
   const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
   const [videoInput, setVideoInput] = useState<MediaDeviceInfo[]>([])
-  const [selectedVideoInput, setSelectedVideoInput] = useState<MediaDeviceInfo>()
+  const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
 
   const [audioInput, setAudioInput] = useState<MediaDeviceInfo[]>([])
-  const [selectedAudioInput, setSelectedAudioInput] = useState<MediaDeviceInfo>()
-
-  const [audioOutput, setAudioOutput] = useState<MediaDeviceInfo[]>([])
-  const [selectedAudioOutput, setSelectedAudioOutput] = useState<MediaDeviceInfo>()
+  const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
   const [error, setError] = useState(false)
 
   const [mic, setMic] = useState(false)
   const [camera, setCamera] = useState(false)
 
-  const handleDevices = useCallback((mediaDevices: MediaDeviceInfo[]) => {
-    const videoInput = filter(mediaDevices, ({ kind }) => kind === 'videoinput')
-    setVideoInput(videoInput)
-    setSelectedVideoInput(videoInput[0])
+  const [micStream, micError, micStreamChanger] = useSharedUserMedia('mic_device')
+  const [camStream, camError, camStreamChanger] = useSharedUserMedia('camera_device')
 
-    const audioInput = filter(mediaDevices, ({ kind }) => kind === 'audioinput')
-    setAudioInput(audioInput)
-    setSelectedAudioInput(audioInput[0])
+  useEffect(() => {
+    if (mic) {
+      micStreamChanger({
+        audio: {
+          deviceId: selectedAudioInput?.deviceId,
+        },
+      })
+    } else {
+      micStreamChanger(undefined)
+    }
+  }, [mic, micStreamChanger, selectedAudioInput?.deviceId])
 
-    const audioOutput = filter(mediaDevices, ({ kind }) => kind === 'audiooutput')
-    setAudioOutput(audioOutput)
-    setSelectedAudioOutput(audioOutput[0])
-  }, [])
+  useEffect(() => {
+    if (camera) {
+      camStreamChanger({
+        video: {
+          deviceId: selectedVideoInput?.deviceId,
+        },
+      })
+    } else {
+      camStreamChanger(undefined)
+    }
+  }, [camStreamChanger, camera, selectedVideoInput?.deviceId])
+
+  const handleDevices = useCallback(
+    (mediaDevices: MediaDeviceInfo[]) => {
+      const videoInput = filter(mediaDevices, ({ kind }) => kind === 'videoinput')
+      setVideoInput(videoInput)
+      setSelectedVideoInput(videoInput[0])
+
+      const audioInput = filter(mediaDevices, ({ kind }) => kind === 'audioinput')
+      setAudioInput(audioInput)
+      setSelectedAudioInput(audioInput[0])
+    },
+    [setSelectedAudioInput, setSelectedVideoInput]
+  )
 
   useEffect(() => {
     const askCameraPermission = async (): Promise<MediaStream | null> =>
@@ -83,14 +108,8 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
             <div className="h-[400px] bg-black rounded-xl overflow-hidden border dark:border-slate-800">
               {!error && selectedVideoInput ? (
                 <>
-                  {camera ? (
-                    <Webcam
-                      audio={mic}
-                      audioConstraints={{ deviceId: selectedAudioInput?.deviceId }}
-                      videoConstraints={{ deviceId: selectedVideoInput?.deviceId }}
-                      className="w-full h-full"
-                      mirrored
-                    />
+                  {camStream ? (
+                    <VideoViewer stream={camStream} className="w-full h-full" />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center">
                       <Icon icon={<CameraIcon color="#FFF" size={64} />} />
@@ -177,19 +196,6 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
                       }))}
                       value={selectedAudioInput?.deviceId}
                       onChange={(value) => setSelectedAudioInput(find(audioInput, (d) => d.deviceId === value))}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <Select
-                      size="large"
-                      suffixIcon={<Icon icon={<Volume2Icon color="#0060FF" />} />}
-                      options={map(audioOutput, (d) => ({
-                        label: d.label,
-                        value: d.deviceId,
-                      }))}
-                      value={selectedAudioOutput?.deviceId}
-                      onChange={(value) => setSelectedAudioOutput(find(audioOutput, (d) => d.deviceId === value))}
                       className="w-full"
                     />
                   </div>

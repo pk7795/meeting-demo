@@ -47,6 +47,9 @@ export const Meeting: React.FC<Props> = ({ room, participated, bluesea }) => {
   const [openChat, setOpenChat] = useState(false)
   const { isMobile } = useDevice()
 
+  useSharedUserMedia('mic_device')
+  useSharedUserMedia('camera_device')
+
   const [, setMeetingUserState] = useMeetingUserState()
 
   useEffect(() => {

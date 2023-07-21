@@ -26,6 +26,7 @@ import { inviteToRoom } from '@/app/actions'
 import { OneUserInvite } from '@/app/meeting/[passcode]/page'
 import { ButtonIcon, Copy, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
+import { useSelectedCam, useSelectedMic } from '@/contexts'
 import { useDevice } from '@/hooks'
 import { BlueseaSenders } from '@/lib/consts'
 
@@ -40,21 +41,18 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [micPubState, micPublisherStream] = usePublisherState(micPublisher)
   const [camPubState, camPublisherStream] = usePublisherState(camPublisher)
 
-  const [micStream, micError, micStreamChanger] = useSharedUserMedia('mic_device')
-  const [camStream, camError, camStreamChanger] = useSharedUserMedia('camera_device')
-
-  useEffect(() => {
-    micStreamChanger({ audio: true })
-    camStreamChanger({ video: true })
-  }, [])
+  const [micStream, , micStreamChanger] = useSharedUserMedia('mic_device')
+  const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
+  const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
+  const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
   useEffect(() => {
     micPublisher.switchStream(micStream)
-  }, [micStream])
+  }, [micPublisher, micStream])
 
   useEffect(() => {
     camPublisher.switchStream(camStream)
-  }, [camStream])
+  }, [camPublisher, camStream])
 
   const params = useParams()
   const { modal, message } = useApp()
@@ -95,17 +93,25 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
     if (micPublisherStream) {
       micStreamChanger(undefined)
     } else {
-      micStreamChanger({ audio: true })
+      micStreamChanger({
+        audio: {
+          deviceId: selectedAudioInput?.deviceId,
+        },
+      })
     }
-  }, [micPublisherStream])
+  }, [micPublisherStream, micStreamChanger, selectedAudioInput?.deviceId])
 
   const toggleCam = useCallback(() => {
     if (camPublisherStream) {
       camStreamChanger(undefined)
     } else {
-      camStreamChanger({ video: true })
+      camStreamChanger({
+        video: {
+          deviceId: selectedVideoInput?.deviceId,
+        },
+      })
     }
-  }, [camPublisherStream])
+  }, [camPublisherStream, camStreamChanger, selectedVideoInput?.deviceId])
 
   const onInvite = useCallback(() => {
     startTransitionInviteToRoom(() => {

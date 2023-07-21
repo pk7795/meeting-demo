@@ -27,6 +27,8 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const users = new MapContainer<string, ParticipatingUser>()
     const messages = new MapContainer<string, RoomMessageWithUser>()
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
+    const selectedMic = new DataContainer<MediaDeviceInfo | null>(null)
+    const selectedCam = new DataContainer<MediaDeviceInfo | null>(null)
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -144,6 +146,8 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
       users,
       messages,
       userState,
+      selectedMic,
+      selectedCam,
       destroy,
     }
   }, [room, session?.user.id, session?.user.image, session?.user.name])
@@ -189,6 +193,18 @@ export const useMeetingUsers = () => {
 
 export const useMeetingUserState = () => {
   const context = useMeeting()
-  const state = useReactionData<DataContainer<MeetingUserStatus>>(context.data.userState)
+  const state = useReactionData<MeetingUserStatus>(context.data.userState)
   return [state, context.setUserState] as const
+}
+
+export const useSelectedMic = () => {
+  const context = useMeeting()
+  const state = useReactionData<MediaDeviceInfo | null>(context.data.selectedMic)
+  return [state, context.data.selectedMic.change] as const
+}
+
+export const useSelectedCam = () => {
+  const context = useMeeting()
+  const state = useReactionData<MediaDeviceInfo | null>(context.data.selectedCam)
+  return [state, context.data.selectedCam.change] as const
 }
