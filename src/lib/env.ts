@@ -8,4 +8,9 @@ export const env = {
   GITHUB_SECRET: process.env.GITHUB_SECRET as string,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
+  BLUESEA_CONFIG: {
+    api: process.env.BLUESEA_API as string,
+    gateway: process.env.BLUESEA_GATEWAY as string,
+    appToken: process.env.BLUESEA_APP_TOKEN as string,
+  },
 } as const
