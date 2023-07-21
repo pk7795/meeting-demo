@@ -4,6 +4,7 @@ import { usePeerRemoteStream } from 'bluesea-media-react-sdk'
 import { MicIcon, MicOffIcon } from 'lucide-react'
 import { Icon } from '@/components'
 import { ParticipatingUser } from '@/contexts'
+import { usePeerRemoteStreamActive } from '@/hooks'
 import { BlueseaSenders, BlueseaStreamPriority } from '@/lib/consts'
 
 type Props = {
@@ -11,8 +12,8 @@ type Props = {
 }
 
 export const RemoteUser = ({ user }: Props) => {
-  const audioStream = usePeerRemoteStream(user.id!, BlueseaSenders.audio.name)
-  const videoStream = usePeerRemoteStream(user.id!, BlueseaSenders.video.name)
+  const audioStream = usePeerRemoteStreamActive(user.id!, BlueseaSenders.audio.name)
+  const videoStream = usePeerRemoteStreamActive(user.id!, BlueseaSenders.video.name)
 
   return (
     <Col span={24} md={8} lg={6} key={user.name}>
