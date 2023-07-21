@@ -105,18 +105,18 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
       <div className="lg:w-[1024px] lg:mt-24 m-auto p-4">
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
-            <div className="h-[400px] bg-black rounded-xl overflow-hidden border dark:border-slate-800">
+            <div className="aspect-video bg-black rounded-xl overflow-hidden border dark:border-slate-800">
               {!error && selectedVideoInput ? (
                 <>
                   {camStream ? (
-                    <VideoViewer stream={camStream} className="w-full h-full" />
+                    <VideoViewer stream={camStream} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center">
-                      <Icon icon={<CameraIcon color="#FFF" size={64} />} />
+                      <Icon className="-mt-6" icon={<CameraIcon color="#FFF" size={64} />} />
                       <div className="text-white">Camera is off</div>
                     </div>
                   )}
-                  <Space size="large" className="absolute bottom-4 left-1/2 -translate-x-1/2">
+                  <Space className="absolute bottom-4 left-1/2 -translate-x-1/2">
                     <ButtonIcon
                       size="large"
                       type="primary"
@@ -149,7 +149,7 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
             </div>
           </Col>
           <Col span={24} lg={12}>
-            <div className="w-full mt-4">
+            <div className="w-full">
               {user ? (
                 <div className="mb-2">
                   <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">

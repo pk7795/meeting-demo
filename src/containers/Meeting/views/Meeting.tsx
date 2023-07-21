@@ -1,7 +1,7 @@
 'use client'
 
 import { Actions, ChatLayout, Prepare, ViewGrid, ViewLeft } from '../components'
-import { ConfigProvider, Space, theme } from 'antd'
+import { Space } from 'antd'
 import {
   BlueseaSessionProvider,
   LogLevel,
@@ -9,15 +9,18 @@ import {
   StreamKinds,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
+import dayjs from 'dayjs'
 import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
+import { useRecoilValue } from 'recoil'
 import { RoomParticipant } from '@prisma/client'
-import { LOGO_WHITE_LONG } from '@public'
+import { LOGO_BLACK_LONG, LOGO_WHITE_LONG } from '@public'
 import { ButtonIcon, Drawer } from '@/components'
 import { MeetingProvider, useMeetingUserState } from '@/contexts'
 import { useDevice } from '@/hooks'
 import { BlueseaSession } from '@/lib/bluesea'
+import { themeState } from '@/recoil'
 import { RoomPopulated } from '@/types/types'
 
 type Props = {
@@ -91,6 +94,15 @@ export const Meeting: React.FC<Omit<Props, 'bluesea'>> = ({ room }) => {
   const [layout, setLayout] = useState<Layout>(Layout.GRID)
   const [openChat, setOpenChat] = useState(false)
   const { isMobile } = useDevice()
+  const theme = useRecoilValue(themeState)
+  const [date, setDate] = useState(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDate(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   useSharedUserMedia('mic_device')
   useSharedUserMedia('camera_device')
@@ -124,67 +136,71 @@ export const Meeting: React.FC<Omit<Props, 'bluesea'>> = ({ room }) => {
   }
 
   return isJoined ? (
-    <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-      <div className="dark:bg-dark_ebony h-screen" id="full-screen">
-        <div className="h-full flex items-center">
-          <div className="flex-1 h-full flex flex-col">
-            <div className="flex items-center justify-between border-b border-b-[#232C3C] h-16 px-4 bg-[#17202E]">
+    <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen" id="full-screen">
+      <div className="h-full flex items-center">
+        <div className="flex-1 h-full flex flex-col">
+          <div className="flex items-center justify-between border-b dark:border-b-[#232C3C] h-16 px-4 bg-white dark:bg-[#17202E]">
+            <Space>
               <Link href="/">
-                <img src={LOGO_WHITE_LONG} alt="" className="h-8" />
+                <img src={theme === 'dark' ? LOGO_WHITE_LONG : LOGO_BLACK_LONG} alt="" className="h-8" />
               </Link>
-              {!isMobile && (
-                <Space>
-                  <ButtonIcon
-                    onClick={() => setLayout(Layout.GRID)}
-                    icon={<LayoutGridIcon size={16} color={layout === Layout.GRID ? '#fff' : '#525861'} />}
-                  />
-                  <ButtonIcon
-                    onClick={() => setLayout(Layout.LEFT)}
-                    icon={<LayoutPanelLeftIcon size={16} color={layout === Layout.LEFT ? '#fff' : '#525861'} />}
-                  />
-                  <ButtonIcon
-                    onClick={() => onOpenFullScreen()}
-                    icon={
-                      !isMaximize ? (
-                        <MaximizeIcon size={16} color="#525861" />
-                      ) : (
-                        <MinimizeIcon size={16} color="#525861" />
-                      )
-                    }
-                    className="__bluesea_video_viewer_fullscreen_button"
-                  />
-                </Space>
-              )}
-              {/* TODO: record */}
-              {/* <Space>
+              <div className="border-l dark:border-l-[#232C3C] ml-6 pl-6">
+                <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
+                <div className="dark:text-gray-400">{date}</div>
+              </div>
+            </Space>
+            {!isMobile && (
+              <Space>
+                <ButtonIcon
+                  onClick={() => setLayout(Layout.GRID)}
+                  icon={<LayoutGridIcon size={16} color={layout === Layout.GRID ? '#2D8CFF' : '#9ca3af'} />}
+                />
+                <ButtonIcon
+                  onClick={() => setLayout(Layout.LEFT)}
+                  icon={<LayoutPanelLeftIcon size={16} color={layout === Layout.LEFT ? '#2D8CFF' : '#9ca3af'} />}
+                />
+                <ButtonIcon
+                  onClick={() => onOpenFullScreen()}
+                  icon={
+                    !isMaximize ? (
+                      <MaximizeIcon size={16} color="#9ca3af" />
+                    ) : (
+                      <MinimizeIcon size={16} color="#9ca3af" />
+                    )
+                  }
+                  className="__bluesea_video_viewer_fullscreen_button"
+                />
+              </Space>
+            )}
+            {/* TODO: record */}
+            {/* <Space>
                 <div className="border border-[#3A4250] bg-[#28303E] rounded-lg flex items-center px-4 h-8">
                   <Icon className="mr-2" icon={<IconPlayerRecordFilled size={16} className="text-red-500" />} />
                   <span className="text-white">13:03:34</span>
                 </div>
               </Space> */}
-            </div>
-            <div className="flex-1 flex flex-col p-4 overflow-y-auto">
-              {layout === Layout.GRID && <ViewGrid />}
-              {layout === Layout.LEFT && !isMobile && <ViewLeft />}
-            </div>
-            <Actions openChat={openChat} setOpenChat={setOpenChat} />
           </div>
-          {!isMobile ? (
-            <>
-              {openChat && (
-                <div className="w-80 h-full bg-[#17202E] border-l border-l-[#232C3C]">
-                  <ChatLayout room={room} />
-                </div>
-              )}
-            </>
-          ) : (
-            <Drawer open={openChat} onClose={() => setOpenChat(false)} bodyStyle={{ padding: 0 }}>
-              <ChatLayout room={room} />
-            </Drawer>
-          )}
+          <div className="flex-1 flex flex-col p-4 overflow-y-auto">
+            {layout === Layout.GRID && <ViewGrid />}
+            {layout === Layout.LEFT && !isMobile && <ViewLeft />}
+          </div>
+          <Actions openChat={openChat} setOpenChat={setOpenChat} />
         </div>
+        {!isMobile ? (
+          <>
+            {openChat && (
+              <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
+                <ChatLayout room={room} />
+              </div>
+            )}
+          </>
+        ) : (
+          <Drawer open={openChat} onClose={() => setOpenChat(false)} bodyStyle={{ padding: 0 }}>
+            <ChatLayout room={room} />
+          </Drawer>
+        )}
       </div>
-    </ConfigProvider>
+    </div>
   ) : (
     <Prepare setIsJoined={setIsJoined} name={name} setName={setName} />
   )

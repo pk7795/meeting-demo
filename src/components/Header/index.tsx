@@ -48,10 +48,14 @@ export const Header: React.FC<Props> = () => {
   useEffect(() => {
     if (theme === 'dark') {
       document.body.classList.remove('light')
+      document.body.classList.remove('bg-white')
       document.body.classList.add('dark')
+      document.body.classList.add('bg-dark_ebony')
     } else {
       document.body.classList.remove('dark')
+      document.body.classList.remove('bg-dark_ebony')
       document.body.classList.add('light')
+      document.body.classList.add('bg-white')
     }
   }, [theme])
 

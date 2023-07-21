@@ -158,13 +158,13 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   }, [modal, router])
 
   return (
-    <div className="flex items-center justify-center h-16 bg-[#17202E] border-t border-t-[#232C3C]">
+    <div className="flex items-center justify-center h-16 bg-white dark:bg-[#17202E] border-t dark:border-t-[#232C3C]">
       <div className="flex items-center justify-between w-full px-6">
         {!isMobile && (
           <Space>
             <Copy text={params?.code as string}>
-              <div className="border border-[#3A4250] bg-[#28303E] rounded-lg flex items-center px-4 h-8 cursor-pointer">
-                <Typography.Paragraph ellipsis className="text-sm mb-0 mr-2 text-white w-[100px]">
+              <div className="border dark:border-[#3A4250] bg-[#F9FAFB] dark:bg-[#28303E] rounded-lg flex items-center px-4 h-8 cursor-pointer">
+                <Typography.Paragraph ellipsis className="text-sm mb-0 mr-2 dark:text-white w-[100px]">
                   {params?.passcode}
                 </Typography.Paragraph>
                 <CopyIcon size={16} color="#D1D5DB" />
@@ -174,7 +174,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
               icon={<PlusIcon size={16} />}
               size="middle"
               type="primary"
-              className="border border-[#3A4250] bg-[#28303E] shadow-none text-xs px-6"
+              className="border dark:border-[#3A4250] dark:bg-[#28303E] shadow-none text-xs px-6"
               onClick={() => setOpenModalInvites(true)}
             >
               Invite
@@ -186,9 +186,9 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             size="large"
             type="primary"
             className={classNames(
-              'shadow-none border border-[#3A4250]',
+              'shadow-none border dark:border-[#3A4250]',
               micPublisherStream ? 'bg-primary' : 'bg-red-500',
-              typeof audioLevel === 'number' && audioLevel > -40 && 'ring-2 ring-primary'
+              typeof audioLevel === 'number' && audioLevel > -40 && 'ring-2 ring-green-500'
             )}
             onClick={toggleMic}
             icon={micPublisherStream ? <MicIcon size={16} color="#FFFFFF" /> : <MicOffIcon size={16} color="#FFFFFF" />}
@@ -198,7 +198,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             size="large"
             type="primary"
             className={classNames(
-              'shadow-none border border-[#3A4250]',
+              'shadow-none border dark:border-[#3A4250]',
               camPublisherStream ? 'bg-primary' : 'bg-red-500'
             )}
             onClick={toggleCam}
@@ -210,17 +210,25 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
           <ButtonIcon
             size="large"
             type="primary"
-            className={classNames('shadow-none border border-[#3A4250]', !openChat ? 'bg-[#28303E]' : 'bg-primary')}
+            className={classNames(
+              'shadow-none border border-gray-200 dark:border-[#3A4250]',
+              !openChat ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
+            )}
             onClick={() => setOpenChat(!openChat)}
-            icon={<MessageCircleIcon size={16} color="#FFFFFF" />}
+            icon={
+              <MessageCircleIcon
+                size={16}
+                className={classNames('dark:text-white text-primary_text', openChat ? 'text-white' : '')}
+              />
+            }
             tooltip="Chat"
           />
           <ButtonIcon
             size="large"
             type="primary"
-            className="shadow-none border border-[#3A4250] bg-[#28303E]"
+            className="shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]"
             onClick={() => setOpenModalSettings(true)}
-            icon={<Settings2Icon size={16} color="#FFFFFF" />}
+            icon={<Settings2Icon size={16} className="dark:text-white text-primary_text" />}
             tooltip="Settings"
           />
           {isMobile && (
@@ -232,14 +240,18 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
               content={
                 <div>
                   <Copy text={params?.code as string}>
-                    <div className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 text-white')}>
+                    <div
+                      className={classNames(
+                        'h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white'
+                      )}
+                    >
                       <HashIcon size={16} />
                       <div className="text-sm ml-2">Copy passcode</div>
                     </div>
                   </Copy>
                   <div
                     onClick={() => setOpenModalInvites(true)}
-                    className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 text-white')}
+                    className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
                   >
                     <PlusIcon size={16} />
                     <div className="text-sm ml-2">Invite</div>
@@ -251,15 +263,15 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
               <ButtonIcon
                 size="large"
                 type="primary"
-                className="shadow-none border border-[#3A4250] bg-[#28303E]"
-                icon={<MoreHorizontalIcon size={16} color="#FFFFFF" />}
+                className="shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]"
+                icon={<MoreHorizontalIcon size={16} className="dark:text-white text-primary_text" />}
               />
             </Popover>
           )}
         </Space>
         <div>
           <ButtonIcon size="large" type="primary" className="bg-red-500 shadow-none text-xs px-6" onClick={onEndCall}>
-            {!isMobile ? 'Leave Meeting' : <PhoneOffIcon size={24} color="#FFFFFF" />}
+            {!isMobile ? 'Leave Meeting' : <PhoneOffIcon size={24} className="text-white" />}
           </ButtonIcon>
         </div>
       </div>
