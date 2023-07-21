@@ -1,5 +1,5 @@
 import { VideoViewerWrapper } from './VideoViewerWrapper'
-import { usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
+import { useAudioLevelProducer, usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { MicIcon, MicOffIcon } from 'lucide-react'
 import { Icon } from '@/components'
@@ -16,6 +16,10 @@ export const LocalUser = ({ user, isFullScreen }: Props) => {
   const micPublisher = usePublisher(BlueseaSenders.audio)
   const [, camPublisherStream] = usePublisherState(camPublisher)
   const [, micPublisherStream] = usePublisherState(micPublisher)
+  const audioLevel = useAudioLevelProducer(micPublisher)
+
+  // TODO: create function isAudible()
+  const minAudioLevel = -50
 
   const sizeIcon = isFullScreen ? 24 : 16
 
@@ -23,7 +27,8 @@ export const LocalUser = ({ user, isFullScreen }: Props) => {
     <div
       className={classNames(
         'w-full relative bg-black rounded-lg overflow-hidden',
-        !isFullScreen ? 'aspect-video' : 'h-full'
+        !isFullScreen ? 'aspect-video' : 'h-full',
+        typeof audioLevel === 'number' && audioLevel > minAudioLevel ? 'ring-2 ring-yellow-500' : ''
       )}
     >
       <VideoViewerWrapper stream={camPublisherStream} priority={100} user={user} isFullScreen={isFullScreen} />
