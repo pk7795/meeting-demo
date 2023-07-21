@@ -1,4 +1,4 @@
-import { JoinMeeting } from '@/containers'
+import { WrappedJoinMeeting } from '@/containers'
 import { getPrisma, getSessionUser } from '@/lib'
 
 export type OneRoomInvite = {
@@ -55,5 +55,5 @@ export default async function IndexJoinMeeting() {
     })
   }
 
-  return <JoinMeeting roomInvite={roomInvite} myRooms={myRooms} />
+  return <WrappedJoinMeeting roomInvite={roomInvite} myRooms={myRooms} />
 }

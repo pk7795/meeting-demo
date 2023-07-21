@@ -6,18 +6,27 @@ import { isEmpty, map } from 'lodash'
 import { HashIcon, LogInIcon, XIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useCallback, useState, useTransition } from 'react'
+import { useCallback, useEffect, useState, useTransition } from 'react'
+import { RoomInvite } from '@prisma/client'
 import { SCREEN } from '@public'
 import { IconBrandGithub, IconBrandGoogle, IconLogin, IconVideoPlus } from '@tabler/icons-react'
 import { OneMyRooms, OneRoomInvite } from '@/app/(join-meeting)/page'
 import { createRoom } from '@/app/actions'
 import { ButtonIcon, CardPrimary, Copy, Icon, useApp } from '@/components'
+import { supabase } from '@/config/supabase'
+import { GlobalContextProvider } from '@/contexts'
 import { MainLayout } from '@/layouts'
 
 type Props = {
   roomInvite: OneRoomInvite[] | null
   myRooms: OneMyRooms[] | null
 }
+
+export const WrappedJoinMeeting = ({ roomInvite, myRooms }: Props) => (
+  <GlobalContextProvider>
+    <JoinMeeting roomInvite={roomInvite} myRooms={myRooms} />
+  </GlobalContextProvider>
+)
 
 export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
   const { message } = useApp()
@@ -29,6 +38,22 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
   const [openJoinRoomModal, setOpenJoinRoomModal] = useState(false)
   const { data: user } = useSession()
   const [isPendingCreateRoom, startTransitionCreateRoom] = useTransition()
+  const [invites, setInvites] = useState<OneRoomInvite[] | null>(roomInvite)
+
+  const onNewInvite = useCallback(
+    async (invite: RoomInvite) => {
+      const room = await supabase.from('Room').select('*').eq('id', invite.roomId).single()
+
+      const roomInvite = { ...invite, room: room.data }
+
+      if (invites) {
+        setInvites([...invites, roomInvite])
+      } else {
+        setInvites([roomInvite])
+      }
+    },
+    [invites, supabase]
+  )
 
   const onCreateRoom = useCallback(
     ({ room_name }: { room_name: string }) => {
@@ -61,6 +86,27 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
     formJoinRoom.resetFields()
   }, [formCreateRoom, formJoinRoom])
 
+  useEffect(() => {
+    if (user) {
+      const roomInviteSubscription = supabase
+        .channel('room-invite:' + user!.user!.id)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'RoomInvite',
+            filter: 'email=eq.' + user!.user!.email,
+          },
+          (payload: { new: RoomInvite }) => onNewInvite(payload.new)
+        )
+        .subscribe()
+
+      return () => {
+        roomInviteSubscription?.unsubscribe()
+      }
+    }
+  }, [onNewInvite, supabase, user])
   return (
     <MainLayout>
       <div className="container p-6 m-auto">
@@ -187,12 +233,12 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
             </Col>
           </Row>
         )}
-        {!isEmpty(roomInvite) && (
+        {!isEmpty(invites) && (
           <Row className="mt-6">
             <Col span={24}>
               <CardPrimary title="My invites">
                 <Table
-                  dataSource={map(roomInvite, (r) => ({
+                  dataSource={map(invites, (r) => ({
                     ...r,
                     key: r.id,
                   }))}

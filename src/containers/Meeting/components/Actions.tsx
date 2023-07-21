@@ -10,6 +10,7 @@ import {
   MicIcon,
   MicOffIcon,
   PlusIcon,
+  RefreshCwIcon,
   ScreenShareIcon,
   VideoIcon,
   VideoOffIcon,
@@ -21,6 +22,7 @@ import { IconPlayerRecordFilled } from '@tabler/icons-react'
 import { inviteToRoom } from '@/app/actions'
 import { OneUserInvite } from '@/app/meeting/[passcode]/page'
 import { ButtonIcon, Copy, useApp } from '@/components'
+import { supabase } from '@/config/supabase'
 
 type Props = {
   userInvite: OneUserInvite[]
@@ -39,6 +41,8 @@ export const Actions: React.FC<Props> = ({ userInvite, openChat, setOpenChat }) 
   const [recording, setRecording] = useState(false)
   const [inviteEmail, setInviteEmail] = useState<string[]>([])
   const [isPendingInviteToRoom, startTransitionInviteToRoom] = useTransition()
+  const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
+  const [inviteOptions, setInviteOptions] = useState<OneUserInvite[]>([])
 
   const onInvite = useCallback(() => {
     startTransitionInviteToRoom(() => {
@@ -88,6 +92,18 @@ export const Actions: React.FC<Props> = ({ userInvite, openChat, setOpenChat }) 
       color: '#fff !important',
     },
   })
+
+  async function getAvailableInvites() {
+    const users = supabase
+      .from('User')
+      .select('id, name, email, emailVerified, image, role, status, createdAt, updatedAt')
+    const { data, error } = await users
+    if (error) {
+      console.log(error)
+      return []
+    }
+    return data
+  }
 
   return (
     <div className="flex items-center justify-center h-16 bg-[#17202E] border-t border-t-[#232C3C]">
@@ -183,9 +199,26 @@ export const Actions: React.FC<Props> = ({ userInvite, openChat, setOpenChat }) 
         destroyOnClose
         centered
       >
+        <ButtonIcon
+          icon={<RefreshCwIcon size={16} />}
+          size="middle"
+          type="primary"
+          loading={isLoadingAvailableInvites}
+          className="border border-[#3A4250] bg-[#28303E] shadow-none text-xs px-6 mb-4"
+          onClick={() => {
+            startTransitionAvailableInvites(() => {
+              getAvailableInvites().then((res) => {
+                setInviteOptions(res)
+              })
+            })
+          }}
+        >
+          Refresh{' '}
+        </ButtonIcon>
         <Select
           mode="tags"
           id="select"
+          loading={true}
           dropdownStyle={{
             backgroundColor: '#121825 !important',
           }}
