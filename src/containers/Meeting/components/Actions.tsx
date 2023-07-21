@@ -1,7 +1,13 @@
 'use client'
 
 import { Modal, Popover, Select, Space, Typography } from 'antd'
-import { StreamKinds, usePublisher, usePublisherState, useSharedUserMedia } from 'bluesea-media-react-sdk'
+import {
+  StreamKinds,
+  useAudioLevelProducer,
+  usePublisher,
+  usePublisherState,
+  useSharedUserMedia,
+} from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { map } from 'lodash'
 import {
@@ -45,6 +51,8 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
   const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
+
+  const audioLevel = useAudioLevelProducer(micPublisher)
 
   useEffect(() => {
     micPublisher.switchStream(micStream)
@@ -196,7 +204,9 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             onClick={toggleMic}
             icon={micPublisherStream ? <MicIcon size={16} color="#FFFFFF" /> : <MicOffIcon size={16} color="#FFFFFF" />}
             tooltip="Mute/Unmute"
-          />
+          >
+            {audioLevel}
+          </ButtonIcon>
           <ButtonIcon
             size="large"
             type="primary"
