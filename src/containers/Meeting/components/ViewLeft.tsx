@@ -5,9 +5,8 @@ import { RemoteUser } from './RemoteUser'
 import { Col, Row } from 'antd'
 import classNames from 'classnames'
 import { map } from 'lodash'
-import { useEffect } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
-import { useOnlineMeetingUsersList, usePinnedUser, useTalkingUserId } from '@/contexts/meeting'
+import { useOnlineMeetingUsersList, usePinnedUser } from '@/contexts/meeting'
 import { BlueseaStreamPriority } from '@/lib/consts'
 
 type Props = {}
@@ -15,13 +14,7 @@ type Props = {}
 export const ViewLeft: React.FC<Props> = () => {
   const users = useOnlineMeetingUsersList()
   const [pinnedUser, setPinnedUser] = usePinnedUser()
-  const talkingUserId = useTalkingUserId()
 
-  useEffect(() => {
-    if (talkingUserId) {
-      console.log('talkingUserId haha', talkingUserId)
-    }
-  }, [talkingUserId])
   const renderPinnedUser = () => {
     // if no user pinned then render a placeholder image
     // indicating that the user can pin a user
