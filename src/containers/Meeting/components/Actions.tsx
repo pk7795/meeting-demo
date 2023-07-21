@@ -65,26 +65,6 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const audioLevel = useAudioLevelProducer(micPublisher)
 
   useEffect(() => {
-    if (selectedVideoInput) {
-      camStreamChanger({
-        video: {
-          deviceId: selectedVideoInput?.deviceId,
-        },
-      })
-    }
-  }, [camStreamChanger, selectedVideoInput])
-
-  useEffect(() => {
-    if (selectedAudioInput) {
-      micStreamChanger({
-        audio: {
-          deviceId: selectedAudioInput?.deviceId,
-        },
-      })
-    }
-  }, [micStreamChanger, selectedAudioInput])
-
-  useEffect(() => {
     micPublisher.switchStream(micStream)
   }, [micPublisher, micStream])
 
@@ -329,6 +309,11 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             value={selectedVideoInput?.deviceId}
             onChange={(value) => {
               setSelectedVideoInput(find(videoInput, (d) => d.deviceId === value))
+              camStreamChanger({
+                video: {
+                  deviceId: value,
+                },
+              })
             }}
             className="w-full"
           />
@@ -344,6 +329,11 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
             value={selectedAudioInput?.deviceId}
             onChange={(value) => {
               setSelectedAudioInput(find(audioInput, (d) => d.deviceId === value))
+              micStreamChanger({
+                audio: {
+                  deviceId: value,
+                },
+              })
             }}
             className="w-full"
           />
