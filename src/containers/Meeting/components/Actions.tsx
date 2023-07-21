@@ -3,6 +3,7 @@
 import { Modal, Popover, Select, Space, Typography } from 'antd'
 import {
   StreamKinds,
+  useActions,
   useAudioLevelProducer,
   usePublisher,
   usePublisherState,
@@ -44,6 +45,7 @@ type Props = {
 
 export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const { data: user } = useSession()
+  const actions = useActions()
   const camPublisher = usePublisher(BlueseaSenders.video)
   const micPublisher = usePublisher(BlueseaSenders.audio)
   const [, micPublisherStream] = usePublisherState(micPublisher)
@@ -75,6 +77,10 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
   const [inviteOptions, setInviteOptions] = useState<OneUserInvite[]>([])
   const { isMobile } = useDevice()
+
+  useEffect(() => {
+    actions.connect()
+  }, [actions])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
