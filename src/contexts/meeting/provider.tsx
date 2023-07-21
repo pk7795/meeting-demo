@@ -29,6 +29,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     const userState = new DataContainer<MeetingUserStatus>({ online: false, joining: '' })
     const selectedMic = new DataContainer<MediaDeviceInfo | null>(null)
     const selectedCam = new DataContainer<MediaDeviceInfo | null>(null)
+    const pinnedUser = new DataContainer<ParticipatingUser | null>(null)
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -144,6 +145,7 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
 
     return {
       users,
+      pinnedUser,
       messages,
       userState,
       selectedMic,
@@ -163,7 +165,14 @@ export const MeetingProvider = ({ children, room }: { children: React.ReactNode;
     [data.userState]
   )
 
-  return <MeetingContext.Provider value={{ data, setUserState }}>{children}</MeetingContext.Provider>
+  const setPinnedUser = useCallback(
+    (user: ParticipatingUser | null) => {
+      data.pinnedUser.change(user)
+    },
+    [data.pinnedUser]
+  )
+
+  return <MeetingContext.Provider value={{ data, setUserState, setPinnedUser }}>{children}</MeetingContext.Provider>
 }
 
 export const useMeeting = () => {
@@ -207,4 +216,10 @@ export const useSelectedCam = () => {
   const context = useMeeting()
   const state = useReactionData<MediaDeviceInfo | null>(context.data.selectedCam)
   return [state, context.data.selectedCam.change] as const
+}
+
+export const usePinnedUser = () => {
+  const context = useMeeting()
+  const pinnedUser = useReactionData<ParticipatingUser | null>(context.data.pinnedUser)
+  return [pinnedUser, context.setPinnedUser] as const
 }

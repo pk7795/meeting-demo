@@ -7,8 +7,6 @@ import {
   LogLevel,
   MixMinusMode,
   StreamKinds,
-  useActions,
-  usePublisher,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
 import { LayoutGridIcon, LayoutPanelTop, MaximizeIcon, MinimizeIcon } from 'lucide-react'
@@ -39,7 +37,7 @@ export const MeetingWrapped = ({ room, participated, bluesea }: Props) => (
   </MeetingProvider>
 )
 
-export const Meeting: React.FC<Props> = ({ room, participated, bluesea }) => {
+export const Meeting: React.FC<Props> = ({ room, bluesea }) => {
   const [name, setName] = useState('')
   const [isJoined, setIsJoined] = useState(false)
   const [isMaximize, setIsMaximize] = useState(false)

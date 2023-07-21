@@ -8,7 +8,6 @@ import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'lucide
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
-import Webcam from 'react-webcam'
 import { createRoomParticipant } from '@/app/actions'
 import { ButtonIcon, Icon } from '@/components'
 import { useSelectedCam, useSelectedMic } from '@/contexts'
@@ -36,8 +35,8 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
   const [mic, setMic] = useState(false)
   const [camera, setCamera] = useState(false)
 
-  const [micStream, micError, micStreamChanger] = useSharedUserMedia('mic_device')
-  const [camStream, camError, camStreamChanger] = useSharedUserMedia('camera_device')
+  const [, , micStreamChanger] = useSharedUserMedia('mic_device')
+  const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
 
   useEffect(() => {
     if (mic) {
