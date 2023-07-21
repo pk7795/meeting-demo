@@ -17,13 +17,6 @@ export type OneUserInvite = {
 export default async function IndexMeeting({ params }: { params: { passcode?: string } }) {
   const prisma = getPrisma()
   const session = await getSessionUser()
-  const usersToInvite = await prisma.user.findMany({
-    where: {
-      id: {
-        not: session?.id,
-      },
-    },
-  })
   const userParticipated = await prisma.roomParticipant.findFirst({
     where: {
       userId: session?.id,
@@ -65,5 +58,5 @@ export default async function IndexMeeting({ params }: { params: { passcode?: st
     },
   })
 
-  return <MeetingWrapped userInvite={usersToInvite} room={room} participated={!!userParticipated} />
+  return <MeetingWrapped room={room} participated={!!userParticipated} />
 }
