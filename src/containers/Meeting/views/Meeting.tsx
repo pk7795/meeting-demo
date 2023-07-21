@@ -79,7 +79,7 @@ export const Meeting: React.FC<Props> = ({ room, participated, bluesea }) => {
 
   return isJoined ? (
     <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-      <div className="bg-[#101826] h-screen" id="full-screen">
+      <div className="dark:bg-dark_ebony h-screen" id="full-screen">
         <div className="h-full flex items-center">
           <div className="flex-1 h-full flex flex-col">
             <BlueseaSessionProvider

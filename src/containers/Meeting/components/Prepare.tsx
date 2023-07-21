@@ -80,7 +80,7 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
       <div className="lg:w-[1024px] lg:mt-24 m-auto p-4">
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
-            <div className="h-[400px] bg-black rounded-xl overflow-hidden">
+            <div className="h-[400px] bg-black rounded-xl overflow-hidden border dark:border-slate-800">
               {!error && selectedVideoInput ? (
                 <>
                   {camera ? (
@@ -133,13 +133,21 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
             <div className="w-full mt-4">
               {user ? (
                 <div className="mb-2">
-                  <Typography.Title className="font-semibold text-3xl mb-2">Ready to join?</Typography.Title>
-                  <Typography.Paragraph className="text-xl mb-0 font-light">{user?.user?.name}</Typography.Paragraph>
-                  <Typography.Paragraph className="text-xl mb-0 font-light">{user?.user?.email}</Typography.Paragraph>
+                  <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">
+                    Ready to join?
+                  </Typography.Title>
+                  <Typography.Paragraph className="text-xl mb-0 font-light dark:text-gray-400">
+                    {user?.user?.name}
+                  </Typography.Paragraph>
+                  <Typography.Paragraph className="text-xl mb-0 font-light dark:text-gray-400">
+                    {user?.user?.email}
+                  </Typography.Paragraph>
                 </div>
               ) : (
                 <div className="mb-4">
-                  <Typography.Title className="font-semibold text-3xl mb-2">What&apos;s your name?</Typography.Title>
+                  <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">
+                    What&apos;s your name?
+                  </Typography.Title>
                   <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter name" size="large" />
                 </div>
               )}

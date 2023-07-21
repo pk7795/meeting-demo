@@ -21,7 +21,11 @@ export const CardPrimary: React.FC<Props> = ({
 }) => {
   return (
     <Card
-      className={classNames('border border-gray-200', hoverable ? 'hover:shadow-sm cursor-pointer' : '', className)}
+      className={classNames(
+        'border border-gray-200 dark:border-slate-800',
+        hoverable ? 'hover:shadow-sm cursor-pointer' : '',
+        className
+      )}
       {...props}
     >
       <div className="flex items-center justify-between mb-3">

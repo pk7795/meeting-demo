@@ -117,10 +117,10 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
       <div className="container p-6 m-auto">
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
-            <Typography.Title className="font-semibold text-4xl">
+            <Typography.Title className="font-semibold text-4xl dark:text-gray-100">
               Premium video meetings. Now free for everyone.
             </Typography.Title>
-            <Typography.Paragraph className="font-extralight text-3xl">
+            <Typography.Paragraph className="font-extralight text-3xl dark:text-gray-400">
               We re-engineered the service we built for secure business meetings, Bluesea Meet, to make it free and
               available for all.
             </Typography.Paragraph>
@@ -183,7 +183,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
             </div>
           </Col>
           <Col span={24} lg={12}>
-            <img src={SCREEN} alt="" className="w-full" />
+            <img src={SCREEN} alt="" className="w-full rounded-md overflow-hidden" />
           </Col>
         </Row>
         {!isEmpty(myRooms) && (
