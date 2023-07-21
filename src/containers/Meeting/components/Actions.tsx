@@ -89,7 +89,6 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
     modal.confirm({
       title: 'Are you sure you want to end this call?',
       okText: 'End Call',
-      cancelText: 'Cancel',
       okButtonProps: {
         danger: true,
       },

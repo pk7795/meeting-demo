@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import { filter, find, map } from 'lodash'
 import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon, Volume2Icon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import Webcam from 'react-webcam'
 import { createRoomParticipant } from '@/app/actions'
@@ -20,6 +20,7 @@ type Props = {
 
 export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
   const { data: user } = useSession()
+  const router = useRouter()
   const params = useParams()
   const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
   const [videoInput, setVideoInput] = useState<MediaDeviceInfo[]>([])
@@ -76,7 +77,7 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
 
   return (
     <MainLayout>
-      <div className="lg:w-[1024px] mt-24 m-auto h-[calc(100vh-40px)] px-4">
+      <div className="lg:w-[1024px] lg:mt-24 m-auto p-4">
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
             <div className="h-[400px] bg-black rounded-xl overflow-hidden">
@@ -186,30 +187,21 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
                   </div>
                 </>
               )}
-              {user ? (
+              <div className="flex items-center mt-4">
+                <ButtonIcon onClick={() => router.push('/')} className="mr-2" type="default" size="large">
+                  Cancel
+                </ButtonIcon>
                 <ButtonIcon
                   loading={isPendingCreateRoomParticipant}
                   onClick={onJoinMeeting}
                   block
-                  className="mt-4"
                   type="primary"
                   size="large"
+                  disabled={!user && !name}
                 >
-                  Join now
+                  {user ? 'Join now' : 'Ask to join'}
                 </ButtonIcon>
-              ) : (
-                <ButtonIcon
-                  loading={isPendingCreateRoomParticipant}
-                  onClick={onJoinMeeting}
-                  block
-                  className="mt-4"
-                  type="primary"
-                  size="large"
-                  disabled={!name}
-                >
-                  Ask to join
-                </ButtonIcon>
-              )}
+              </div>
             </div>
           </Col>
         </Row>

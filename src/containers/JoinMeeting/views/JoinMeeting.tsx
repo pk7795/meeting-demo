@@ -306,7 +306,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
             <Input placeholder="Enter room name" size="large" />
           </Form.Item>
           <div className="flex items-center justify-between">
-            <ButtonIcon onClick={onCancel} type="primary" ghost size="large" className="flex-1 mr-2">
+            <ButtonIcon onClick={onCancel} type="default" size="large" className="flex-1 mr-2">
               Cancel
             </ButtonIcon>
             <ButtonIcon loading={isPendingCreateRoom} htmlType="submit" type="primary" size="large" className="flex-1">
@@ -330,7 +330,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
             <Input placeholder="Enter passcode" size="large" />
           </Form.Item>
           <div className="flex items-center justify-between">
-            <ButtonIcon onClick={onCancel} type="primary" ghost size="large" className="flex-1 mr-2">
+            <ButtonIcon onClick={onCancel} type="default" size="large" className="flex-1 mr-2">
               Cancel
             </ButtonIcon>
             <ButtonIcon htmlType="submit" type="primary" size="large" className="flex-1">

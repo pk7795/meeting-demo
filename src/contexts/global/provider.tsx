@@ -1,7 +1,7 @@
 import { Button, notification, Space } from 'antd'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { createContext, useCallback, useEffect, useMemo } from 'react'
+import { createContext, useCallback, useEffect } from 'react'
 import { RoomInvite } from '@prisma/client'
 import { supabase } from '@/config/supabase'
 
