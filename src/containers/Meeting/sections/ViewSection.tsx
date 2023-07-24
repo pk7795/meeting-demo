@@ -1,6 +1,6 @@
 'use client'
 
-import { LocalUser, RemoteUser } from '../components'
+import { LocalBigViewer, LocalUser, RemoteBigViewer, RemoteUser } from '../components'
 import { useOnlineMeetingParticipantsList, usePinnedParticipant } from '../contexts'
 import { Col, Row } from 'antd'
 import classNames from 'classnames'
@@ -8,7 +8,6 @@ import { isEmpty, map } from 'lodash'
 import { useEffect } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { useDevice } from '@/hooks'
-import { BlueseaStreamPriority } from '@/lib/consts'
 
 type Props = {
   layout: 'GRID' | 'LEFT'
@@ -25,23 +24,24 @@ export const ViewSection: React.FC<Props> = ({ layout }) => {
     }
   }, [pinnedParticipant, setPinnedParticipant, participants])
 
-  const renderPinnedUser = () => {
+  const renderBigViewer = () => {
     if (!pinnedParticipant) {
       return null
     } else {
       if (pinnedParticipant.is_me) {
-        return <LocalUser participant={pinnedParticipant} isFullScreen />
+        return <LocalBigViewer participant={pinnedParticipant} />
       } else {
-        return <RemoteUser participant={pinnedParticipant} priority={BlueseaStreamPriority.BigVideo} isFullScreen />
+        return <RemoteBigViewer participant={pinnedParticipant} />
       }
     }
   }
+
   return (
     <Row gutter={[16, 16]} className="h-full mx-0 md:-mx-2">
       {!isMobile && layout !== 'GRID' && (
         <Col span={24} lg={18}>
           <div className="w-full h-[calc(100vh-160px)] relative flex items-center bg-black rounded-lg">
-            {renderPinnedUser()}
+            {renderBigViewer()}
           </div>
         </Col>
       )}

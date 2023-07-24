@@ -1,5 +1,6 @@
 'use client'
 
+import { BlueseaSenders } from '../constants'
 import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
 import { Modal, Popover, Select, Space, Typography } from 'antd'
 import {
@@ -24,7 +25,6 @@ import {
   PhoneOffIcon,
   PlusIcon,
   ScreenShareIcon,
-  ScreenShareOffIcon,
   Settings2Icon,
   VideoIcon,
   VideoOffIcon,
@@ -37,7 +37,6 @@ import { inviteToRoom } from '@/app/actions'
 import { ButtonIcon, Copy, Icon, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
 import { useDevice } from '@/hooks'
-import { BlueseaSenders } from '@/lib/consts'
 
 type Props = {
   openChat: boolean
@@ -256,11 +255,10 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
             )}
             onClick={toggleScreen}
             icon={
-              screenPublisherStream ? (
-                <ScreenShareIcon size={16} color="#FFFFFF" />
-              ) : (
-                <ScreenShareOffIcon size={16} color="#FFFFFF" />
-              )
+              <ScreenShareIcon
+                size={16}
+                className={classNames('dark:text-white text-primary_text', screenPublisherStream ? 'text-white' : '')}
+              />
             }
             tooltip="Start/Stop Screen Share"
           />
