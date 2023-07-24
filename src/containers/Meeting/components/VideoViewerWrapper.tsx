@@ -14,8 +14,8 @@ export const VideoViewerWrapper: FC<Props> = ({ stream, priority, participant, i
   return stream ? (
     <VideoViewer className="w-full h-full object-cover" stream={stream} priority={priority} />
   ) : (
-    <div className="w-full h-full flex items-center justify-center">
-      <Avatar src={participant.user?.image} size={isFullScreen ? 120 : 64} className="bg-primary border-none">
+    <div className="w-full h-full flex items-center justify-center bg-black">
+      <Avatar src={participant.user?.image} size={isFullScreen ? 120 : 50} className="bg-primary border-none">
         {participant.name?.charAt(0)}
       </Avatar>
     </div>

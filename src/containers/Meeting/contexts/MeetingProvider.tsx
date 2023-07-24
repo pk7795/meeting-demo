@@ -1,5 +1,5 @@
 import { useAudioSlotMix } from 'bluesea-media-react-sdk'
-import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
@@ -303,6 +303,27 @@ export const usePinnedParticipant = () => {
   const context = useMeeting()
   const pinnedUser = useReactionData<MeetingParticipant | null>(context.data.pinnedPaticipant)
   return [pinnedUser, context.setPinnedParticipant] as const
+}
+
+export const usePinned = (id: string) => {
+  const context = useMeeting()
+  const [pinned, setPinned] = useState(context.data.pinnedPaticipant.data?.id === id)
+
+  console.log('--------------------------------------------------------')
+  console.log('context.data.pinnedPaticipant.data', context.data.pinnedPaticipant.data, id)
+  console.log('--------------------------------------------------------')
+
+  useEffect(() => {
+    const handle = () => {
+      setPinned(context.data.pinnedPaticipant.data?.id === id)
+    }
+    context.data.pinnedPaticipant.addChangeListener(handle)
+    handle()
+    return () => {
+      context.data.pinnedPaticipant.removeChangeListener(handle)
+    }
+  }, [context.data.pinnedPaticipant, id])
+  return pinned
 }
 
 export const useTalkingParticipantId = () => {

@@ -7,6 +7,7 @@ import {
   useAudioLevelProducer,
   usePublisher,
   usePublisherState,
+  useSharedDisplayMedia,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
@@ -22,6 +23,8 @@ import {
   MoreHorizontalIcon,
   PhoneOffIcon,
   PlusIcon,
+  ScreenShareIcon,
+  ScreenShareOffIcon,
   Settings2Icon,
   VideoIcon,
   VideoOffIcon,
@@ -29,8 +32,8 @@ import {
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
+import { UserRole, UserStatus } from '@prisma/client'
 import { inviteToRoom } from '@/app/actions'
-import { OneUserInvite } from '@/app/meeting/[passcode]/page'
 import { ButtonIcon, Copy, Icon, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
 import { useDevice } from '@/hooks'
@@ -41,7 +44,7 @@ type Props = {
   setOpenChat: (open: boolean) => void
 }
 
-export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
+export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const { data: user } = useSession()
   const actions = useActions()
   const params = useParams()
@@ -52,16 +55,32 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [inviteEmail, setInviteEmail] = useState<string[]>([])
   const [isPendingInviteToRoom, startTransitionInviteToRoom] = useTransition()
   const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
-  const [inviteOptions, setInviteOptions] = useState<OneUserInvite[]>([])
+  const [inviteOptions, setInviteOptions] = useState<
+    {
+      id: string
+      name: string | null
+      email: string | null
+      emailVerified: Date | null
+      image: string | null
+      role: UserRole
+      status: UserStatus
+      createdAt: Date
+      updatedAt: Date
+    }[]
+  >([])
   const { isMobile } = useDevice()
 
   const camPublisher = usePublisher(BlueseaSenders.video)
   const micPublisher = usePublisher(BlueseaSenders.audio)
+  const screenVideoPublisher = usePublisher(BlueseaSenders.screen_video)
+  const screenAudioPublisher = usePublisher(BlueseaSenders.screen_audio)
   const [, micPublisherStream] = usePublisherState(micPublisher)
   const [, camPublisherStream] = usePublisherState(camPublisher)
+  const [, screenPublisherStream] = usePublisherState(screenVideoPublisher)
 
   const [micStream, , micStreamChanger] = useSharedUserMedia('mic_device')
   const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
+  const [screenStream, , screenStreamChanger] = useSharedDisplayMedia('screen_device')
 
   const [videoInput] = useVideoInput()
   const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
@@ -70,9 +89,11 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
   const audioLevel = useAudioLevelProducer(micPublisher)
+
   useEffect(() => {
     actions.connect()
   }, [actions])
+
   useEffect(() => {
     micPublisher.switchStream(micStream)
   }, [micPublisher, micStream])
@@ -80,6 +101,14 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   useEffect(() => {
     camPublisher.switchStream(camStream)
   }, [camPublisher, camStream])
+
+  useEffect(() => {
+    screenAudioPublisher.switchStream(screenStream)
+  }, [screenAudioPublisher, screenStream])
+
+  useEffect(() => {
+    screenVideoPublisher.switchStream(screenStream)
+  }, [screenStream, screenVideoPublisher])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
@@ -128,6 +157,17 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
       })
     }
   }, [camPublisherStream, camStreamChanger, selectedVideoInput?.deviceId])
+
+  const toggleScreen = useCallback(() => {
+    if (screenPublisherStream) {
+      screenStreamChanger(undefined)
+    } else {
+      screenStreamChanger({
+        video: true,
+        audio: true,
+      })
+    }
+  }, [screenPublisherStream, screenStreamChanger])
 
   const onInvite = useCallback(() => {
     startTransitionInviteToRoom(() => {
@@ -206,6 +246,23 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
               camPublisherStream ? <VideoIcon size={16} color="#FFFFFF" /> : <VideoOffIcon size={16} color="#FFFFFF" />
             }
             tooltip="Start/Stop Camera"
+          />
+          <ButtonIcon
+            size="large"
+            type="primary"
+            className={classNames(
+              'shadow-none border border-gray-200 dark:border-[#3A4250]',
+              !screenPublisherStream ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
+            )}
+            onClick={toggleScreen}
+            icon={
+              screenPublisherStream ? (
+                <ScreenShareIcon size={16} color="#FFFFFF" />
+              ) : (
+                <ScreenShareOffIcon size={16} color="#FFFFFF" />
+              )
+            }
+            tooltip="Start/Stop Screen Share"
           />
           <ButtonIcon
             size="large"
