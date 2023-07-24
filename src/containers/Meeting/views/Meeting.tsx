@@ -1,14 +1,14 @@
 'use client'
 
-import { Actions, Prepare } from '../components'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
-import { ChatSection, ViewSection } from '../sections'
+import { ChatSection, PrepareSection, ToolbarSection, ViewSection } from '../sections'
 import { Space } from 'antd'
 import {
   BlueseaSessionProvider,
   LogLevel,
   MixMinusMode,
   StreamKinds,
+  useSharedDisplayMedia,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
 import dayjs from 'dayjs'
@@ -86,6 +86,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
 
   useSharedUserMedia('mic_device')
   useSharedUserMedia('camera_device')
+  useSharedDisplayMedia('screen_device')
 
   const onOpenFullScreen = () => {
     const el = document.getElementById('full-screen')
@@ -189,7 +190,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
                   <div className="flex-1 flex flex-col p-4 overflow-y-auto">
                     <ViewSection layout={layout} />
                   </div>
-                  <Actions openChat={openChat} setOpenChat={setOpenChat} />
+                  <ToolbarSection openChat={openChat} setOpenChat={setOpenChat} />
                 </div>
                 {!isMobile ? (
                   <>
@@ -209,7 +210,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
           </MeetingProvider>
         </BlueseaSessionProvider>
       ) : (
-        <Prepare
+        <PrepareSection
           onJoinMeeting={onJoinMeeting}
           isLoadingJoinMeeting={isPendingCreateRoomParticipant}
           name={name}

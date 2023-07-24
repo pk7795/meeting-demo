@@ -1,8 +1,25 @@
 import { StreamKinds } from 'bluesea-media-react-sdk'
 
 export const BlueseaSenders = {
-  video: { kind: StreamKinds.VIDEO, name: 'video_main', simulcast: true },
-  audio: { kind: StreamKinds.AUDIO, name: 'audio_main' },
+  video: {
+    kind: StreamKinds.VIDEO,
+    name: 'video_main',
+    simulcast: true,
+  },
+  audio: {
+    kind: StreamKinds.AUDIO,
+    name: 'audio_main',
+  },
+  screen_video: {
+    kind: StreamKinds.VIDEO,
+    name: 'video_screen',
+    simulcast: true,
+    screen: true,
+  },
+  screen_audio: {
+    kind: StreamKinds.AUDIO,
+    name: 'audio_screen',
+  },
 }
 
 export const BlueseaStreamPriority = {

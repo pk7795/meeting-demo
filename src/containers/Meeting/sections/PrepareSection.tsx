@@ -19,7 +19,7 @@ type Props = {
   setName: (name: string) => void
 }
 
-export const Prepare: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMeeting, name, setName }) => {
+export const PrepareSection: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMeeting, name, setName }) => {
   const { data: user } = useSession()
   const router = useRouter()
 
