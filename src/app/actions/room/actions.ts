@@ -31,13 +31,6 @@ export async function createRoom({ data }: { data: RoomInput }) {
         ownerId: session?.id as string,
       },
     })
-    await prisma.roomParticipant.create({
-      data: {
-        ...data,
-        roomId: res?.id as string,
-        userId: session?.id as string,
-      },
-    })
     return res
   }
 }

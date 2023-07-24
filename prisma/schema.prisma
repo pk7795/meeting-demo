@@ -71,7 +71,6 @@ model User {
   roomInvites      RoomInvite[]
   roomParticipants RoomParticipant[]
   rooms            Room[]
-  messages         Messages[]
 }
 
 model VerificationToken {
@@ -132,6 +131,7 @@ model RoomParticipant {
 
   room Room  @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages         Messages[]
 
   @@index([roomId])
   @@index([userId])
@@ -148,15 +148,15 @@ enum MessageType {
 model Messages {
   id        String      @id @default(cuid())
   roomId    String
-  userId    String
+  participantId    String
   content   String
   type      MessageType @default(TEXT)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 
   room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  participant RoomParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
 
   @@index([roomId])
-  @@index([userId])
+  @@index([participantId])
 }

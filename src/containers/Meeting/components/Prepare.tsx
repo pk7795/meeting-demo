@@ -1,29 +1,27 @@
 'use client'
 
+import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
 import { Col, Divider, Input, Row, Select, Space, Typography } from 'antd'
 import { useSharedUserMedia, VideoViewer } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { filter, find, map } from 'lodash'
 import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState, useTransition } from 'react'
-import { createRoomParticipant } from '@/app/actions'
+import { useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
 import { ButtonIcon, Icon } from '@/components'
-import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '@/contexts'
 import { MainLayout } from '@/layouts'
 
 type Props = {
-  setIsJoined: (isJoined: boolean) => void
+  onJoinMeeting: () => void
+  isLoadingJoinMeeting: boolean
   name: string
   setName: (name: string) => void
 }
 
-export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
+export const Prepare: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMeeting, name, setName }) => {
   const { data: user } = useSession()
   const router = useRouter()
-  const params = useParams()
-  const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
 
   const [videoInput, setVideoInput] = useVideoInput()
   const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
@@ -86,19 +84,6 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
       })
       .catch(() => setError(true))
   }, [handleDevices])
-
-  const onJoinMeeting = useCallback(() => {
-    startTransitionCreateRoomParticipant(() => {
-      createRoomParticipant({
-        data: {
-          name,
-          passcode: params?.passcode as string,
-        },
-      }).then(() => {
-        setIsJoined(true)
-      })
-    })
-  }, [name, params?.passcode, setIsJoined])
 
   return (
     <MainLayout>
@@ -206,7 +191,7 @@ export const Prepare: React.FC<Props> = ({ setIsJoined, name, setName }) => {
                   Cancel
                 </ButtonIcon>
                 <ButtonIcon
-                  loading={isPendingCreateRoomParticipant}
+                  loading={isLoadingJoinMeeting}
                   onClick={onJoinMeeting}
                   block
                   type="primary"

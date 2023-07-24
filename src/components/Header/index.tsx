@@ -1,17 +1,17 @@
 'use client'
 
-import { ButtonIcon } from '../Custom'
-import { Button, Col, Divider, Form, Input, Modal, Popover, Row, Space, Typography } from 'antd'
+import { Col, Divider, Popover, Row, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import dayjs from 'dayjs'
 import { LogInIcon, LogOutIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { LOGO_BLACK_LONG, LOGO_WHITE_LONG } from '@public'
 import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react'
+import { ButtonIcon } from '@/components'
 import { themeState } from '@/recoil'
 
 type Props = {}
@@ -23,20 +23,6 @@ export const Header: React.FC<Props> = () => {
   const [theme, setTheme] = useRecoilState(themeState)
 
   const [date, setDate] = useState(dayjs().format('hh:mm A • ddd, MMM DD'))
-  const [form] = Form.useForm()
-
-  const onFinish = useCallback(() => {
-    //
-  }, [])
-
-  useEffect(() => {
-    if (window.location.href.includes('localhost')) {
-      form.setFieldsValue({
-        email: 'admin@bluesea.live',
-        password: 'bluesea@123456',
-      })
-    }
-  }, [form])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -160,43 +146,6 @@ export const Header: React.FC<Props> = () => {
           </Space>
         </Col>
       </Row>
-      <Modal footer={false}>
-        <Form form={form} onFinish={onFinish} layout="vertical">
-          <Typography.Title level={4} className="dark:text-gray-100">
-            Sign In
-          </Typography.Title>
-          <Typography.Paragraph className="dark:text-gray-400">Please enter your details below.</Typography.Paragraph>
-          <Form.Item
-            name="email"
-            label="Email Address"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your email!',
-              },
-            ]}
-          >
-            <Input size="large" placeholder="example@email.com" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              {
-                required: true,
-                message: 'Please input your password!',
-              },
-            ]}
-          >
-            <Input.Password size="large" placeholder="Enter your password" />
-          </Form.Item>
-          <Form.Item>
-            <Button size="large" block type="primary" className="bg-primary" htmlType="submit">
-              Sign In
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   )
 }
