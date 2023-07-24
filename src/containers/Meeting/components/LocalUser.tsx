@@ -1,75 +1,46 @@
+import { BlueseaSenders } from '../constants'
 import { MeetingParticipant } from '../contexts'
-import { VideoViewerWrapper } from './VideoViewerWrapper'
-import {
-  MediaStreamArc,
-  StreamConsumer,
-  StreamConsumerPair,
-  StreamRemote,
-  useAudioLevelProducer,
-  usePublisher,
-  usePublisherState,
-  VideoViewer,
-} from 'bluesea-media-react-sdk'
-import classNames from 'classnames'
+import { Avatar } from 'antd'
+import { useAudioLevelProducer, usePublisher, usePublisherState, VideoViewer } from 'bluesea-media-react-sdk'
 import { MicIcon, MicOffIcon } from 'lucide-react'
+import { useMemo } from 'react'
 import { Icon } from '@/components'
-import { BlueseaSenders } from '@/lib/consts'
 
 type Props = {
   participant: MeetingParticipant
-  isFullScreen?: boolean
 }
 
-export const LocalUser = ({ participant, isFullScreen }: Props) => {
+const MIN_AUDIO_LEVEL = -50
+
+export const LocalUser = ({ participant }: Props) => {
   const camPublisher = usePublisher(BlueseaSenders.video)
   const micPublisher = usePublisher(BlueseaSenders.audio)
-  const screenVideoPublisher = usePublisher(BlueseaSenders.screen_video)
-  const [, camPublisherStream] = usePublisherState(camPublisher)
-  const [, micPublisherStream] = usePublisherState(micPublisher)
-  const [, screenPublisherStream] = usePublisherState(screenVideoPublisher)
+  const [, camStream] = usePublisherState(camPublisher)
+  const [, micStream] = usePublisherState(micPublisher)
 
   const audioLevel = useAudioLevelProducer(micPublisher)
-
-  // TODO: create function isAudible()
-  const minAudioLevel = -50
-
-  const sizeIcon = isFullScreen ? 24 : 16
+  const isTalking = useMemo(() => typeof audioLevel === 'number' && audioLevel > MIN_AUDIO_LEVEL, [audioLevel])
 
   return (
-    <div
-      className={classNames(
-        'w-full relative bg-black rounded-lg overflow-hidden',
-        screenPublisherStream ? 'aspect-video' : isFullScreen ? 'h-full' : 'aspect-video',
-        typeof audioLevel === 'number' && audioLevel > minAudioLevel ? 'ring-2 ring-yellow-500' : ''
-      )}
-    >
-      <div className={classNames(screenPublisherStream ? 'block' : 'hidden')}>
-        <VideoViewer
-          className="w-full h-full object-cover"
-          stream={
-            screenPublisherStream as MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer
-          }
-          priority={1000}
-        />
-      </div>
-      <div
-        className={classNames(
-          'rounded-lg overflow-hidden',
-          screenPublisherStream ? 'w-1/3 aspect-video absolute top-0 right-0' : 'w-full h-full'
+    <div className="w-full relative bg-black rounded-lg overflow-hidden aspect-video">
+      <div className="rounded-lg overflow-hidden w-full h-full">
+        {camStream ? (
+          <VideoViewer className="w-full h-full object-cover" stream={camStream} priority={100} />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-black">
+            <Avatar src={participant.user?.image} size={50} className="bg-primary border-none">
+              {participant.name?.charAt(0)}
+            </Avatar>
+          </div>
         )}
-      >
-        <VideoViewerWrapper
-          stream={camPublisherStream}
-          priority={100}
-          participant={participant}
-          isFullScreen={isFullScreen}
-        />
       </div>
       <div className="absolute bottom-0 left-0 p-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tr-lg rounded-bl-lg">
         {participant.name}
       </div>
       <div className="absolute bottom-0 right-0 p-2 text-white bg-[rgba(0,0,0,0.50)] rounded-tl-lg rounded-br-lg">
-        <Icon icon={micPublisherStream ? <MicIcon size={sizeIcon} /> : <MicOffIcon size={sizeIcon} />} />
+        <Icon
+          icon={micStream ? <MicIcon size={16} color={isTalking ? '#84cc16' : '#ffffff'} /> : <MicOffIcon size={16} />}
+        />
       </div>
     </div>
   )
