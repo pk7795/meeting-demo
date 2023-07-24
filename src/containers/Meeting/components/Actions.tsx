@@ -29,8 +29,8 @@ import {
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
+import { UserRole, UserStatus } from '@prisma/client'
 import { inviteToRoom } from '@/app/actions'
-import { OneUserInvite } from '@/app/meeting/[passcode]/page'
 import { ButtonIcon, Copy, Icon, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
 import { useDevice } from '@/hooks'
@@ -52,7 +52,19 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [inviteEmail, setInviteEmail] = useState<string[]>([])
   const [isPendingInviteToRoom, startTransitionInviteToRoom] = useTransition()
   const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
-  const [inviteOptions, setInviteOptions] = useState<OneUserInvite[]>([])
+  const [inviteOptions, setInviteOptions] = useState<
+    {
+      id: string
+      name: string | null
+      email: string | null
+      emailVerified: Date | null
+      image: string | null
+      role: UserRole
+      status: UserStatus
+      createdAt: Date
+      updatedAt: Date
+    }[]
+  >([])
   const { isMobile } = useDevice()
 
   const camPublisher = usePublisher(BlueseaSenders.video)

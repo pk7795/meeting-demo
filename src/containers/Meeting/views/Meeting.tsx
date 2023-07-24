@@ -1,7 +1,8 @@
 'use client'
 
-import { Actions, ChatLayout, Prepare, ViewGrid, ViewLeft } from '../components'
+import { Actions, Prepare } from '../components'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
+import { ChatSection, ViewSection } from '../sections'
 import { Space } from 'antd'
 import {
   BlueseaSessionProvider,
@@ -23,14 +24,10 @@ import { ButtonIcon, Drawer } from '@/components'
 import { useDevice } from '@/hooks'
 import { BlueseaSession } from '@/lib/bluesea'
 import { themeState } from '@/recoil'
+import { RoomPopulated } from '@/types/types'
 
 type Props = {
-  room: any
-}
-
-enum Layout {
-  GRID = 'grid',
-  LEFT = 'left',
+  room: RoomPopulated
 }
 
 export const Meeting: React.FC<Props> = ({ room }) => {
@@ -38,7 +35,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
   const params = useParams()
   const [name, setName] = useState('')
   const [isMaximize, setIsMaximize] = useState(false)
-  const [layout, setLayout] = useState<Layout>(Layout.GRID)
+  const [layout, setLayout] = useState<'GRID' | 'LEFT'>('GRID')
   const [openChat, setOpenChat] = useState(false)
   const { isMobile } = useDevice()
   const theme = useRecoilValue(themeState)
@@ -160,7 +157,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
                       <Link href="/">
                         <img src={theme === 'dark' ? LOGO_WHITE_LONG : LOGO_BLACK_LONG} alt="" className="h-8" />
                       </Link>
-                      <div className="border-l dark:border-l-[#232C3C] ml-6 pl-6">
+                      <div className="border-l dark:border-l-[#232C3C] ml-6 pl-6 hidden md:block">
                         <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
                         <div className="dark:text-gray-400">{date}</div>
                       </div>
@@ -168,14 +165,12 @@ export const Meeting: React.FC<Props> = ({ room }) => {
                     {!isMobile && (
                       <Space>
                         <ButtonIcon
-                          onClick={() => setLayout(Layout.GRID)}
-                          icon={<LayoutGridIcon size={16} color={layout === Layout.GRID ? '#2D8CFF' : '#9ca3af'} />}
+                          onClick={() => setLayout('GRID')}
+                          icon={<LayoutGridIcon size={16} color={layout === 'GRID' ? '#2D8CFF' : '#9ca3af'} />}
                         />
                         <ButtonIcon
-                          onClick={() => setLayout(Layout.LEFT)}
-                          icon={
-                            <LayoutPanelLeftIcon size={16} color={layout === Layout.LEFT ? '#2D8CFF' : '#9ca3af'} />
-                          }
+                          onClick={() => setLayout('LEFT')}
+                          icon={<LayoutPanelLeftIcon size={16} color={layout === 'LEFT' ? '#2D8CFF' : '#9ca3af'} />}
                         />
                         <ButtonIcon
                           onClick={() => onOpenFullScreen()}
@@ -190,17 +185,9 @@ export const Meeting: React.FC<Props> = ({ room }) => {
                         />
                       </Space>
                     )}
-                    {/* TODO: record */}
-                    {/* <Space>
-                <div className="border border-[#3A4250] bg-[#28303E] rounded-lg flex items-center px-4 h-8">
-                  <Icon className="mr-2" icon={<IconPlayerRecordFilled size={16} className="text-red-500" />} />
-                  <span className="text-white">13:03:34</span>
-                </div>
-              </Space> */}
                   </div>
                   <div className="flex-1 flex flex-col p-4 overflow-y-auto">
-                    {layout === Layout.GRID && <ViewGrid />}
-                    {layout === Layout.LEFT && !isMobile && <ViewLeft />}
+                    <ViewSection layout={layout} />
                   </div>
                   <Actions openChat={openChat} setOpenChat={setOpenChat} />
                 </div>
@@ -208,13 +195,13 @@ export const Meeting: React.FC<Props> = ({ room }) => {
                   <>
                     {openChat && (
                       <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
-                        <ChatLayout room={room} />
+                        <ChatSection room={room} />
                       </div>
                     )}
                   </>
                 ) : (
                   <Drawer open={openChat} onClose={() => setOpenChat(false)} bodyStyle={{ padding: 0 }}>
-                    <ChatLayout room={room} />
+                    <ChatSection room={room} />
                   </Drawer>
                 )}
               </div>

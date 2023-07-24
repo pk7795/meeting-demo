@@ -1,17 +1,35 @@
-import { UserRole, UserStatus } from '@prisma/client'
 import { Meeting } from '@/containers'
 import { getPrisma } from '@/lib'
 
-export type OneUserInvite = {
+export type OneRoom = {
   id: string
-  name: string | null
-  email: string | null
-  emailVerified: Date | null
-  image: string | null
-  role: UserRole
-  status: UserStatus
+  roomId: string
+  name: string
+  userId: string | null
+  joinedAt: Date
   createdAt: Date
   updatedAt: Date
+  user: {
+    id: string
+    name: string | null
+    image: string | null
+  } | null
+  messages: {
+    id: string
+    content: string
+    createdAt: Date
+    updatedAt: Date
+    participantId: string
+    participant: {
+      id: string
+      name: string
+      user: {
+        id: string
+        name: string | null
+        image: string | null
+      } | null
+    }
+  }[]
 }
 
 export default async function IndexMeeting({ params }: { params: { passcode: string } }) {

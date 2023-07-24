@@ -15,7 +15,7 @@ type Props = {
   room: Partial<Room> | null
 }
 
-export const ChatLayout: React.FC<Props> = ({ room }) => {
+export const ChatSection: React.FC<Props> = ({ room }) => {
   const ref = useRef<Scrollbars>(null)
   const refInput = useRef<any>(null)
   const [form] = Form.useForm()

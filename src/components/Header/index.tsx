@@ -1,6 +1,6 @@
 'use client'
 
-import { Col, Divider, Popover, Row, Space, Typography } from 'antd'
+import { Avatar, Col, Divider, Popover, Row, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import dayjs from 'dayjs'
 import { LogInIcon, LogOutIcon, MoonIcon, SunIcon } from 'lucide-react'
@@ -69,9 +69,9 @@ export const Header: React.FC<Props> = () => {
                     <div>
                       <div>
                         <Space>
-                          <div className="h-12 w-12 rounded-full flex items-center justify-center text-white bg-amber-500 text-2xl uppercase">
+                          <Avatar size={48} src={user?.user?.image}>
                             {user?.user?.name?.charAt(0)}
-                          </div>
+                          </Avatar>
                           <div className="flex flex-col">
                             <div className="">{user?.user?.name}</div>
                             <div className="text-neutral-500">{user?.user?.email}</div>
@@ -96,9 +96,7 @@ export const Header: React.FC<Props> = () => {
                   }
                   trigger="hover"
                 >
-                  <div className="h-7 w-7 rounded-full flex items-center justify-center text-white bg-amber-500 text-xs uppercase cursor-pointer">
-                    {user?.user?.name?.charAt(0)}
-                  </div>
+                  <Avatar src={user?.user?.image}>{user?.user?.name?.charAt(0)}</Avatar>
                 </Popover>
               </Space>
             ) : (
