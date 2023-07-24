@@ -22,6 +22,7 @@ import {
   MicIcon,
   MicOffIcon,
   MoreHorizontalIcon,
+  PencilRulerIcon,
   PhoneOffIcon,
   PlusIcon,
   ScreenShareIcon,
@@ -31,10 +32,10 @@ import {
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import { UserRole, UserStatus } from '@prisma/client'
 import { inviteToRoom } from '@/app/actions'
-import { ButtonIcon, Copy, Icon, useApp } from '@/components'
+import { ButtonIcon, Copy, Drawer, Icon, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
 import { useDevice } from '@/hooks'
 
@@ -51,6 +52,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const router = useRouter()
   const [openModalInvites, setOpenModalInvites] = useState(false)
   const [openModalSettings, setOpenModalSettings] = useState(false)
+  const [openDrawerWhiteboard, setOpenDrawerWhiteboard] = useState(false)
   const [inviteEmail, setInviteEmail] = useState<string[]>([])
   const [isPendingInviteToRoom, startTransitionInviteToRoom] = useTransition()
   const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
@@ -88,6 +90,11 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
   const audioLevel = useAudioLevelProducer(micPublisher)
+
+  const whiteboardUri = useMemo(
+    () => `https://wbo.ophir.dev/boards/bluesea-meeting-${params?.passcode}`,
+    [params?.passcode]
+  )
 
   useEffect(() => {
     actions.connect()
@@ -266,6 +273,16 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
             size="large"
             type="primary"
             className={classNames(
+              'shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]'
+            )}
+            onClick={() => setOpenDrawerWhiteboard(true)}
+            icon={<PencilRulerIcon size={16} className={classNames('dark:text-white text-primary_text')} />}
+            tooltip="Whiteboard"
+          />
+          <ButtonIcon
+            size="large"
+            type="primary"
+            className={classNames(
               'shadow-none border border-gray-200 dark:border-[#3A4250]',
               !openChat ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
             )}
@@ -415,6 +432,15 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
           />
         </div>
       </Modal>
+      <Drawer
+        title="Whiteboard"
+        placement="bottom"
+        height="70%"
+        open={openDrawerWhiteboard}
+        onClose={() => setOpenDrawerWhiteboard(false)}
+      >
+        <iframe src={whiteboardUri} className="w-full h-full" />
+      </Drawer>
     </div>
   )
 }
