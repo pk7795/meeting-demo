@@ -1,5 +1,6 @@
 'use client'
 
+import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
 import { Modal, Popover, Select, Space, Typography } from 'antd'
 import {
   useActions,
@@ -32,7 +33,6 @@ import { inviteToRoom } from '@/app/actions'
 import { OneUserInvite } from '@/app/meeting/[passcode]/page'
 import { ButtonIcon, Copy, Icon, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
-import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '@/contexts'
 import { useDevice } from '@/hooks'
 import { BlueseaSenders } from '@/lib/consts'
 
@@ -162,7 +162,7 @@ export const Actions: React.FC<Props> = ({ openChat, setOpenChat }) => {
       <div className="flex items-center justify-between w-full px-6">
         {!isMobile && (
           <Space>
-            <Copy text={params?.code as string}>
+            <Copy text={params?.passcode as string}>
               <div className="border dark:border-[#3A4250] bg-[#F9FAFB] dark:bg-[#28303E] rounded-lg flex items-center px-4 h-8 cursor-pointer">
                 <Typography.Paragraph ellipsis className="text-sm mb-0 mr-2 dark:text-white w-[100px]">
                   {params?.passcode}

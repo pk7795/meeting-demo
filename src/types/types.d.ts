@@ -1,15 +1,21 @@
-import { Prisma, Room } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 // TODO: abstract inclusion of Prisma types
 export type RoomParticipants = Prisma.RoomParticipantsGetPayload<{
   select: { id: true; name: true; image: true }
 }>
-export type RoomMessageWithUser = Prisma.MessagesGetPayload<{
+export type RoomMessageWithParticipant = Prisma.MessagesGetPayload<{
   select: {
     id: true
     content: true
     createdAt: true
-    user: { select: { id: true; name: true; image: true } }
+    participant: {
+      select: {
+        id: true
+        name: true
+        user: { select: { id: true; name: true; image: true } }
+      }
+    }
   }
 }>
 
@@ -31,12 +37,19 @@ export const roomInclude = Prisma.validator<Prisma.RoomInclude>()({
       content: true,
       createdAt: true,
       updatedAt: true,
-      userId: true,
-      user: {
+      participantId: true,
+      participant: {
         select: {
           id: true,
           name: true,
-          image: true,
+          userId: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
         },
       },
     },

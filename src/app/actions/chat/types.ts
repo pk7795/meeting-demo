@@ -8,4 +8,8 @@ export class MessageInput {
   @IsString()
   @IsNotEmpty()
   roomId!: string
+
+  @IsString()
+  @IsNotEmpty()
+  participantId!: string
 }

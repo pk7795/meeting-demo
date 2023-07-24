@@ -1,6 +1,7 @@
 'use client'
 
-import { Form, Input } from 'antd'
+import { MeetingParticipant, useCurrentParticipant, useMeetingMessages, useMeetingParticipantsList } from '../contexts'
+import { Avatar, Form, Input } from 'antd'
 import { map } from 'lodash'
 import { SendIcon } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
@@ -8,7 +9,6 @@ import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
 import { createMessage } from '@/app/actions/chat'
 import { ButtonIcon } from '@/components'
-import { useMeetingMessages, useMeetingUsers, useMeetingUsersList } from '@/contexts'
 import { formatDateChat } from '@/utils'
 
 type Props = {
@@ -21,8 +21,8 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
   const [form] = Form.useForm()
 
   const messages = useMeetingMessages()
-  const usersList = useMeetingUsersList()
-  const users = useMeetingUsers()
+  const paticipantsList = useMeetingParticipantsList()
+  const currentParticipant = useCurrentParticipant()
 
   useEffect(() => {
     ref.current?.scrollToBottom()
@@ -35,22 +35,23 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
         data: {
           content: values?.input,
           roomId: room!.id!,
+          participantId: currentParticipant.id,
         },
       }).then(() => {
         form.setFieldValue('input', '')
         refInput.current?.focus()
       })
     },
-    [form, room]
+    [currentParticipant.id, form, room]
   )
 
   // TODO: add type
-  const renderUserStatus = useCallback((user: any) => {
-    if (user.meetingStatus?.online) {
-      if (user.meetingStatus?.joining === 'prepare-meeting') {
+  const renderUserStatus = useCallback((participant: MeetingParticipant) => {
+    if (participant.meetingStatus?.online) {
+      if (participant.meetingStatus?.joining === 'prepare-meeting') {
         return <div className="ml-2 w-1 h-1 rounded-full bg-[#FBBF24]" />
       }
-      if (user.meetingStatus?.joining === 'meeting') {
+      if (participant.meetingStatus?.joining === 'meeting') {
         return <div className="ml-2 w-1 h-1 rounded-full bg-[#10B981]" />
       }
     } else {
@@ -58,31 +59,20 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
     }
   }, [])
 
-  const getMessageUser = useCallback(
-    (message: any) => {
-      if (message?.user) {
-        return message.user
-      } else {
-        return users.get(message.userId)
-      }
-    },
-    [users]
-  )
-
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center border-b dark:border-b-[#232C3C] h-16 px-4 dark:bg-[#1D2431] bg-white">
-        <div className="text-lg text-[#9CA3AF]">Participants ({usersList?.length})</div>
+        <div className="text-lg text-[#9CA3AF]">Participants ({paticipantsList?.length})</div>
       </div>
       <div className="border-b dark:border-b-[#232C3C] max-h-[300px] min-h-[50px]">
         <Scrollbars className="h-full">
           <div className="p-2 h-full">
             {/* List participating user by name and image and active status*/}
-            {map(usersList, (user: any) => (
-              <div className="flex items-center mb-2 last:mb-0" key={user.id}>
-                <img src={user.image} alt="" className="w-8 h-8 rounded-full" />
-                <div className="ml-2 text-[#9CA3AF]">{user.name}</div>
-                {renderUserStatus(user)}
+            {map(paticipantsList, (p) => (
+              <div className="flex items-center mb-2 last:mb-0" key={p.id}>
+                <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
+                <div className="ml-2 text-[#9CA3AF]">{p.name}</div>
+                {renderUserStatus(p)}
               </div>
             ))}
           </div>
@@ -94,13 +84,15 @@ export const ChatLayout: React.FC<Props> = ({ room }) => {
         </div>
         <Scrollbars ref={ref}>
           <div className="p-2">
-            {map(messages, (message: any) => (
+            {map(messages, (message) => (
               <div key={message.id} className="mb-2">
                 <div className="flex items-center">
-                  <img src={getMessageUser(message).image} alt="" className="w-8 h-8 rounded-full mr-2" />
+                  <Avatar className="mr-2" src={message.participant.user?.image}>
+                    {message.participant.name?.charAt(0)}
+                  </Avatar>
                   <div>
                     <div className="flex items-center">
-                      <div className="text-xs font-bold text-[#F87171]">{getMessageUser(message).name}</div>
+                      <div className="text-xs font-bold text-[#F87171]">{message.participant.name}</div>
                       <div className="ml-2 text-xs text-[#9CA3AF]">{formatDateChat(message.createdAt)}</div>
                     </div>
                     <div className="text-sm text-[#9CA3AF]">{message.content}</div>

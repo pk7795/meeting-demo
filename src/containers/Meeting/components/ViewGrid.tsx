@@ -1,21 +1,21 @@
 'use client'
 
+import { useOnlineMeetingParticipantsList } from '../contexts'
 import { LocalUser } from './LocalUser'
 import { RemoteUser } from './RemoteUser'
 import { Col, Row } from 'antd'
 import { map } from 'lodash'
-import { useOnlineMeetingUsersList } from '@/contexts'
 
 type Props = {}
 
 export const ViewGrid: React.FC<Props> = () => {
-  const users = useOnlineMeetingUsersList()
+  const participants = useOnlineMeetingParticipantsList()
 
   return (
     <Row gutter={[16, 16]}>
-      {map(users, (u) => (
+      {map(participants, (u) => (
         <Col span={24} md={8} lg={6} key={u.id}>
-          {u.is_me ? <LocalUser key={u.id} user={u} /> : <RemoteUser key={u.id} user={u} />}
+          {u.is_me ? <LocalUser key={u.id} participant={u} /> : <RemoteUser key={u.id} participant={u} />}
         </Col>
       ))}
     </Row>
