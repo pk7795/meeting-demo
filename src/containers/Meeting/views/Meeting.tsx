@@ -1,5 +1,6 @@
 'use client'
 
+import { BlueseaSenders } from '../constants'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
 import { ChatSection, PrepareSection, ToolbarSection, ViewSection } from '../sections'
 import { Space } from 'antd'
@@ -101,11 +102,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
   }
 
   const senders = useMemo(() => {
-    return [
-      { kind: StreamKinds.AUDIO, name: 'audio_main' },
-      { kind: StreamKinds.VIDEO, name: 'video_main', simulcast: true },
-      { kind: StreamKinds.VIDEO, name: 'video_screen', simulcast: true },
-    ]
+    return [BlueseaSenders.audio, BlueseaSenders.video, BlueseaSenders.screen_audio, BlueseaSenders.screen_video]
   }, [])
   const createAudio: [HTMLAudioElement, HTMLAudioElement, HTMLAudioElement] = useMemo(() => {
     const audio1 = document.createElement('audio')
