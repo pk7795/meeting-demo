@@ -19,7 +19,7 @@ export const ButtonIcon: React.FC<Props> = ({ children, icon, tooltip, className
     },
   })
   return (
-    <Tooltip title={tooltip}>
+    <Tooltip title={tooltip} trigger="hover">
       <Button
         type="text"
         size="small"

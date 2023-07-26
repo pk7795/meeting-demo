@@ -8,6 +8,8 @@ export * from './App'
 export * from './Icon'
 export * from './Result'
 
+export * from './Tabs'
+
 export * from './ButtonIcon'
 export * from './ButtonConfirm'
 export * from './FormList'

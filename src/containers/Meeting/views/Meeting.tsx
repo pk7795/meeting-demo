@@ -12,13 +12,13 @@ import {
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
 import dayjs from 'dayjs'
-import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon } from 'lucide-react'
+import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { RoomParticipant } from '@prisma/client'
-import { LOGO_BLACK_LONG, LOGO_WHITE_LONG } from '@public'
+import { LOGO_BLACK_LONG, LOGO_SHORT, LOGO_WHITE_LONG } from '@public'
 import { acceptParticipant } from '@/app/actions'
 import { ButtonIcon, Drawer } from '@/components'
 import { supabase } from '@/config/supabase'
@@ -41,12 +41,26 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
   const [openChat, setOpenChat] = useState(false)
   const { isMaximize, onOpenFullScreen } = useFullScreen()
   const { isMobile } = useDevice()
-  const theme = useRecoilValue(themeState)
+  const [theme, setTheme] = useRecoilState(themeState)
   const [date, setDate] = useState(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
   const [blueseaConfig, setBlueseaConfig] = useState<BlueseaSession>()
   const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
 
   const [joined, setJoined] = useState(false)
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.remove('light')
+      document.body.classList.remove('bg-white')
+      document.body.classList.add('dark')
+      document.body.classList.add('bg-dark_ebony')
+    } else {
+      document.body.classList.remove('dark')
+      document.body.classList.remove('bg-dark_ebony')
+      document.body.classList.add('light')
+      document.body.classList.add('bg-white')
+    }
+  }, [theme])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -64,6 +78,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
   const senders = useMemo(() => {
     return [BlueseaSenders.audio, BlueseaSenders.video, BlueseaSenders.screen_audio, BlueseaSenders.screen_video]
   }, [])
+
   const createAudio: [HTMLAudioElement, HTMLAudioElement, HTMLAudioElement] = useMemo(() => {
     const audio1 = document.createElement('audio')
     audio1.id = 'id-audio-1'
@@ -191,9 +206,9 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
                   <div className="flex items-center justify-between border-b dark:border-b-[#232C3C] h-16 px-4 bg-white dark:bg-[#17202E]">
                     <Space>
                       <Link href="/">
-                        <img src={theme === 'dark' ? LOGO_WHITE_LONG : LOGO_BLACK_LONG} alt="" className="h-8" />
+                        <img src={theme === 'dark' ? LOGO_SHORT : LOGO_SHORT} alt="" className="h-8" />
                       </Link>
-                      <div className="border-l dark:border-l-[#232C3C] ml-6 pl-6 hidden md:block">
+                      <div className="pl-2 hidden md:block">
                         <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
                         <div className="dark:text-gray-400">{date}</div>
                       </div>
@@ -218,6 +233,11 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
                             )
                           }
                           className="__bluesea_video_viewer_fullscreen_button"
+                        />
+                        <ButtonIcon
+                          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                          shape="circle"
+                          icon={theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} color="#000" />}
                         />
                       </Space>
                     )}

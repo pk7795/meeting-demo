@@ -3,7 +3,7 @@ import { BlueseaSenders } from '../constants'
 import { MeetingParticipant } from '../contexts'
 import { Stream } from '../types'
 import classNames from 'classnames'
-import { MicIcon, MicOffIcon } from 'lucide-react'
+import { MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
 import { FC, useMemo } from 'react'
 import { Icon } from '@/components'
 import { usePeerRemoteStreamActive } from '@/hooks'
@@ -41,9 +41,10 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
     <div className="w-full relative bg-black rounded-lg overflow-hidden aspect-video">
       <div className="rounded-lg overflow-hidden w-full h-full">{_renderView}</div>
       <div className="absolute bottom-0 left-0 p-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tr-lg rounded-bl-lg">
+        {isPinned && <Icon className="mr-1" icon={<PinIcon size={12} fill="#fff" />} />}
         {participant.name}
       </div>
-      <div className="absolute bottom-0 right-0 p-2 text-white bg-[rgba(0,0,0,0.50)] rounded-tl-lg rounded-br-lg">
+      <div className="absolute top-1 right-1 text-white rounded-full w-6 h-6 flex items-center justify-center bg-black bg-opacity-25">
         <Icon icon={micStream ? <MicIcon size={16} /> : <MicOffIcon size={16} />} />
       </div>
     </div>
