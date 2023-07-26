@@ -1,3 +1,5 @@
+import { v4 } from 'uuid'
+
 /// generate random token string with provided length
 export function randomToken(length: number) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -6,4 +8,8 @@ export function randomToken(length: number) {
     res += chars.charAt(Math.floor(Math.random() * chars.length))
   }
   return res
+}
+
+export function randomUUID() {
+  return v4()
 }

@@ -1,5 +1,6 @@
 import { Meeting } from '@/containers'
-import { getPrisma } from '@/lib'
+import { getPrisma, getSessionUser } from '@/lib'
+import { RoomAccessStatus } from '@/lib/constants'
 
 export type OneRoom = {
   id: string
@@ -34,6 +35,7 @@ export type OneRoom = {
 
 export default async function IndexMeeting({ params }: { params: { passcode: string } }) {
   const prisma = getPrisma()
+  const session = await getSessionUser()
 
   const room = await prisma.room.findFirst({
     where: {
@@ -80,5 +82,36 @@ export default async function IndexMeeting({ params }: { params: { passcode: str
     throw new Error('RoomNotFound')
   }
 
-  return <Meeting room={room} />
+  let myParticipant = null
+  if (session) {
+    myParticipant = await prisma.roomParticipant.findFirst({
+      where: {
+        roomId: room.id,
+        userId: session.id,
+      },
+    })
+  }
+
+  const roomInvite = await prisma.roomInvite.findFirst({
+    where: {
+      roomId: room.id,
+      email: session?.email,
+    },
+  })
+
+  let access = RoomAccessStatus.JOINED
+
+  if (room.ownerId !== session?.id) {
+    if (!roomInvite) {
+      if (!myParticipant) {
+        access = RoomAccessStatus.NEED_ASK
+      } else {
+        if (!myParticipant.accepted) {
+          access = RoomAccessStatus.PENDING
+        }
+      }
+    }
+  }
+
+  return <Meeting room={room} myParticipant={myParticipant} access={access} />
 }

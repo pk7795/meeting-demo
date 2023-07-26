@@ -91,3 +91,40 @@ export async function createRoomParticipantGuestUser({ data }: { data: { name: s
     roomParticipant,
   }
 }
+
+export async function acceptParticipant(participantId: string) {
+  const prisma = getPrisma()
+  const session = await getSessionUser()
+
+  if (!session) {
+    throw new Error('Unauthorized')
+  }
+
+  const roomParticipant = await prisma.roomParticipant.findFirst({
+    where: {
+      id: participantId,
+    },
+    include: {
+      room: true,
+    },
+  })
+
+  if (!roomParticipant) {
+    throw new Error('ParticipantNotFound')
+  }
+
+  if (roomParticipant.room.ownerId !== session.id) {
+    throw new Error('Unauthorized')
+  }
+
+  const updatedRoomParticipant = await prisma.roomParticipant.update({
+    where: {
+      id: participantId,
+    },
+    data: {
+      accepted: true,
+    },
+  })
+
+  return updatedRoomParticipant
+}

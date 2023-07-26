@@ -55,6 +55,7 @@ export const MeetingProvider = ({
       name: string
       image: string
     }
+    accepted: boolean
     joinedAt: Date
     createdAt: Date
     updatedAt: Date

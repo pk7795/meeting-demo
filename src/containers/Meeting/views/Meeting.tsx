@@ -1,14 +1,13 @@
 'use client'
 
-import { BlueseaSenders } from '../constants'
+import { BlueseaSenders, UserType } from '../constants'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
 import { ChatSection, PrepareSection, ToolbarSection, ViewSection } from '../sections'
-import { Space } from 'antd'
+import { Button, notification, Space } from 'antd'
 import {
   BlueseaSessionProvider,
   LogLevel,
   MixMinusMode,
-  StreamKinds,
   useSharedDisplayMedia,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
@@ -16,25 +15,28 @@ import dayjs from 'dayjs'
 import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRecoilValue } from 'recoil'
+import { RoomParticipant } from '@prisma/client'
 import { LOGO_BLACK_LONG, LOGO_WHITE_LONG } from '@public'
-import { createRoomParticipantGuestUser, createRoomParticipantLoginUser } from '@/app/actions'
+import { acceptParticipant } from '@/app/actions'
 import { ButtonIcon, Drawer } from '@/components'
+import { supabase } from '@/config/supabase'
 import { useDevice } from '@/hooks'
 import { BlueseaSession } from '@/lib/bluesea'
+import { RoomAccessStatus } from '@/lib/constants'
 import { themeState } from '@/recoil'
 import { RoomPopulated } from '@/types/types'
 
 type Props = {
   room: RoomPopulated
+  myParticipant: RoomParticipant | null
+  access: RoomAccessStatus
 }
 
-export const Meeting: React.FC<Props> = ({ room }) => {
-  const { data: user } = useSession()
-  const params = useParams()
-  const [name, setName] = useState('')
+export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
+  const { data } = useSession()
+  const [api, contextHolder] = notification.useNotification()
   const [isMaximize, setIsMaximize] = useState(false)
   const [layout, setLayout] = useState<'GRID' | 'LEFT'>('GRID')
   const [openChat, setOpenChat] = useState(false)
@@ -42,16 +44,9 @@ export const Meeting: React.FC<Props> = ({ room }) => {
   const theme = useRecoilValue(themeState)
   const [date, setDate] = useState(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
   const [blueseaConfig, setBlueseaConfig] = useState<BlueseaSession>()
-  const [roomParticipant, setRoomParticipant] = useState<{
-    id: string
-    roomId: string
-    name: string
-    userId: string | null
-    joinedAt: Date
-    createdAt: Date
-    updatedAt: Date
-  }>()
-  const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
+  const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
+
+  const [joined, setJoined] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,31 +54,6 @@ export const Meeting: React.FC<Props> = ({ room }) => {
     }, 1000)
     return () => clearInterval(interval)
   }, [])
-
-  const onJoinMeeting = useCallback(() => {
-    startTransitionCreateRoomParticipant(() => {
-      if (user) {
-        createRoomParticipantLoginUser({
-          data: {
-            passcode: params?.passcode as string,
-          },
-        }).then(({ blueseaConfig, roomParticipant }) => {
-          setBlueseaConfig(blueseaConfig)
-          setRoomParticipant(roomParticipant)
-        })
-      } else {
-        createRoomParticipantGuestUser({
-          data: {
-            name,
-            passcode: params?.passcode as string,
-          },
-        }).then(({ blueseaConfig, roomParticipant }) => {
-          setBlueseaConfig(blueseaConfig)
-          setRoomParticipant(roomParticipant)
-        })
-      }
-    })
-  }, [name, params?.passcode, user])
 
   useSharedUserMedia('mic_device')
   useSharedUserMedia('camera_device')
@@ -121,6 +91,38 @@ export const Meeting: React.FC<Props> = ({ room }) => {
     return [audio1, audio2, audio3]
   }, [])
 
+  const openNotification = useCallback(
+    (opts: {
+      message: string
+      description: string
+      buttons: {
+        confirm: string
+        onConfirm: () => void
+        cancel: string
+        onCancel: () => void
+      }
+    }) => {
+      const key = 'open' + Date.now()
+      const btn = (
+        <Space>
+          <Button type="link" size="small" onClick={opts.buttons.onCancel}>
+            {opts.buttons.cancel}
+          </Button>
+          <Button type="primary" size="small" onClick={opts.buttons.onConfirm}>
+            {opts.buttons.confirm}
+          </Button>
+        </Space>
+      )
+      api.open({
+        message: opts.message,
+        description: opts.description,
+        btn,
+        key,
+      })
+    },
+    [api]
+  )
+
   useEffect(() => {
     document.body.appendChild(createAudio[0])
     document.body.appendChild(createAudio[1])
@@ -132,9 +134,55 @@ export const Meeting: React.FC<Props> = ({ room }) => {
     }
   }, [createAudio])
 
+  const sendAcceptJoinRequest = useCallback(
+    (id: string, type: UserType) => {
+      console.log(`${id}:room:${room.id}`)
+
+      if (type === UserType.User) {
+        acceptParticipant(id)
+      }
+
+      const channel = supabase.channel(`${id}:room:${room.id}`)
+      channel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          channel.send({ type: 'broadcast', event: 'accepted', payload: { token: 'aaaaaa' } })
+        }
+      })
+    },
+    [room.id]
+  )
+
+  useEffect(() => {
+    if (data?.user.id === room.ownerId) {
+      supabase
+        .channel(`room:${room.id}`)
+        .on('broadcast', { event: 'ask' }, ({ payload }) => {
+          const id = payload.id
+          const name = payload.name
+          const type = payload.type
+          openNotification({
+            message: `A ${type} named ${name} is requesting to join the room`,
+            description: 'Do you want to accept this request?',
+            buttons: {
+              confirm: 'Accept',
+              onConfirm: () => {
+                sendAcceptJoinRequest(id, type)
+              },
+              cancel: 'Reject',
+              onCancel: () => {
+                api.destroy()
+              },
+            },
+          })
+        })
+        .subscribe()
+    }
+  }, [api, data?.user.id, openNotification, room.id, room.ownerId, sendAcceptJoinRequest])
+
   return (
     <MediaDeviceProvider>
-      {blueseaConfig && roomParticipant ? (
+      {contextHolder}
+      {blueseaConfig && roomParticipant && joined ? (
         <BlueseaSessionProvider
           logLevel={LogLevel.WARN}
           gateways={blueseaConfig.gateway}
@@ -208,10 +256,14 @@ export const Meeting: React.FC<Props> = ({ room }) => {
         </BlueseaSessionProvider>
       ) : (
         <PrepareSection
-          onJoinMeeting={onJoinMeeting}
-          isLoadingJoinMeeting={isPendingCreateRoomParticipant}
-          name={name}
-          setName={setName}
+          room={room}
+          onJoinMeeting={() => {
+            setJoined(true)
+          }}
+          setRoomParticipant={setRoomParticipant}
+          setBlueseaConfig={setBlueseaConfig}
+          myParticipant={roomParticipant}
+          roomAccess={access}
         />
       )}
     </MediaDeviceProvider>
