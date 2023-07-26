@@ -1,6 +1,6 @@
 import { UserType } from '../constants'
 import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
-import { Col, Divider, Input, Row, Select, Space, Typography } from 'antd'
+import { Col, Divider, Input, Row, Select, Space, Spin, Typography } from 'antd'
 import { useSharedUserMedia, VideoViewer } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { filter, find, map } from 'lodash'
@@ -35,7 +35,7 @@ export const PrepareSection: React.FC<Props> = ({
   setBlueseaConfig,
   roomAccess,
 }) => {
-  const { data: user } = useSession()
+  const { data: user, status } = useSession()
   const router = useRouter()
 
   const [videoInput, setVideoInput] = useVideoInput()
@@ -298,65 +298,72 @@ export const PrepareSection: React.FC<Props> = ({
             </div>
           </Col>
           <Col span={24} lg={12}>
-            <div className="w-full">
-              {user ? (
-                <div className="mb-2">
-                  <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">
-                    Ready to join?
-                  </Typography.Title>
-                  <Typography.Paragraph className="text-xl mb-0 font-light dark:text-gray-400">
-                    {user?.user?.name}
-                  </Typography.Paragraph>
-                  <Typography.Paragraph className="text-xl mb-0 font-light dark:text-gray-400">
-                    {user?.user?.email}
-                  </Typography.Paragraph>
-                </div>
-              ) : (
-                <div className="mb-4">
-                  <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">
-                    Enter your name to start!
-                  </Typography.Title>
-                  <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter name" size="large" />
-                </div>
-              )}
-              {!error && (
-                <>
-                  <Divider />
+            <Spin spinning={status === 'loading'}>
+              <div className="w-full">
+                {user ? (
+                  <div className="mb-2">
+                    <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">
+                      Ready to join?
+                    </Typography.Title>
+                    <Typography.Paragraph className="text-xl mb-0 font-light dark:text-gray-400">
+                      {user?.user?.name}
+                    </Typography.Paragraph>
+                    <Typography.Paragraph className="text-xl mb-0 font-light dark:text-gray-400">
+                      {user?.user?.email}
+                    </Typography.Paragraph>
+                  </div>
+                ) : (
                   <div className="mb-4">
-                    <Select
+                    <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">
+                      Enter your name to start!
+                    </Typography.Title>
+                    <Input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter name"
                       size="large"
-                      suffixIcon={<Icon icon={<CameraIcon color="#0060FF" />} />}
-                      options={map(videoInput, (d) => ({
-                        label: d.label,
-                        value: d.deviceId,
-                      }))}
-                      value={selectedVideoInput?.deviceId}
-                      onChange={(value) => setSelectedVideoInput(find(videoInput, (d) => d.deviceId === value))}
-                      className="w-full"
                     />
                   </div>
-                  <div className="mb-4">
-                    <Select
-                      size="large"
-                      suffixIcon={<Icon icon={<MicIcon color="#0060FF" />} />}
-                      options={map(audioInput, (d) => ({
-                        label: d.label,
-                        value: d.deviceId,
-                      }))}
-                      value={selectedAudioInput?.deviceId}
-                      onChange={(value) => setSelectedAudioInput(find(audioInput, (d) => d.deviceId === value))}
-                      className="w-full"
-                    />
-                  </div>
-                </>
-              )}
-              <div className="flex items-center mt-4">
-                <ButtonIcon onClick={() => router.push('/')} className="mr-2" type="default" size="large">
-                  Cancel
-                </ButtonIcon>
-                {renderJoinButton()}
+                )}
+                {!error && (
+                  <>
+                    <Divider />
+                    <div className="mb-4">
+                      <Select
+                        size="large"
+                        suffixIcon={<Icon icon={<CameraIcon color="#0060FF" />} />}
+                        options={map(videoInput, (d) => ({
+                          label: d.label,
+                          value: d.deviceId,
+                        }))}
+                        value={selectedVideoInput?.deviceId}
+                        onChange={(value) => setSelectedVideoInput(find(videoInput, (d) => d.deviceId === value))}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <Select
+                        size="large"
+                        suffixIcon={<Icon icon={<MicIcon color="#0060FF" />} />}
+                        options={map(audioInput, (d) => ({
+                          label: d.label,
+                          value: d.deviceId,
+                        }))}
+                        value={selectedAudioInput?.deviceId}
+                        onChange={(value) => setSelectedAudioInput(find(audioInput, (d) => d.deviceId === value))}
+                        className="w-full"
+                      />
+                    </div>
+                  </>
+                )}
+                <div className="flex items-center mt-4">
+                  <ButtonIcon onClick={() => router.push('/')} className="mr-2" type="default" size="large">
+                    Cancel
+                  </ButtonIcon>
+                  {renderJoinButton()}
+                </div>
               </div>
-            </div>
+            </Spin>
           </Col>
         </Row>
       </div>

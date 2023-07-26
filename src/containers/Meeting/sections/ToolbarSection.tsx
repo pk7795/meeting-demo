@@ -18,7 +18,7 @@ import {
   CopyIcon,
   HashIcon,
   MailPlusIcon,
-  MessageCircleIcon,
+  MessagesSquareIcon,
   MicIcon,
   MicOffIcon,
   MoreHorizontalIcon,
@@ -265,48 +265,39 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
             }
             tooltip="Start/Stop Camera"
           />
-          <ButtonIcon
-            size="large"
-            type="primary"
-            className={classNames(
-              'shadow-none border border-gray-200 dark:border-[#3A4250]',
-              !screenPublisherStream ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
-            )}
-            onClick={toggleScreen}
-            icon={
-              <ScreenShareIcon
-                size={16}
-                className={classNames('dark:text-white text-primary_text', screenPublisherStream ? 'text-white' : '')}
+          {!isMobile && (
+            <>
+              <ButtonIcon
+                size="large"
+                type="primary"
+                className={classNames(
+                  'shadow-none border border-gray-200 dark:border-[#3A4250]',
+                  !screenPublisherStream ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
+                )}
+                onClick={toggleScreen}
+                icon={
+                  <ScreenShareIcon
+                    size={16}
+                    className={classNames(
+                      'dark:text-white text-primary_text',
+                      screenPublisherStream ? 'text-white' : ''
+                    )}
+                  />
+                }
+                tooltip="Start/Stop Screen Share"
               />
-            }
-            tooltip="Start/Stop Screen Share"
-          />
-          <ButtonIcon
-            size="large"
-            type="primary"
-            className={classNames(
-              'shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]'
-            )}
-            onClick={() => setOpenDrawerWhiteboard(true)}
-            icon={<PencilRulerIcon size={16} className={classNames('dark:text-white text-primary_text')} />}
-            tooltip="Whiteboard"
-          />
-          <ButtonIcon
-            size="large"
-            type="primary"
-            className={classNames(
-              'shadow-none border border-gray-200 dark:border-[#3A4250]',
-              !openChat ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
-            )}
-            onClick={() => setOpenChat(!openChat)}
-            icon={
-              <MessageCircleIcon
-                size={16}
-                className={classNames('dark:text-white text-primary_text', openChat ? 'text-white' : '')}
+              <ButtonIcon
+                size="large"
+                type="primary"
+                className={classNames(
+                  'shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]'
+                )}
+                onClick={() => setOpenDrawerWhiteboard(true)}
+                icon={<PencilRulerIcon size={16} className={classNames('dark:text-white text-primary_text')} />}
+                tooltip="Whiteboard"
               />
-            }
-            tooltip="Chat"
-          />
+            </>
+          )}
           <ButtonIcon
             size="large"
             type="primary"
@@ -340,6 +331,13 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
                     <PlusIcon size={16} />
                     <div className="text-sm ml-2">Invite</div>
                   </div>
+                  <div
+                    onClick={() => setOpenDrawerWhiteboard(true)}
+                    className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
+                  >
+                    <PencilRulerIcon size={16} />
+                    <div className="text-sm ml-2">Whiteboard</div>
+                  </div>
                 </div>
               }
               trigger="hover"
@@ -352,11 +350,27 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
               />
             </Popover>
           )}
+          <ButtonIcon size="large" type="primary" className="bg-red-500 shadow-none text-xs px-6" onClick={onEndCall}>
+            <PhoneOffIcon size={16} className="text-white" />
+          </ButtonIcon>
         </Space>
         <div>
-          <ButtonIcon size="large" type="primary" className="bg-red-500 shadow-none text-xs px-6" onClick={onEndCall}>
-            {!isMobile ? 'Leave Meeting' : <PhoneOffIcon size={24} className="text-white" />}
-          </ButtonIcon>
+          <ButtonIcon
+            size="large"
+            type="primary"
+            className={classNames(
+              'shadow-none border border-gray-200 dark:border-[#3A4250]',
+              !openChat ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
+            )}
+            onClick={() => setOpenChat(!openChat)}
+            icon={
+              <MessagesSquareIcon
+                size={16}
+                className={classNames('dark:text-white text-primary_text', openChat ? 'text-white' : '')}
+              />
+            }
+            tooltip="Chat/Participants"
+          />
         </div>
       </div>
       <Modal
