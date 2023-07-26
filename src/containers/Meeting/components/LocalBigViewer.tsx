@@ -1,14 +1,8 @@
 import { BigViewer } from '.'
 import { BlueseaSenders } from '../constants'
 import { MeetingParticipant } from '../contexts'
-import {
-  MediaStreamArc,
-  StreamConsumer,
-  StreamConsumerPair,
-  StreamRemote,
-  usePublisher,
-  usePublisherState,
-} from 'bluesea-media-react-sdk'
+import { Stream } from '../types'
+import { usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { FC } from 'react'
 
@@ -27,20 +21,10 @@ export const LocalBigViewer: FC<Props> = ({ participant }) => {
   return (
     <>
       <div className={classNames('w-full h-full', screenStream ? 'block' : 'hidden')}>
-        <BigViewer
-          participant={participant}
-          stream={screenStream as MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer}
-          priority={1000}
-          isScreenShare
-        />
+        <BigViewer participant={participant} stream={screenStream as Stream} priority={1000} isScreenShare />
       </div>
       <div className={classNames('w-full h-full', !screenStream ? 'block' : 'hidden')}>
-        <BigViewer
-          participant={participant}
-          stream={camStream as MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer}
-          micStream={micStream}
-          priority={100}
-        />
+        <BigViewer participant={participant} stream={camStream as Stream} micStream={micStream} priority={100} />
       </div>
     </>
   )

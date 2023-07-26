@@ -8,7 +8,7 @@ dayjs.extend(timezone)
 export const formatDate = (date: any) => (date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '')
 
 export const genPasscode = () => {
-  const length = 10
+  const length = 8
   const date = Date.now().toString()
 
   let charset = ''
@@ -23,4 +23,4 @@ export const genPasscode = () => {
   return password
 }
 
-export const formatDateChat = (date: Date) => (date ? dayjs(date).format('HH:mm') : '')
+export const formatDateChat = (date: Date) => (date ? dayjs(date).format('hh:mm a') : '')

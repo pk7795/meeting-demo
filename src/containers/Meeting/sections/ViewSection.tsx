@@ -4,34 +4,30 @@ import { LocalBigViewer, LocalUser, RemoteBigViewer, RemoteUser } from '../compo
 import { useOnlineMeetingParticipantsList, usePinnedParticipant } from '../contexts'
 import { Col, Row } from 'antd'
 import classNames from 'classnames'
-import { isEmpty, map } from 'lodash'
-import { useEffect } from 'react'
+import { map } from 'lodash'
+import { PinIcon, PinOffIcon } from 'lucide-react'
 import Scrollbars from 'react-custom-scrollbars-2'
+import { ButtonIcon } from '@/components'
 import { useDevice } from '@/hooks'
 
 type Props = {
   layout: 'GRID' | 'LEFT'
+  setLayout: (layout: 'GRID' | 'LEFT') => void
 }
 
-export const ViewSection: React.FC<Props> = ({ layout }) => {
+export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
   const participants = useOnlineMeetingParticipantsList()
   const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
   const { isMobile } = useDevice()
 
-  useEffect(() => {
-    if (!isEmpty(participants) && !pinnedParticipant) {
-      setPinnedParticipant(participants?.[0])
-    }
-  }, [pinnedParticipant, setPinnedParticipant, participants])
-
   const renderBigViewer = () => {
-    if (!pinnedParticipant) {
+    if (!pinnedParticipant?.p) {
       return null
     } else {
-      if (pinnedParticipant.is_me) {
-        return <LocalBigViewer participant={pinnedParticipant} />
+      if (pinnedParticipant?.p.is_me) {
+        return <LocalBigViewer participant={pinnedParticipant?.p} />
       } else {
-        return <RemoteBigViewer participant={pinnedParticipant} />
+        return <RemoteBigViewer participant={pinnedParticipant?.p} />
       }
     }
   }
@@ -48,19 +44,42 @@ export const ViewSection: React.FC<Props> = ({ layout }) => {
       <Col span={24} lg={isMobile ? 24 : layout === 'GRID' ? 24 : 6}>
         <Scrollbars>
           <Row gutter={[16, 16]} className="w-full">
-            {map(participants, (u) => (
-              <Col span={isMobile ? 24 : layout === 'GRID' ? 6 : 24} key={u.id}>
-                <div
-                  onClick={() => setPinnedParticipant(u)}
-                  className={classNames(
-                    'border-2 rounded-lg',
-                    layout !== 'GRID' && u.id === pinnedParticipant?.id ? 'border-green-500' : 'border-transparent'
-                  )}
-                >
-                  {u.is_me ? <LocalUser key={u.id} participant={u} /> : <RemoteUser key={u.id} participant={u} />}
-                </div>
-              </Col>
-            ))}
+            {map(participants, (p) => {
+              const isPinned = layout !== 'GRID' && p.id === pinnedParticipant?.p?.id
+              return (
+                <Col span={isMobile ? 24 : layout === 'GRID' ? 6 : 24} key={p.id}>
+                  <div
+                    className={classNames(
+                      'border-2 rounded-lg relative',
+                      isPinned ? 'border-green-500' : 'border-transparent'
+                    )}
+                  >
+                    <ButtonIcon
+                      className="absolute top-1 left-1 z-50"
+                      icon={isPinned ? <PinOffIcon size={16} /> : <PinIcon size={16} />}
+                      onClick={() => {
+                        if (isPinned) {
+                          setPinnedParticipant(null)
+                          return
+                        }
+                        setPinnedParticipant({
+                          p,
+                          force: true,
+                        })
+                        if (layout === 'GRID') {
+                          setLayout('LEFT')
+                        }
+                      }}
+                    />
+                    {p.is_me ? (
+                      <LocalUser key={p.id} participant={p} isPinned={isPinned} />
+                    ) : (
+                      <RemoteUser key={p.id} participant={p} isPinned={isPinned} />
+                    )}
+                  </div>
+                </Col>
+              )
+            })}
           </Row>
         </Scrollbars>
       </Col>
