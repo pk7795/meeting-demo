@@ -140,6 +140,18 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
     }
   }, [getAvailableInvites, openModalInvites])
 
+  const onEndedScreenShare = useCallback(() => {
+    screenStreamChanger(undefined)
+  }, [screenStreamChanger])
+
+  useEffect(() => {
+    screenStream?.stream.getVideoTracks()?.[0]?.addEventListener('ended', onEndedScreenShare)
+
+    return () => {
+      screenStream?.stream.getVideoTracks()?.[0]?.removeEventListener('ended', onEndedScreenShare)
+    }
+  }, [onEndedScreenShare, screenStream?.stream, screenStreamChanger])
+
   const toggleMic = useCallback(() => {
     if (micPublisherStream) {
       micStreamChanger(undefined)
@@ -362,6 +374,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
         }}
         destroyOnClose
         centered
+        getContainer={() => document.getElementById('full-screen') as HTMLElement}
       >
         <Typography.Paragraph className="dark:text-gray-400 mb-2">
           Invite people to join this meeting
@@ -390,6 +403,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
         footer={false}
         destroyOnClose
         centered
+        getContainer={() => document.getElementById('full-screen') as HTMLElement}
       >
         <div className="mb-4">
           <Select
@@ -438,6 +452,8 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
         height="70%"
         open={openDrawerWhiteboard}
         onClose={() => setOpenDrawerWhiteboard(false)}
+        destroyOnClose
+        getContainer={() => document.getElementById('full-screen') as HTMLElement}
       >
         <iframe src={whiteboardUri} className="w-full h-full" />
       </Drawer>

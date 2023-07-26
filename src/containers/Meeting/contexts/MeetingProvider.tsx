@@ -6,19 +6,21 @@ import { supabase } from '@/config'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
 import { RoomMessageWithParticipant, RoomPopulated } from '@/types/types'
 
+type PinnedPaticipant = { p: MeetingParticipant; force?: boolean }
+
 export const MeetingContext = createContext<{
   data: {
     paticipants: MapContainer<string, MeetingParticipant>
     messages: MapContainer<string, RoomMessageWithParticipant>
     participantState: DataContainer<MeetingParticipantStatus>
 
-    pinnedPaticipant: DataContainer<MeetingParticipant | null>
+    pinnedPaticipant: DataContainer<PinnedPaticipant | null>
     talkingParticipantId: DataContainer<string>
     currentPaticipant: RoomParticipant
     destroy: () => void
   }
   setParticipantState: (state: MeetingParticipantStatus) => void
-  setPinnedParticipant: (participant: MeetingParticipant | null) => void
+  setPinnedParticipant: (participant: PinnedPaticipant | null) => void
 }>({} as any)
 
 export interface MeetingParticipantStatus {
@@ -65,13 +67,15 @@ export const MeetingProvider = ({
     const messages = new MapContainer<string, RoomMessageWithParticipant>()
     const participantState = new DataContainer<MeetingParticipantStatus>({ online: true, joining: 'meeting' })
 
-    const pinnedPaticipant = new DataContainer<MeetingParticipant | null>(null)
+    const pinnedPaticipant = new DataContainer<PinnedPaticipant | null>(null)
     const talkingParticipantId = new DataContainer<string>('')
 
     talkingParticipantId.addChangeListener((participantId) => {
       const paticipant = paticipants.get(participantId)
-      if (paticipant) {
-        pinnedPaticipant.change(paticipant)
+      if (paticipant && !pinnedPaticipant.data?.force) {
+        pinnedPaticipant.change({
+          p: paticipant,
+        })
       }
     })
 
@@ -226,7 +230,7 @@ export const MeetingProvider = ({
   )
 
   const setPinnedParticipant = useCallback(
-    (participant: MeetingParticipant | null) => {
+    (participant: PinnedPaticipant | null) => {
       data.pinnedPaticipant.change(participant)
     },
     [data.pinnedPaticipant]
@@ -301,8 +305,8 @@ export const useMeetingParticipantState = () => {
 
 export const usePinnedParticipant = () => {
   const context = useMeeting()
-  const pinnedUser = useReactionData<MeetingParticipant | null>(context.data.pinnedPaticipant)
-  return [pinnedUser, context.setPinnedParticipant] as const
+  const pinnedPaticipant = useReactionData<PinnedPaticipant | null>(context.data.pinnedPaticipant)
+  return [pinnedPaticipant, context.setPinnedParticipant] as const
 }
 
 export const useTalkingParticipantId = () => {

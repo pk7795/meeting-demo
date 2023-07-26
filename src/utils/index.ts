@@ -8,7 +8,7 @@ dayjs.extend(timezone)
 export const formatDate = (date: any) => (date ? dayjs(date).format('DD/MM/YYYY HH:mm:ss') : '')
 
 export const genPasscode = () => {
-  const length = 10
+  const length = 8
   const date = Date.now().toString()
 
   let charset = ''
