@@ -10,7 +10,8 @@
     "test": "jest --runInBand --force-exit --detectOpenHandles --coverage --passWithNoTests",
     "gen-key": "jose newkey -s 512 -t oct -a HS512",
     "prepare": "husky install",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@emotion/css": "^11.11.2",
