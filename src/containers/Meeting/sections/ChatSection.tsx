@@ -113,12 +113,12 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
           key="2"
           className="rounded-none border-none"
         >
-          <Scrollbars className="h-[calc(100vh-192px)] dark:bg-[#1D2431] bg-white">
+          <Scrollbars ref={ref} className="h-[calc(100vh-192px)] dark:bg-[#1D2431] bg-white">
             <div className="h-full p-2">
               {map(messages, (message) => (
                 <div key={message.id} className="mb-2">
                   <div className="flex items-end">
-                    <Avatar size={24} className="mr-2" src={message.participant.user?.image}>
+                    <Avatar className="mr-2" src={message.participant.user?.image}>
                       {message.participant.name?.charAt(0)}
                     </Avatar>
                     <div className="flex-1">
@@ -142,12 +142,8 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
         <div className="flex items-center justify-center h-16 border-t dark:border-t-[#232C3C]">
           <div className="flex items-center justify-between w-full px-4">
             <Form.Item className="mb-0 flex-1 mr-2" name="input">
-              <Input.TextArea
+              <Input
                 ref={refInput}
-                autoSize={{
-                  maxRows: 1,
-                  minRows: 1,
-                }}
                 size="large"
                 className="bg-transparent border-transparent flex-1 text-[#6B7280] placeholder:text-[#6B7280]"
                 placeholder="Type something..."
