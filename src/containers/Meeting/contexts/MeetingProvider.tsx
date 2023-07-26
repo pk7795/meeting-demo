@@ -25,7 +25,7 @@ export const MeetingContext = createContext<{
 
 export interface MeetingParticipantStatus {
   online: boolean
-  joining: string
+  joining: 'prepare-meeting' | 'meeting' | null
   audio?: boolean
   video?: boolean
 }
@@ -161,13 +161,7 @@ export const MeetingProvider = ({
         .on('presence', { event: 'leave' }, ({ key }) => {
           const paticipant = paticipants.get(key)
           if (paticipant) {
-            paticipants.set(key, {
-              ...paticipant,
-              meetingStatus: {
-                online: false,
-                joining: '',
-              },
-            })
+            paticipants.del(key)
           }
         })
 

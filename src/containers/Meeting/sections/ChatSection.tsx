@@ -1,11 +1,13 @@
 'use client'
 
 import { MeetingParticipant, useCurrentParticipant, useMeetingMessages, useMeetingParticipantsList } from '../contexts'
-import { Avatar, Form, Input } from 'antd'
+import { Avatar, Collapse, Form, Input } from 'antd'
+import classNames from 'classnames'
 import { map } from 'lodash'
 import { SendIcon } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
+import { css } from '@emotion/css'
 import { Room } from '@prisma/client'
 import { createMessage } from '@/app/actions/chat'
 import { ButtonIcon } from '@/components'
@@ -49,66 +51,103 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
   const renderUserStatus = useCallback((participant: MeetingParticipant) => {
     if (participant.meetingStatus?.online) {
       if (participant.meetingStatus?.joining === 'prepare-meeting') {
-        return <div className="ml-2 w-1 h-1 rounded-full bg-[#FBBF24]" />
+        return '#FBBF24'
       }
       if (participant.meetingStatus?.joining === 'meeting') {
-        return <div className="ml-2 w-1 h-1 rounded-full bg-[#10B981]" />
+        return '#10B981'
       }
     } else {
-      return <div className="ml-2 w-1 h-1 rounded-full bg-[#F87171]" />
+      return '#F87171'
     }
   }, [])
 
+  const classNameCollapse = css({
+    '.ant-collapse-header': {
+      paddingTop: '0px !important',
+      paddingBottom: '0px !important',
+      height: 64,
+      alignItems: 'center !important',
+      borderRadius: '0px !important',
+    },
+    '.ant-collapse-content': {
+      borderRadius: '0px !important',
+      border: 'none !important',
+    },
+    '.ant-collapse-content-box': {
+      padding: '0px !important',
+    },
+  })
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center border-b dark:border-b-[#232C3C] h-16 px-4 dark:bg-[#1D2431] bg-white">
-        <div className="text-lg text-[#9CA3AF]">Participants ({paticipantsList?.length})</div>
-      </div>
-      <div className="border-b dark:border-b-[#232C3C] max-h-[300px] min-h-[50px]">
-        <Scrollbars className="h-full">
-          <div className="p-2 h-full">
-            {/* List participating user by name and image and active status*/}
-            {map(paticipantsList, (p) => (
-              <div className="flex items-center mb-2 last:mb-0" key={p.id}>
-                <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
-                <div className="ml-2 text-[#9CA3AF]">{p.name}</div>
-                {renderUserStatus(p)}
-              </div>
-            ))}
-          </div>
-        </Scrollbars>
-      </div>
-      <div className="flex-1 flex flex-col">
-        <div className="flex items-center border-b dark:border-b-[#232C3C] h-16 px-4 dark:bg-[#1D2431] bg-white">
-          <div className="text-lg text-[#9CA3AF]">Chat</div>
-        </div>
-        <Scrollbars ref={ref}>
-          <div className="p-2">
-            {map(messages, (message) => (
-              <div key={message.id} className="mb-2">
-                <div className="flex items-center">
-                  <Avatar className="mr-2" src={message.participant.user?.image}>
-                    {message.participant.name?.charAt(0)}
-                  </Avatar>
-                  <div>
-                    <div className="flex items-center">
-                      <div className="text-xs font-bold text-[#F87171]">{message.participant.name}</div>
-                      <div className="ml-2 text-xs text-[#9CA3AF]">{formatDateChat(message.createdAt)}</div>
+      <Collapse
+        defaultActiveKey={['2']}
+        expandIconPosition="right"
+        accordion
+        className={classNames('border-none rounded-none flex-1', classNameCollapse)}
+      >
+        <Collapse.Panel
+          header={<div className="text-lg text-[#6B7280]">Participants ({paticipantsList?.length})</div>}
+          key="1"
+          className="rounded-none border-none"
+        >
+          <Scrollbars className="h-[calc(100vh-192px)] dark:bg-[#1D2431] bg-white">
+            <div className="h-full p-2">
+              {map(paticipantsList, (p) => (
+                <div className="flex items-center mb-2 last:mb-0" key={p.id}>
+                  <div className="relative">
+                    <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
+                    <div
+                      className="absolute bottom-0 right-0 w-2 h-2 rounded-full"
+                      style={{ backgroundColor: renderUserStatus(p) }}
+                    />
+                  </div>
+                  <div className="ml-2 text-[#6B7280]">{p.name}</div>
+                </div>
+              ))}
+            </div>
+          </Scrollbars>
+        </Collapse.Panel>
+        <Collapse.Panel
+          header={<div className="text-lg text-[#6B7280]">Chat</div>}
+          key="2"
+          className="rounded-none border-none"
+        >
+          <Scrollbars className="h-[calc(100vh-192px)] dark:bg-[#1D2431] bg-white">
+            <div className="h-full p-2">
+              {map(messages, (message) => (
+                <div key={message.id} className="mb-2">
+                  <div className="flex items-end">
+                    <Avatar size={24} className="mr-2" src={message.participant.user?.image}>
+                      {message.participant.name?.charAt(0)}
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs font-bold text-[#F87171]">{message.participant.name}</div>
+                        <div className="ml-2 text-[9px] text-[#6B7280]">{formatDateChat(message.createdAt)}</div>
+                      </div>
+                      <div
+                        className="text-sm text-[#6B7280] p-2 rounded-lg bg-gray-200 dark:bg-dark_ebony whitespace-pre-wrap w-fit"
+                        dangerouslySetInnerHTML={{ __html: message.content }}
+                      />
                     </div>
-                    <div className="text-sm text-[#9CA3AF]">{message.content}</div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </Scrollbars>
-      </div>
+              ))}
+            </div>
+          </Scrollbars>
+        </Collapse.Panel>
+      </Collapse>
       <Form form={form} onFinish={onSend}>
         <div className="flex items-center justify-center h-16 border-t dark:border-t-[#232C3C]">
           <div className="flex items-center justify-between w-full px-4">
             <Form.Item className="mb-0 flex-1 mr-2" name="input">
-              <Input
+              <Input.TextArea
                 ref={refInput}
+                autoSize={{
+                  maxRows: 1,
+                  minRows: 1,
+                }}
                 size="large"
                 className="bg-transparent border-transparent flex-1 text-[#6B7280] placeholder:text-[#6B7280]"
                 placeholder="Type something..."
