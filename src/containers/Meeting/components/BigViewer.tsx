@@ -1,6 +1,7 @@
 import { MeetingParticipant } from '../contexts'
+import { MicStream, Stream } from '../types'
 import { Avatar } from 'antd'
-import { MediaStreamArc, StreamConsumer, StreamConsumerPair, StreamRemote, VideoViewer } from 'bluesea-media-react-sdk'
+import { VideoViewer } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { MicIcon, MicOffIcon } from 'lucide-react'
 import { FC } from 'react'
@@ -8,8 +9,8 @@ import { Icon } from '@/components'
 
 type Props = {
   participant: MeetingParticipant
-  stream: MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer
-  micStream?: MediaStreamArc | MediaStream | StreamRemote | undefined
+  stream: Stream
+  micStream?: MicStream
   priority?: number
   isScreenShare?: boolean
 }
@@ -19,11 +20,7 @@ export const BigViewer: FC<Props> = ({ participant, stream, micStream, priority,
   return (
     <div className="w-full relative bg-black rounded-lg overflow-hidden h-full flex items-center">
       {stream ? (
-        <VideoViewer
-          className={classNameVideo}
-          stream={stream as MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer}
-          priority={priority}
-        />
+        <VideoViewer className={classNameVideo} stream={stream} priority={priority} />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">
           <Avatar src={participant.user?.image} size={120} className="bg-primary border-none">

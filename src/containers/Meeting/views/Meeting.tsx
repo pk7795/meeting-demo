@@ -8,7 +8,6 @@ import {
   BlueseaSessionProvider,
   LogLevel,
   MixMinusMode,
-  StreamKinds,
   useSharedDisplayMedia,
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
@@ -22,7 +21,7 @@ import { useRecoilValue } from 'recoil'
 import { LOGO_BLACK_LONG, LOGO_WHITE_LONG } from '@public'
 import { createRoomParticipantGuestUser, createRoomParticipantLoginUser } from '@/app/actions'
 import { ButtonIcon, Drawer } from '@/components'
-import { useDevice } from '@/hooks'
+import { useDevice, useFullScreen } from '@/hooks'
 import { BlueseaSession } from '@/lib/bluesea'
 import { themeState } from '@/recoil'
 import { RoomPopulated } from '@/types/types'
@@ -35,9 +34,9 @@ export const Meeting: React.FC<Props> = ({ room }) => {
   const { data: user } = useSession()
   const params = useParams()
   const [name, setName] = useState('')
-  const [isMaximize, setIsMaximize] = useState(false)
   const [layout, setLayout] = useState<'GRID' | 'LEFT'>('GRID')
   const [openChat, setOpenChat] = useState(false)
+  const { isMaximize, onOpenFullScreen } = useFullScreen()
   const { isMobile } = useDevice()
   const theme = useRecoilValue(themeState)
   const [date, setDate] = useState(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
@@ -89,17 +88,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
   useSharedUserMedia('camera_device')
   useSharedDisplayMedia('screen_device')
 
-  const onOpenFullScreen = () => {
-    const el = document.getElementById('full-screen')
-    if (document.fullscreenElement) {
-      document.exitFullscreen()
-      setIsMaximize(false)
-      return
-    } else {
-      el?.requestFullscreen()
-      setIsMaximize(true)
-    }
-  }
+  useEffect(() => {}, [])
 
   const senders = useMemo(() => {
     return [BlueseaSenders.audio, BlueseaSenders.video, BlueseaSenders.screen_audio, BlueseaSenders.screen_video]
@@ -147,7 +136,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
           receivers={{ audio: 0, video: 5 }}
         >
           <MeetingProvider room={room} roomParticipant={roomParticipant}>
-            <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen" id="full-screen">
+            <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen" id="id--fullScreen">
               <div className="h-full flex items-center">
                 <div className="flex-1 h-full flex flex-col">
                   <div className="flex items-center justify-between border-b dark:border-b-[#232C3C] h-16 px-4 bg-white dark:bg-[#17202E]">
@@ -185,7 +174,7 @@ export const Meeting: React.FC<Props> = ({ room }) => {
                     )}
                   </div>
                   <div className="flex-1 flex flex-col p-4 overflow-y-auto">
-                    <ViewSection layout={layout} />
+                    <ViewSection layout={layout} setLayout={setLayout} />
                   </div>
                   <ToolbarSection openChat={openChat} setOpenChat={setOpenChat} />
                 </div>

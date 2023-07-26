@@ -1,7 +1,7 @@
 import { BigViewer } from '.'
 import { BlueseaSenders, BlueseaStreamPriority } from '../constants'
 import { MeetingParticipant } from '../contexts'
-import { MediaStreamArc, StreamConsumer, StreamConsumerPair, StreamRemote } from 'bluesea-media-react-sdk'
+import { Stream } from '../types'
 import classNames from 'classnames'
 import { FC } from 'react'
 import { usePeerRemoteStreamActive } from '@/hooks'
@@ -20,7 +20,7 @@ export const RemoteBigViewer: FC<Props> = ({ participant }) => {
       <div className={classNames('w-full h-full', screenStream ? 'block' : 'hidden')}>
         <BigViewer
           participant={participant}
-          stream={screenStream as MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer}
+          stream={screenStream as Stream}
           priority={BlueseaStreamPriority.BigVideo}
           isScreenShare
         />
@@ -28,7 +28,7 @@ export const RemoteBigViewer: FC<Props> = ({ participant }) => {
       <div className={classNames('w-full h-full', !screenStream ? 'block' : 'hidden')}>
         <BigViewer
           participant={participant}
-          stream={camStream as MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer}
+          stream={camStream as Stream}
           micStream={micStream}
           priority={BlueseaStreamPriority.BigVideo}
         />
