@@ -23,4 +23,4 @@ export const genPasscode = () => {
   return password
 }
 
-export const formatDateChat = (date: Date) => (date ? dayjs(date).format('HH:mm') : '')
+export const formatDateChat = (date: Date) => (date ? dayjs(date).format('hh:mm a') : '')
