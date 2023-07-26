@@ -132,6 +132,7 @@ export const PrepareSection: React.FC<Props> = ({
             },
           })
           setAccess(RoomAccessStatus.PENDING)
+          roomChannel.unsubscribe()
         }
       })
     },

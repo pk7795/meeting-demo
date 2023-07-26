@@ -100,6 +100,9 @@ export default async function IndexMeeting({ params }: { params: { passcode: str
   })
 
   let access = RoomAccessStatus.JOINED
+  if (!session) {
+    access = RoomAccessStatus.NEED_ASK
+  }
 
   if (room.ownerId !== session?.id) {
     if (!roomInvite) {

@@ -59,8 +59,6 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
   useSharedUserMedia('camera_device')
   useSharedDisplayMedia('screen_device')
 
-  useEffect(() => {}, [])
-
   const senders = useMemo(() => {
     return [BlueseaSenders.audio, BlueseaSenders.video, BlueseaSenders.screen_audio, BlueseaSenders.screen_video]
   }, [])
@@ -95,10 +93,24 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
       const key = 'open' + Date.now()
       const btn = (
         <Space>
-          <Button type="link" size="small" onClick={opts.buttons.onCancel}>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              opts.buttons.onCancel()
+              api.destroy(key)
+            }}
+          >
             {opts.buttons.cancel}
           </Button>
-          <Button type="primary" size="small" onClick={opts.buttons.onConfirm}>
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => {
+              opts.buttons.onConfirm()
+              api.destroy(key)
+            }}
+          >
             {opts.buttons.confirm}
           </Button>
         </Space>
@@ -136,6 +148,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
       channel.subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           channel.send({ type: 'broadcast', event: 'accepted', payload: { token: 'aaaaaa' } })
+          channel.unsubscribe()
         }
       })
     },
@@ -159,9 +172,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access }) => {
                 sendAcceptJoinRequest(id, type)
               },
               cancel: 'Reject',
-              onCancel: () => {
-                api.destroy()
-              },
+              onCancel: () => {},
             },
           })
         })
