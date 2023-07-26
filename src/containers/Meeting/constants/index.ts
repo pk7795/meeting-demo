@@ -28,3 +28,8 @@ export const BlueseaStreamPriority = {
   BigVideo: 500,
   ScreenShare: 1000,
 }
+
+export enum UserType {
+  Guest = 'guest',
+  User = 'user',
+}

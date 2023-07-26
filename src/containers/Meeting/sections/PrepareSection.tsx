@@ -1,5 +1,4 @@
-'use client'
-
+import { UserType } from '../constants'
 import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
 import { Col, Divider, Input, Row, Select, Space, Typography } from 'antd'
 import { useSharedUserMedia, VideoViewer } from 'bluesea-media-react-sdk'
@@ -8,18 +7,34 @@ import { filter, find, map } from 'lodash'
 import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
+import { RoomParticipant } from '@prisma/client'
+import { RealtimeChannel } from '@supabase/supabase-js'
+import { createRoomParticipantGuestUser, createRoomParticipantLoginUser } from '@/app/actions'
 import { ButtonIcon, Icon } from '@/components'
+import { supabase } from '@/config/supabase'
 import { MainLayout } from '@/layouts'
+import { RoomAccessStatus } from '@/lib/constants'
+import { randomUUID } from '@/lib/random'
+import { RoomPopulated } from '@/types/types'
 
 type Props = {
   onJoinMeeting: () => void
-  isLoadingJoinMeeting: boolean
-  name: string
-  setName: (name: string) => void
+  room: RoomPopulated
+  myParticipant: RoomParticipant | null
+  setRoomParticipant: (participant: RoomParticipant) => void
+  setBlueseaConfig: (config: any) => void
+  roomAccess: RoomAccessStatus
 }
 
-export const PrepareSection: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMeeting, name, setName }) => {
+export const PrepareSection: React.FC<Props> = ({
+  room,
+  onJoinMeeting,
+  myParticipant,
+  setRoomParticipant,
+  setBlueseaConfig,
+  roomAccess,
+}) => {
   const { data: user } = useSession()
   const router = useRouter()
 
@@ -29,6 +44,9 @@ export const PrepareSection: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMe
   const [audioInput, setAudioInput] = useAudioInput()
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
 
+  const [access, setAccess] = useState<RoomAccessStatus | null>(roomAccess)
+  const [name, setName] = useState('')
+
   const [error, setError] = useState(false)
 
   const [mic, setMic] = useState(false)
@@ -36,6 +54,14 @@ export const PrepareSection: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMe
 
   const [, , micStreamChanger] = useSharedUserMedia('mic_device')
   const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
+
+  const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
+
+  const [acceptSubscription, setAcceptSubscription] = useState<RealtimeChannel>()
+
+  const guestUUID = useMemo(() => {
+    return randomUUID() + ':' + room.id
+  }, [room.id])
 
   useEffect(() => {
     if (mic) {
@@ -84,6 +110,143 @@ export const PrepareSection: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMe
       })
       .catch(() => setError(true))
   }, [handleDevices])
+
+  useEffect(() => {
+    return () => {
+      acceptSubscription?.unsubscribe()
+    }
+  }, [acceptSubscription])
+
+  const sendJoinRequest = useCallback(
+    (id: string, name: string, type: string) => {
+      const roomChannel = supabase.channel(`room:${room.id}`)
+      roomChannel.subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          roomChannel.send({
+            type: 'broadcast',
+            event: 'ask',
+            payload: {
+              id,
+              name,
+              type,
+            },
+          })
+          setAccess(RoomAccessStatus.PENDING)
+        }
+      })
+    },
+    [room.id]
+  )
+
+  const onUserJoin = useCallback(() => {
+    startTransitionCreateRoomParticipant(() => {
+      createRoomParticipantLoginUser({
+        data: {
+          passcode: room.passcode as string,
+        },
+      }).then(({ blueseaConfig, roomParticipant }) => {
+        setRoomParticipant(roomParticipant)
+        setBlueseaConfig(blueseaConfig)
+        onJoinMeeting()
+      })
+    })
+  }, [onJoinMeeting, room.passcode, setBlueseaConfig, setRoomParticipant])
+
+  const onGuestJoin = useCallback(() => {
+    startTransitionCreateRoomParticipant(() => {
+      createRoomParticipantGuestUser({
+        data: {
+          name,
+          passcode: room.passcode as string,
+        },
+      }).then(({ blueseaConfig, roomParticipant }) => {
+        setRoomParticipant(roomParticipant)
+        setBlueseaConfig(blueseaConfig)
+        onJoinMeeting()
+      })
+    })
+  }, [name, onJoinMeeting, room.passcode, setBlueseaConfig, setRoomParticipant])
+
+  const onJoin = useCallback(() => {
+    if (user) {
+      onUserJoin()
+    } else {
+      onGuestJoin()
+    }
+  }, [onGuestJoin, onUserJoin, user])
+
+  const onAsk = useCallback(() => {
+    startTransitionCreateRoomParticipant(() => {
+      if (user) {
+        createRoomParticipantLoginUser({
+          data: {
+            passcode: room.passcode as string,
+          },
+        }).then(({ blueseaConfig, roomParticipant }) => {
+          setRoomParticipant(roomParticipant)
+          setBlueseaConfig(blueseaConfig)
+          sendJoinRequest(roomParticipant.id, user.user.name as string, UserType.User)
+          setAcceptSubscription(
+            supabase
+              .channel(`${roomParticipant.id}:room:${room.id}`)
+              .on('broadcast', { event: 'accepted' }, ({ payload }) => {
+                setAccess(RoomAccessStatus.JOINED)
+                onJoin()
+              })
+              .subscribe()
+          )
+        })
+      } else {
+        sendJoinRequest(guestUUID, name, UserType.Guest)
+        setAcceptSubscription(
+          supabase
+            .channel(`${guestUUID}:room:${room.id}`)
+            .on('broadcast', { event: 'accepted' }, ({ payload }) => {
+              setAccess(RoomAccessStatus.JOINED)
+              onJoin()
+            })
+            .subscribe()
+        )
+      }
+    })
+  }, [guestUUID, name, onJoin, room.id, room.passcode, sendJoinRequest, setBlueseaConfig, setRoomParticipant, user])
+
+  const renderJoinButton = () => {
+    switch (access) {
+      case RoomAccessStatus.PENDING:
+        return (
+          <div className="flex items-center gap-4">
+            <ButtonIcon loading={true} block type="primary" size="large" disabled={true}>
+              Waiting for approval...
+            </ButtonIcon>
+            <ButtonIcon onClick={onAsk} block type="primary" size="large">
+              Request Again
+            </ButtonIcon>
+          </div>
+        )
+      case RoomAccessStatus.JOINED:
+        return (
+          <ButtonIcon onClick={onJoin} loading={isPendingCreateRoomParticipant} block type="primary" size="large">
+            Join
+          </ButtonIcon>
+        )
+      case RoomAccessStatus.NEED_ASK:
+        return (
+          <ButtonIcon
+            loading={isPendingCreateRoomParticipant}
+            onClick={onAsk}
+            block
+            type="primary"
+            size="large"
+            disabled={!user && !name}
+          >
+            Ask to join
+          </ButtonIcon>
+        )
+      default:
+        return <ButtonIcon loading={true} block type="primary" size="large" disabled={true} />
+    }
+  }
 
   return (
     <MainLayout>
@@ -150,7 +313,7 @@ export const PrepareSection: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMe
               ) : (
                 <div className="mb-4">
                   <Typography.Title className="font-semibold text-3xl mb-2 dark:text-gray-100">
-                    What&apos;s your name?
+                    Enter your name to start!
                   </Typography.Title>
                   <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter name" size="large" />
                 </div>
@@ -190,16 +353,7 @@ export const PrepareSection: React.FC<Props> = ({ onJoinMeeting, isLoadingJoinMe
                 <ButtonIcon onClick={() => router.push('/')} className="mr-2" type="default" size="large">
                   Cancel
                 </ButtonIcon>
-                <ButtonIcon
-                  loading={isLoadingJoinMeeting}
-                  onClick={onJoinMeeting}
-                  block
-                  type="primary"
-                  size="large"
-                  disabled={!user && !name}
-                >
-                  {user ? 'Join now' : 'Ask to join'}
-                </ButtonIcon>
+                {renderJoinButton()}
               </div>
             </div>
           </Col>

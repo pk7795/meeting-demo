@@ -117,23 +117,15 @@ export function JwtTokenPipe() {
   }
 }
 
-export async function JwtTokenEncrypt(data: any, issuer: string): Promise<string> {
+export async function JwtTokenEncrypt(data: any, expires: number = 24 * 60 * 60): Promise<string> {
   const jwt = await new EncryptJWT(data)
-    .setIssuer(issuer)
+    .setExpirationTime(expires)
     .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
     .encrypt(JwtSecret)
   return jwt
 }
 
-export async function createGroupToken(group_id: string): Promise<GroupToken> {
-  const token = await JwtTokenEncrypt(
-    {
-      group_id,
-    },
-    'group_token'
-  )
-  return {
-    server_endpoint: env.PUBLIC_URL + '/api/instances',
-    token,
-  }
+export async function JwtTokenDecrypt(token: string): Promise<any> {
+  const { payload } = await jwtDecrypt(token, JwtSecret)
+  return payload
 }
