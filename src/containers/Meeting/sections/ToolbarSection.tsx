@@ -374,7 +374,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
         }}
         destroyOnClose
         centered
-        getContainer={() => document.getElementById('full-screen') as HTMLElement}
+        getContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
       >
         <Typography.Paragraph className="dark:text-gray-400 mb-2">
           Invite people to join this meeting
@@ -403,7 +403,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
         footer={false}
         destroyOnClose
         centered
-        getContainer={() => document.getElementById('full-screen') as HTMLElement}
+        getContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
       >
         <div className="mb-4">
           <Select
@@ -453,7 +453,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
         open={openDrawerWhiteboard}
         onClose={() => setOpenDrawerWhiteboard(false)}
         destroyOnClose
-        getContainer={() => document.getElementById('full-screen') as HTMLElement}
+        getContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
       >
         <iframe src={whiteboardUri} className="w-full h-full" />
       </Drawer>
