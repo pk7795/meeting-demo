@@ -1,4 +1,4 @@
-import { ContentHint, SenderConfig, StreamKinds } from 'bluesea-media-react-sdk'
+import { ContentHint, StreamKinds } from 'bluesea-media-react-sdk'
 
 export const BlueseaSenders = {
   video: {
