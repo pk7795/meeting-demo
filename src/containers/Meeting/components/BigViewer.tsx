@@ -61,7 +61,7 @@ export const BigViewer: FC<Props> = ({ participant, stream, micStream, priority,
         {isPinned ? <PinOffIcon size={16} className="text-white" /> : <PinIcon size={16} className="text-white" />}
       </div>
       {stream ? (
-        <VideoViewer className={classNameVideo} stream={stream} priority={priority} />
+        <VideoViewer playsInline className={classNameVideo} stream={stream} priority={priority} />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">
           <Avatar src={participant.user?.image} size={120} className="bg-primary border-none">
