@@ -1,12 +1,12 @@
 import { ViewerWapper } from '.'
 import { BlueseaSenders } from '../constants'
-import { MeetingParticipant } from '../contexts'
 import { Stream } from '../types'
 import classNames from 'classnames'
 import { MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
 import { FC, useMemo } from 'react'
 import { Icon } from '@/components'
 import { usePeerRemoteStreamActive } from '@/hooks'
+import { MeetingParticipant } from '@/types/types'
 
 type Props = {
   participant: MeetingParticipant
@@ -17,6 +17,7 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
   const camStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.video.name)
   const micStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.audio.name)
   const screenStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.screen_video.name)
+  // console.log(participant) // <--- hand raise status in this object
 
   const _renderView = useMemo(() => {
     if (screenStream && !isPinned) {

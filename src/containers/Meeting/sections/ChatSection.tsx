@@ -1,29 +1,47 @@
 'use client'
 
-import { MeetingParticipant, useCurrentParticipant, useMeetingMessages, useMeetingParticipantsList } from '../contexts'
+import { UserType } from '../constants'
+import {
+  useCurrentParticipant,
+  useMeetingMessages,
+  useMeetingParticipantsList,
+  usePendingParticipants,
+} from '../contexts'
 import { Avatar, Form, Input } from 'antd'
 import { map } from 'lodash'
-import { SendIcon } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { CheckCircleIcon, SendIcon, XCircleIcon } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
+import { acceptParticipant, rejectParticipant } from '@/app/actions'
 import { createMessage } from '@/app/actions/chat'
 import { ButtonIcon, Tabs } from '@/components'
+import { MeetingParticipant } from '@/types/types'
 import { formatDateChat } from '@/utils'
 
 type Props = {
   room: Partial<Room> | null
+  sendAcceptJoinRequest: (participantId: string, type: UserType) => void
 }
 
-export const ChatSection: React.FC<Props> = ({ room }) => {
+export const ChatSection: React.FC<Props> = ({ room, sendAcceptJoinRequest }) => {
   const ref = useRef<Scrollbars>(null)
   const refInput = useRef<any>(null)
   const [form] = Form.useForm()
+  const { data } = useSession()
 
   const messages = useMeetingMessages()
   const paticipantsList = useMeetingParticipantsList()
   const currentParticipant = useCurrentParticipant()
+  const [pendingParticipants, delPendingParticipant] = usePendingParticipants()
   const [activeKey, setActiveKey] = useState('1')
+  const [isPendingAccept, startTransitionAccept] = useTransition()
+  const [isPendingReject, startTransitionReject] = useTransition()
+
+  const isRoomOwner = useMemo(() => {
+    return room?.ownerId === data?.user.id
+  }, [data?.user.id, room?.ownerId])
 
   useEffect(() => {
     ref.current?.scrollToBottom()
@@ -58,6 +76,28 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
       return '#F87171'
     }
   }, [])
+
+  const onAccept = useCallback(
+    (participant: MeetingParticipant) => {
+      startTransitionAccept(() => {
+        const userType = participant.user ? UserType.User : UserType.Guest
+        sendAcceptJoinRequest(participant.id, userType)
+        delPendingParticipant(participant.id)
+      })
+    },
+    [delPendingParticipant, sendAcceptJoinRequest]
+  )
+
+  const onReject = useCallback(
+    (participant: MeetingParticipant) => {
+      startTransitionReject(() => {
+        rejectParticipant(participant.id).then(() => {
+          delPendingParticipant(participant.id)
+        })
+      })
+    },
+    [delPendingParticipant]
+  )
 
   return (
     <div className="flex flex-col h-full">
@@ -127,6 +167,43 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
                       <div className="ml-2 text-[#6B7280]">{p.name}</div>
                     </div>
                   ))}
+
+                  {isRoomOwner && pendingParticipants.length > 0 && (
+                    <>
+                      <div className="h-px bg-[#E5E7EB] my-2" />
+                      <div className="text-sm text-[##E5E7EB] mb-2">
+                        Pending requests ({pendingParticipants.length})
+                      </div>
+                      <div className="h-px bg-[#E5E7EB] my-2" />
+
+                      {map(pendingParticipants, (p) => (
+                        <div className="flex items-center mb-2 last:mb-0" key={p.id}>
+                          <div className="relative">
+                            <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
+                          </div>
+                          <div className="ml-2 text-[#6B7280]">{p.name}</div>
+
+                          <div className="ml-auto flex">
+                            <ButtonIcon
+                              size="small"
+                              type="text"
+                              loading={isPendingAccept}
+                              onClick={() => onAccept(p)}
+                              icon={<CheckCircleIcon size={16} />}
+                              className="mr-2"
+                            />
+                            <ButtonIcon
+                              size="small"
+                              type="text"
+                              loading={isPendingReject}
+                              onClick={() => onReject(p)}
+                              icon={<XCircleIcon size={16} />}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
                 </div>
               </Scrollbars>
             ),

@@ -1,6 +1,7 @@
 import { Meeting } from '@/containers'
 import { getPrisma, getSessionUser } from '@/lib'
 import { RoomAccessStatus } from '@/lib/constants'
+import { RoomParticipantWithUser } from '@/types/types'
 
 export type OneRoom = {
   id: string
@@ -116,5 +117,23 @@ export default async function IndexMeeting({ params }: { params: { passcode: str
     }
   }
 
-  return <Meeting room={room} myParticipant={myParticipant} access={access} />
+  // Get pending participants
+  let pendingParticipants: RoomParticipantWithUser[] = []
+  pendingParticipants = await prisma.roomParticipant.findMany({
+    where: {
+      roomId: room.id,
+      accepted: false,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+    },
+  })
+
+  return <Meeting room={room} myParticipant={myParticipant} access={access} pendingParticipants={pendingParticipants} />
 }

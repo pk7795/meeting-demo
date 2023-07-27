@@ -113,14 +113,16 @@ export const PrepareSection: React.FC<Props> = ({
 
   useEffect(() => {
     return () => {
-      acceptSubscription?.unsubscribe()
+      acceptSubscription && supabase.removeChannel(acceptSubscription)
     }
   }, [acceptSubscription])
 
   const sendJoinRequest = useCallback(
     (id: string, name: string, type: string) => {
+      // TODO: Refactor
       const roomChannel = supabase.channel(`room:${room.id}`)
       roomChannel.subscribe((status) => {
+        console.log('AYO', status)
         if (status === 'SUBSCRIBED') {
           roomChannel.send({
             type: 'broadcast',
@@ -129,14 +131,18 @@ export const PrepareSection: React.FC<Props> = ({
               id,
               name,
               type,
+              user: {
+                id: user?.user.id,
+                name: user?.user.name,
+                email: user?.user.image,
+              },
             },
           })
           setAccess(RoomAccessStatus.PENDING)
-          roomChannel.unsubscribe()
         }
       })
     },
-    [room.id]
+    [room.id, user?.user.id, user?.user.image, user?.user.name]
   )
 
   const onUserJoin = useCallback(() => {

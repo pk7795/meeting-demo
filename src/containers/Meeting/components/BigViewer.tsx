@@ -1,4 +1,4 @@
-import { MeetingParticipant, usePinnedParticipant } from '../contexts'
+import { usePinnedParticipant } from '../contexts'
 import { MicStream, Stream } from '../types'
 import { Avatar } from 'antd'
 import { VideoViewer } from 'bluesea-media-react-sdk'
@@ -7,6 +7,7 @@ import { MicIcon, MicOffIcon, PinIcon, PinOffIcon } from 'lucide-react'
 import { FC, useMemo } from 'react'
 import { css } from '@emotion/css'
 import { Icon } from '@/components'
+import { MeetingParticipant } from '@/types/types'
 
 type Props = {
   participant: MeetingParticipant

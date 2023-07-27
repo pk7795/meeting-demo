@@ -1,10 +1,11 @@
+import { UserType } from '../constants'
 import { useAudioSlotMix } from 'bluesea-media-react-sdk'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
-import { RoomMessageWithParticipant, RoomPopulated } from '@/types/types'
+import { MeetingParticipant, RoomMessageWithParticipant, RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 
 type PinnedPaticipant = { p: MeetingParticipant; force?: boolean }
 
@@ -13,14 +14,18 @@ export const MeetingContext = createContext<{
     paticipants: MapContainer<string, MeetingParticipant>
     messages: MapContainer<string, RoomMessageWithParticipant>
     participantState: DataContainer<MeetingParticipantStatus>
-
+    joinRequest: DataContainer<{ id: string; name: string; type: UserType } | null>
     pinnedPaticipant: DataContainer<PinnedPaticipant | null>
     talkingParticipantId: DataContainer<string>
     currentPaticipant: RoomParticipant
+    pendingParticipants: MapContainer<string, Partial<RoomParticipantWithUser>>
+    roomSupabaseChannel: DataContainer<RealtimeChannel>
     destroy: () => void
   }
   setParticipantState: (state: MeetingParticipantStatus) => void
   setPinnedParticipant: (participant: PinnedPaticipant | null) => void
+  clearJoinRequest: () => void
+  deletePendingParticipant: (participantId: string) => void
 }>({} as any)
 
 export interface MeetingParticipantStatus {
@@ -28,22 +33,15 @@ export interface MeetingParticipantStatus {
   joining: 'prepare-meeting' | 'meeting' | null
   audio?: boolean
   video?: boolean
-}
-
-export type MeetingParticipant = Partial<RoomParticipant> & {
-  is_me: boolean
-  online_at?: string
-  meetingStatus?: MeetingParticipantStatus
-  user?: {
-    name: string
-    image: string
-  }
+  handRaised?: boolean
+  screenShare?: boolean
 }
 
 export const MeetingProvider = ({
   children,
   room,
   roomParticipant,
+  pendingParticipantsList,
 }: {
   children: React.ReactNode
   room: RoomPopulated | null
@@ -62,14 +60,22 @@ export const MeetingProvider = ({
     createdAt: Date
     updatedAt: Date
   }
+  pendingParticipantsList: RoomParticipantWithUser[]
 }) => {
   const data = useMemo(() => {
     const paticipants = new MapContainer<string, MeetingParticipant>()
     const messages = new MapContainer<string, RoomMessageWithParticipant>()
-    const participantState = new DataContainer<MeetingParticipantStatus>({ online: true, joining: 'meeting' })
-
+    const participantState = new DataContainer<MeetingParticipantStatus>({
+      online: true,
+      joining: 'meeting',
+      handRaised: false,
+      screenShare: false,
+    })
     const pinnedPaticipant = new DataContainer<PinnedPaticipant | null>(null)
+    const joinRequest = new DataContainer<{ id: string; name: string; type: UserType } | null>(null)
     const talkingParticipantId = new DataContainer<string>('')
+    const pendingParticipants = new MapContainer<string, Partial<RoomParticipantWithUser>>()
+    const roomSupabaseChannel = new DataContainer<RealtimeChannel>({} as any)
 
     talkingParticipantId.addChangeListener((participantId) => {
       const paticipant = paticipants.get(participantId)
@@ -90,6 +96,12 @@ export const MeetingProvider = ({
       return acc
     }, new Map<string, RoomMessageWithParticipant>())
     messages.setBatch(messagesMap)
+
+    const pendingMap = pendingParticipantsList.reduce((acc, participant) => {
+      acc.set(participant.id, participant)
+      return acc
+    }, new Map<string, Partial<RoomParticipantWithUser>>())
+    pendingParticipants.setBatch(pendingMap)
 
     const onMessageRoomChanged = (payload: {
       new: {
@@ -123,6 +135,56 @@ export const MeetingProvider = ({
         onMessageRoomChanged
       )
       .subscribe()
+
+    roomSupabaseChannel.change(supabase.channel(`room:${room!.id}`))
+
+    roomSupabaseChannel.data
+      .on('broadcast', { event: '*' }, ({ event, payload }) => {
+        if (roomParticipant?.user?.id === room!.ownerId) {
+          if (event === 'ask') {
+            const id = payload.id
+            const name = payload.name
+            const type = payload.type
+            const user = payload.user
+
+            if (!pendingParticipants.has(id)) {
+              pendingParticipants.set(id, {
+                id,
+                name,
+                user,
+              })
+            }
+
+            joinRequest.change({
+              id,
+              name,
+              type,
+            })
+          }
+        }
+
+        if (event === 'screen-share') {
+          const screenShare = payload.data.screenShare
+          const participantId = payload.participantId
+          // TODO: Implement a screen queue that dynamically pin the screen share
+          // For now, we just pin the first screen share
+          if (screenShare) {
+            const participant = paticipants.get(participantId)
+            if (participant) {
+              pinnedPaticipant.change({
+                p: participant,
+                force: true,
+              })
+            }
+          } else if (pinnedPaticipant.data?.p.id === participantId) {
+            pinnedPaticipant.change(null)
+          }
+        }
+        if (event === 'interact') {
+          console.log(payload)
+        }
+      })
+      .subscribe((status) => {})
 
     let presenceChannelSubscription: RealtimeChannel | null = null
     if (roomParticipant.id) {
@@ -190,20 +252,24 @@ export const MeetingProvider = ({
     }
 
     const destroy = () => {
-      roomMessageSubscription.unsubscribe()
-      presenceChannelSubscription && presenceChannelSubscription.unsubscribe()
+      supabase.removeChannel(roomMessageSubscription)
+      presenceChannelSubscription && supabase.removeChannel(presenceChannelSubscription)
+      supabase.removeChannel(roomSupabaseChannel.data)
     }
 
     return {
       paticipants,
       pinnedPaticipant,
       talkingParticipantId,
+      pendingParticipants,
       messages,
       participantState,
+      joinRequest,
+      roomSupabaseChannel,
       currentPaticipant: roomParticipant,
       destroy,
     }
-  }, [room, roomParticipant])
+  }, [])
 
   useEffect(() => {
     return data.destroy
@@ -215,6 +281,10 @@ export const MeetingProvider = ({
     },
     [data.participantState]
   )
+
+  const clearJoinRequest = useCallback(() => {
+    data.joinRequest.change(null)
+  }, [data])
 
   const setTalkingParticipantId = useCallback(
     (participantId: string) => {
@@ -229,6 +299,13 @@ export const MeetingProvider = ({
       data.pinnedPaticipant.change(participant)
     },
     [data.pinnedPaticipant]
+  )
+
+  const deletePendingParticipant = useCallback(
+    (participantId: string) => {
+      data.pendingParticipants.del(participantId)
+    },
+    [data.pendingParticipants]
   )
 
   const audioSlot0 = useAudioSlotMix(0)
@@ -261,7 +338,15 @@ export const MeetingProvider = ({
   }, [audioSlot0, audioSlot1, audioSlot2, setTalkingParticipantId])
 
   return (
-    <MeetingContext.Provider value={{ data, setParticipantState, setPinnedParticipant }}>
+    <MeetingContext.Provider
+      value={{
+        data,
+        clearJoinRequest,
+        deletePendingParticipant,
+        setParticipantState,
+        setPinnedParticipant,
+      }}
+    >
       {children}
     </MeetingContext.Provider>
   )
@@ -275,6 +360,11 @@ export const useMeeting = () => {
 export const useMeetingMessages = () => {
   const context = useMeeting()
   return useReactionList(context.data.messages)
+}
+
+export const useRoomSupabaseChannel = () => {
+  const context = useMeeting()
+  return useReactionData<RealtimeChannel>(context.data.roomSupabaseChannel)
 }
 
 export const useMeetingParticipantsList = (): MeetingParticipant[] => {
@@ -313,4 +403,18 @@ export const useTalkingParticipantId = () => {
 export const useCurrentParticipant = () => {
   const context = useMeeting()
   return context.data.currentPaticipant
+}
+
+export const useJoinRequest = () => {
+  const context = useMeeting()
+  const joinRequest = useReactionData<{ id: string; name: string; type: UserType } | null>(context.data.joinRequest)
+  return [joinRequest, context.clearJoinRequest] as const
+}
+
+export const usePendingParticipants = () => {
+  const context = useMeeting()
+  const pendingParticipants = useReactionList<string, Partial<RoomParticipantWithUser>>(
+    context.data.pendingParticipants
+  )
+  return [pendingParticipants, context.deletePendingParticipant] as const
 }

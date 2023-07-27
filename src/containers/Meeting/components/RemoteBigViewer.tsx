@@ -1,10 +1,10 @@
 import { BigViewer } from '.'
 import { BlueseaSenders, BlueseaStreamPriority } from '../constants'
-import { MeetingParticipant } from '../contexts'
 import { Stream } from '../types'
 import classNames from 'classnames'
 import { FC } from 'react'
 import { usePeerRemoteStreamActive } from '@/hooks'
+import { MeetingParticipant } from '@/types/types'
 
 type Props = {
   participant: MeetingParticipant
