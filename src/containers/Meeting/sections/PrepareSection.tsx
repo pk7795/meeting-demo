@@ -195,7 +195,7 @@ export const PrepareSection: React.FC<Props> = ({
           setAcceptSubscription(
             supabase
               .channel(`${roomParticipant.id}:room:${room.id}`)
-              .on('broadcast', { event: 'accepted' }, ({ payload }) => {
+              .on('broadcast', { event: 'accepted' }, () => {
                 setAccess(RoomAccessStatus.JOINED)
                 onJoin()
               })
@@ -207,7 +207,7 @@ export const PrepareSection: React.FC<Props> = ({
         setAcceptSubscription(
           supabase
             .channel(`${guestUUID}:room:${room.id}`)
-            .on('broadcast', { event: 'accepted' }, ({ payload }) => {
+            .on('broadcast', { event: 'accepted' }, () => {
               setAccess(RoomAccessStatus.JOINED)
               onJoin()
             })
@@ -221,14 +221,9 @@ export const PrepareSection: React.FC<Props> = ({
     switch (access) {
       case RoomAccessStatus.PENDING:
         return (
-          <div className="flex items-center gap-4">
-            <ButtonIcon loading={true} block type="primary" size="large" disabled={true}>
-              Waiting for approval...
-            </ButtonIcon>
-            <ButtonIcon onClick={onAsk} block type="primary" size="large">
-              Request Again
-            </ButtonIcon>
-          </div>
+          <ButtonIcon loading={true} block type="primary" size="large" disabled={true}>
+            Waiting for host to accept
+          </ButtonIcon>
         )
       case RoomAccessStatus.JOINED:
         return (

@@ -5,9 +5,11 @@ import { useOnlineMeetingParticipantsList, usePinnedParticipant } from '../conte
 import { Col, Row } from 'antd'
 import classNames from 'classnames'
 import { map } from 'lodash'
-import { PinIcon, PinOffIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, PinIcon, PinOffIcon } from 'lucide-react'
+import { useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { css } from '@emotion/css'
+import { ButtonIcon } from '@/components'
 import { useDevice } from '@/hooks'
 
 type Props = {
@@ -19,6 +21,7 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
   const participants = useOnlineMeetingParticipantsList()
   const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
   const { isMobile } = useDevice()
+  const [showUser, setShowUser] = useState(true)
 
   const renderBigViewer = () => {
     if (!pinnedParticipant?.p) {
@@ -46,13 +49,25 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
   return (
     <Row className="h-full">
       {!isMobile && layout !== 'GRID' && (
-        <Col span={24} lg={20}>
-          <div className="w-[calc(100%-16px)] h-[calc(100vh-160px)] relative flex items-center bg-black rounded-lg">
+        <Col span={24} lg={showUser ? 20 : 24}>
+          <div className={classNames('h-[calc(100vh-160px)] relative flex items-center bg-black rounded-lg w-full')}>
             {renderBigViewer()}
+            <ButtonIcon
+              onClick={() => setShowUser(!showUser)}
+              icon={
+                showUser ? (
+                  <ChevronRightIcon size={16} className="text-white" />
+                ) : (
+                  <ChevronLeftIcon size={16} className="text-white" />
+                )
+              }
+              className="absolute right-2 bg-white bg-opacity-10"
+              shape="circle"
+            />
           </div>
         </Col>
       )}
-      <Col span={24} lg={isMobile ? 24 : layout === 'GRID' ? 24 : 4}>
+      <Col span={24} lg={isMobile ? 24 : layout === 'GRID' ? 24 : showUser ? 4 : 0}>
         <Scrollbars className="w-full">
           <Row>
             {map(participants, (p) => {
