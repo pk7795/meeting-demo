@@ -1,21 +1,14 @@
 'use client'
 
-import { BlueseaSenders, UserType } from '../constants'
+import { UserType } from '../constants'
 import { useJoinRequest, usePendingParticipants, useRoomSupabaseChannel } from '../contexts'
 import { ChatSection, ToolbarSection, ViewSection } from '../sections'
 import { Button, notification, Space } from 'antd'
-import {
-  BlueseaSessionProvider,
-  LogLevel,
-  MixMinusMode,
-  useSharedDisplayMedia,
-  useSharedUserMedia,
-} from 'bluesea-media-react-sdk'
 import dayjs from 'dayjs'
 import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { RoomParticipant } from '@prisma/client'
 import { LOGO_SHORT } from '@public'
@@ -41,7 +34,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [theme, setTheme] = useRecoilState(themeState)
   const [date, setDate] = useState(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
   const [joinRequest, clearJoinRequest] = useJoinRequest()
-  const [pendingParticipants, delPendingParticipant] = usePendingParticipants()
+  const [, delPendingParticipant] = usePendingParticipants()
   const roomSupabaseChannel = useRoomSupabaseChannel()
 
   useEffect(() => {
@@ -64,10 +57,6 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   //   }, 1000)
   //   return () => clearInterval(interval)
   // }, [])
-
-  useSharedUserMedia('mic_device')
-  useSharedUserMedia('camera_device')
-  useSharedDisplayMedia('screen_device')
 
   const openNotification = useCallback(
     (opts: {

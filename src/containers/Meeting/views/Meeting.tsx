@@ -4,7 +4,13 @@ import { BlueseaSenders } from '../constants'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
 import { PrepareSection } from '../sections'
 import { MainSection } from '../sections/MainSection'
-import { BlueseaSessionProvider, LogLevel, MixMinusMode } from 'bluesea-media-react-sdk'
+import {
+  BlueseaSessionProvider,
+  LogLevel,
+  MixMinusMode,
+  useSharedDisplayMedia,
+  useSharedUserMedia,
+} from 'bluesea-media-react-sdk'
 import { useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { BlueseaSession } from '@/lib/bluesea'
@@ -54,6 +60,10 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
       document.getElementById('id-audio-3')?.remove()
     }
   }, [createAudio])
+
+  useSharedUserMedia('mic_device')
+  useSharedUserMedia('camera_device')
+  useSharedDisplayMedia('screen_device')
 
   return (
     <MediaDeviceProvider>

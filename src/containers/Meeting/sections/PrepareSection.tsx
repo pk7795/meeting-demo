@@ -30,7 +30,6 @@ type Props = {
 export const PrepareSection: React.FC<Props> = ({
   room,
   onJoinMeeting,
-  myParticipant,
   setRoomParticipant,
   setBlueseaConfig,
   roomAccess,
