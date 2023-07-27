@@ -59,3 +59,37 @@ export const roomInclude = Prisma.validator<Prisma.RoomInclude>()({
 export type RoomPopulated = Prisma.RoomGetPayload<{
   include: typeof roomInclude
 }>
+
+export type NotificationOptions = {
+  message: string
+  description: string
+  buttons: {
+    confirm?: string
+    onConfirm: () => void
+    cancel: string
+    onCancel: () => void
+  }
+}
+
+export type RoomParticipantWithUser = Prisma.RoomParticipantGetPayload<{
+  include: {
+    user: {
+      select: {
+        id: true
+        name: true
+        image: true
+      }
+    }
+  }
+}>
+
+export type MeetingParticipant = Partial<RoomParticipant> & {
+  is_me: boolean
+  online_at?: string
+  meetingStatus?: MeetingParticipantStatus
+  handRaised?: boolean
+  user?: {
+    name: string
+    image: string
+  }
+}

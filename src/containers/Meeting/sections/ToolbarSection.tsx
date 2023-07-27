@@ -1,7 +1,14 @@
 'use client'
 
 import { BlueseaSenders } from '../constants'
-import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
+import {
+  useAudioInput,
+  useCurrentParticipant,
+  useMeetingParticipantState,
+  useSelectedCam,
+  useSelectedMic,
+  useVideoInput,
+} from '../contexts'
 import { Modal, Popover, Select, Space, Typography } from 'antd'
 import {
   useActions,
@@ -16,6 +23,7 @@ import { find, map } from 'lodash'
 import {
   CameraIcon,
   CopyIcon,
+  HandIcon,
   HashIcon,
   MailPlusIcon,
   MessagesSquareIcon,
@@ -32,8 +40,8 @@ import {
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useParams, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
-import { UserRole, UserStatus } from '@prisma/client'
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { Room, UserRole, UserStatus } from '@prisma/client'
 import { inviteToRoom } from '@/app/actions'
 import { ButtonIcon, Copy, Drawer, Icon, useApp } from '@/components'
 import { supabase } from '@/config/supabase'
@@ -42,14 +50,17 @@ import { useDevice } from '@/hooks'
 type Props = {
   openChat: boolean
   setOpenChat: (open: boolean) => void
+  sendEvent: (event: string, data?: any) => void
 }
 
-export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
+export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEvent }) => {
   const { data: user } = useSession()
   const actions = useActions()
   const params = useParams()
   const { modal, message } = useApp()
   const router = useRouter()
+  const currentParticipant = useCurrentParticipant()
+  const [userState, setUserState] = useMeetingParticipantState()
   const [openModalInvites, setOpenModalInvites] = useState(false)
   const [openModalSettings, setOpenModalSettings] = useState(false)
   const [openDrawerWhiteboard, setOpenDrawerWhiteboard] = useState(false)
@@ -82,6 +93,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
   const [micStream, , micStreamChanger] = useSharedUserMedia('mic_device')
   const [camStream, , camStreamChanger] = useSharedUserMedia('camera_device')
   const [screenStream, , screenStreamChanger] = useSharedDisplayMedia('screen_device')
+  const [prvScreenStream, setPrvScreenStream] = useState<any>(null)
 
   const [videoInput] = useVideoInput()
   const [selectedVideoInput, setSelectedVideoInput] = useSelectedCam()
@@ -114,7 +126,16 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
 
   useEffect(() => {
     screenVideoPublisher.switchStream(screenStream)
-  }, [screenStream, screenVideoPublisher])
+    if (screenStream) {
+      setUserState({ ...userState, screenShare: true })
+      sendEvent('screen-share', { screenShare: true })
+    } else {
+      if (prvScreenStream) {
+        setUserState({ ...userState, screenShare: false })
+        sendEvent('screen-share', { screenShare: false })
+      }
+    }
+  }, [currentParticipant.id, screenStream, screenVideoPublisher, sendEvent, setUserState])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
@@ -177,6 +198,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
   }, [camPublisherStream, camStreamChanger, selectedVideoInput?.deviceId])
 
   const toggleScreen = useCallback(() => {
+    setPrvScreenStream(screenStream)
     if (screenPublisherStream) {
       screenStreamChanger(undefined)
     } else {
@@ -186,6 +208,16 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
       })
     }
   }, [screenPublisherStream, screenStreamChanger])
+
+  const toggleRaiseHand = () => {
+    if (userState.handRaised) {
+      setUserState({ ...userState, handRaised: false })
+      sendEvent('interact', { handRaised: false })
+    } else {
+      setUserState({ ...userState, handRaised: true })
+      sendEvent('interact', { handRaised: true })
+    }
+  }
 
   const onInvite = useCallback(() => {
     startTransitionInviteToRoom(() => {
@@ -298,6 +330,22 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat }) => {
               />
             </>
           )}
+          <ButtonIcon
+            size="large"
+            type="primary"
+            className={classNames(
+              'shadow-none border border-gray-200 dark:border-[#3A4250]',
+              !userState.handRaised ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
+            )}
+            onClick={toggleRaiseHand}
+            icon={
+              <HandIcon
+                size={16}
+                className={classNames('dark:text-white text-primary_text', userState.handRaised ? 'text-white' : '')}
+              />
+            }
+            tooltip="Settings"
+          />
           <ButtonIcon
             size="large"
             type="primary"

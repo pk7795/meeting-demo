@@ -1,12 +1,12 @@
 import { ViewerWapper } from '.'
 import { BlueseaSenders } from '../constants'
-import { MeetingParticipant } from '../contexts'
 import { Stream } from '../types'
 import { useAudioLevelProducer, usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { Icon } from '@/components'
+import { MeetingParticipant } from '@/types/types'
 
 type Props = {
   participant: MeetingParticipant

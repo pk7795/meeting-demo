@@ -21,6 +21,8 @@ export async function createRoomParticipantLoginUser({ data }: { data: { passcod
     throw new Error('RoomNotFound')
   }
 
+  const isOwner = room.ownerId === session.id
+
   let roomParticipant = await prisma.roomParticipant.findFirst({
     where: {
       userId: session.id,
@@ -37,6 +39,7 @@ export async function createRoomParticipantLoginUser({ data }: { data: { passcod
         name: session.name,
         roomId: room.id as string,
         userId: session.id,
+        accepted: isOwner,
       },
       include: {
         user: true,
@@ -75,6 +78,7 @@ export async function createRoomParticipantGuestUser({ data }: { data: { name: s
     data: {
       name: data.name,
       roomId: room.id as string,
+      accepted: true,
     },
   })
 
@@ -114,7 +118,7 @@ export async function acceptParticipant(participantId: string) {
   }
 
   if (roomParticipant.room.ownerId !== session.id) {
-    throw new Error('Unauthorized')
+    throw new Error('Unauthorized: Not Owner')
   }
 
   const updatedRoomParticipant = await prisma.roomParticipant.update({
@@ -123,6 +127,40 @@ export async function acceptParticipant(participantId: string) {
     },
     data: {
       accepted: true,
+    },
+  })
+
+  return updatedRoomParticipant
+}
+
+export async function rejectParticipant(participantId: string) {
+  const prisma = getPrisma()
+  const session = await getSessionUser()
+
+  if (!session) {
+    throw new Error('Unauthorized')
+  }
+
+  const roomParticipant = await prisma.roomParticipant.findFirst({
+    where: {
+      id: participantId,
+    },
+    include: {
+      room: true,
+    },
+  })
+
+  if (!roomParticipant) {
+    throw new Error('ParticipantNotFound')
+  }
+
+  if (roomParticipant.room.ownerId !== session.id) {
+    throw new Error('Unauthorized: Not Owner')
+  }
+
+  const updatedRoomParticipant = await prisma.roomParticipant.delete({
+    where: {
+      id: participantId,
     },
   })
 
