@@ -264,7 +264,7 @@ export const PrepareSection: React.FC<Props> = ({
               {!error && selectedVideoInput ? (
                 <>
                   {camStream ? (
-                    <VideoViewer stream={camStream} className="w-full h-full object-cover" />
+                    <VideoViewer playsInline stream={camStream} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center">
                       <Icon className="-mt-6" icon={<CameraIcon color="#FFF" size={64} />} />
