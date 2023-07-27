@@ -5,11 +5,12 @@ import {
   useAudioInput,
   useCurrentParticipant,
   useMeetingParticipantState,
+  usePendingParticipants,
   useSelectedCam,
   useSelectedMic,
   useVideoInput,
 } from '../contexts'
-import { Modal, Popover, Select, Space, Typography } from 'antd'
+import { Badge, Modal, Popover, Select, Space, Typography } from 'antd'
 import {
   useActions,
   useAudioLevelProducer,
@@ -19,7 +20,7 @@ import {
   useSharedUserMedia,
 } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
-import { find, map } from 'lodash'
+import { find, isEmpty, map } from 'lodash'
 import {
   CameraIcon,
   CopyIcon,
@@ -30,7 +31,7 @@ import {
   MicIcon,
   MicOffIcon,
   MoreHorizontalIcon,
-  PencilRulerIcon,
+  PenLineIcon,
   PhoneOffIcon,
   PlusIcon,
   ScreenShareIcon,
@@ -53,6 +54,10 @@ type Props = {
   sendEvent: (event: string, data?: any) => void
 }
 
+/**
+ * TODO: refactor this component
+ * Asign: @caohv
+ */
 export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEvent }) => {
   const { data: user } = useSession()
   const actions = useActions()
@@ -100,6 +105,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
 
   const [audioInput] = useAudioInput()
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
+  const [pendingParticipants] = usePendingParticipants()
 
   const audioLevel = useAudioLevelProducer(micPublisher)
 
@@ -135,7 +141,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
         sendEvent('screen-share', { screenShare: false })
       }
     }
-  }, [currentParticipant.id, screenStream, screenVideoPublisher, sendEvent, setUserState])
+  }, [currentParticipant.id, prvScreenStream, screenStream, screenVideoPublisher, sendEvent, setUserState, userState])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
@@ -207,7 +213,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
         audio: true,
       })
     }
-  }, [screenPublisherStream, screenStreamChanger])
+  }, [screenPublisherStream, screenStream, screenStreamChanger])
 
   const toggleRaiseHand = () => {
     if (userState.handRaised) {
@@ -325,27 +331,21 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
                   'shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]'
                 )}
                 onClick={() => setOpenDrawerWhiteboard(true)}
-                icon={<PencilRulerIcon size={16} className={classNames('dark:text-white text-primary_text')} />}
+                icon={<PenLineIcon size={16} className={classNames('dark:text-white text-primary_text')} />}
                 tooltip="Whiteboard"
+              />
+              <ButtonIcon
+                size="large"
+                type="primary"
+                className={classNames(
+                  'shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]'
+                )}
+                onClick={toggleRaiseHand}
+                icon={<HandIcon size={16} className={classNames('dark:text-white text-primary_text')} />}
+                tooltip="Raise Hand"
               />
             </>
           )}
-          <ButtonIcon
-            size="large"
-            type="primary"
-            className={classNames(
-              'shadow-none border border-gray-200 dark:border-[#3A4250]',
-              !userState.handRaised ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
-            )}
-            onClick={toggleRaiseHand}
-            icon={
-              <HandIcon
-                size={16}
-                className={classNames('dark:text-white text-primary_text', userState.handRaised ? 'text-white' : '')}
-              />
-            }
-            tooltip="Settings"
-          />
           <ButtonIcon
             size="large"
             type="primary"
@@ -383,8 +383,15 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
                     onClick={() => setOpenDrawerWhiteboard(true)}
                     className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
                   >
-                    <PencilRulerIcon size={16} />
+                    <PenLineIcon size={16} />
                     <div className="text-sm ml-2">Whiteboard</div>
+                  </div>
+                  <div
+                    onClick={toggleRaiseHand}
+                    className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
+                  >
+                    <HandIcon size={16} />
+                    <div className="text-sm ml-2">Raise Hand</div>
                   </div>
                 </div>
               }
@@ -403,22 +410,24 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
           </ButtonIcon>
         </Space>
         <div>
-          <ButtonIcon
-            size="large"
-            type="primary"
-            className={classNames(
-              'shadow-none border border-gray-200 dark:border-[#3A4250]',
-              !openChat ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
-            )}
-            onClick={() => setOpenChat(!openChat)}
-            icon={
-              <MessagesSquareIcon
-                size={16}
-                className={classNames('dark:text-white text-primary_text', openChat ? 'text-white' : '')}
-              />
-            }
-            tooltip="Chat/Participants"
-          />
+          <Badge dot={!isEmpty(pendingParticipants)}>
+            <ButtonIcon
+              size="large"
+              type="primary"
+              className={classNames(
+                'shadow-none border border-gray-200 dark:border-[#3A4250]',
+                !openChat ? 'dark:bg-[#28303E] bg-[#F9FAFB]' : 'bg-primary'
+              )}
+              onClick={() => setOpenChat(!openChat)}
+              icon={
+                <MessagesSquareIcon
+                  size={16}
+                  className={classNames('dark:text-white text-primary_text', openChat ? 'text-white' : '')}
+                />
+              }
+              tooltip="Chat/Participants"
+            />
+          </Badge>
         </div>
       </div>
       <Modal

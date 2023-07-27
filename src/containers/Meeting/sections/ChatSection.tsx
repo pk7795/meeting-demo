@@ -7,9 +7,9 @@ import {
   useMeetingParticipantsList,
   usePendingParticipants,
 } from '../contexts'
-import { Avatar, Form, Input } from 'antd'
-import { map } from 'lodash'
-import { CheckCircleIcon, SendIcon, XCircleIcon } from 'lucide-react'
+import { Avatar, Form, Input, Spin } from 'antd'
+import { isEmpty, map } from 'lodash'
+import { SendIcon, UserCheck2Icon, XIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
@@ -120,10 +120,10 @@ export const ChatSection: React.FC<Props> = ({ room, sendAcceptJoinRequest }) =>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <div className="text-xs font-bold text-[#F87171]">{message.participant.name}</div>
-                            <div className="ml-2 text-[9px] text-[#6B7280]">{formatDateChat(message.createdAt)}</div>
+                            <div className="ml-2 text-[9px] text-gray-400">{formatDateChat(message.createdAt)}</div>
                           </div>
                           <div
-                            className="text-sm text-[#6B7280] p-2 rounded-lg bg-gray-200 dark:bg-dark_ebony whitespace-pre-wrap w-fit"
+                            className="text-sm text-gray-400 p-2 rounded-lg bg-gray-200 dark:bg-dark_ebony whitespace-pre-wrap w-fit"
                             dangerouslySetInnerHTML={{ __html: message.content }}
                           />
                         </div>
@@ -138,7 +138,7 @@ export const ChatSection: React.FC<Props> = ({ room, sendAcceptJoinRequest }) =>
                         <Input
                           ref={refInput}
                           size="large"
-                          className="bg-transparent border-transparent flex-1 text-[#6B7280] placeholder:text-[#6B7280]"
+                          className="bg-transparent border-transparent flex-1 text-gray-400 placeholder"
                           placeholder="Type something..."
                         />
                       </Form.Item>
@@ -155,6 +155,40 @@ export const ChatSection: React.FC<Props> = ({ room, sendAcceptJoinRequest }) =>
             children: (
               <Scrollbars className="h-full dark:bg-[#1D2431] bg-white">
                 <div className="h-full p-2">
+                  {isRoomOwner && !isEmpty(pendingParticipants) && (
+                    <>
+                      <Spin spinning={isPendingAccept || isPendingReject}>
+                        <div className="text-sm text-[#E5E7EB] mb-2">
+                          Pending requests ({pendingParticipants?.length})
+                        </div>
+                        {map(pendingParticipants, (p) => (
+                          <div className="flex items-center mb-2 last:mb-0" key={p.id}>
+                            <div className="relative">
+                              <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
+                            </div>
+                            <div className="ml-2 text-gray-400">{p.name}</div>
+
+                            <div className="ml-auto flex">
+                              <ButtonIcon
+                                size="small"
+                                type="text"
+                                onClick={() => onReject(p)}
+                                icon={<XIcon size={16} />}
+                              />
+                              <ButtonIcon
+                                size="small"
+                                type="text"
+                                onClick={() => onAccept(p)}
+                                icon={<UserCheck2Icon size={16} />}
+                                className="mr-2"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </Spin>
+                      <div className="h-px bg-[#232C3C] my-4" />
+                    </>
+                  )}
                   {map(paticipantsList, (p) => (
                     <div className="flex items-center mb-2 last:mb-0" key={p.id}>
                       <div className="relative">
@@ -164,46 +198,9 @@ export const ChatSection: React.FC<Props> = ({ room, sendAcceptJoinRequest }) =>
                           style={{ backgroundColor: renderUserStatus(p) }}
                         />
                       </div>
-                      <div className="ml-2 text-[#6B7280]">{p.name}</div>
+                      <div className="ml-2 text-gray-400">{p.name}</div>
                     </div>
                   ))}
-
-                  {isRoomOwner && pendingParticipants.length > 0 && (
-                    <>
-                      <div className="h-px bg-[#E5E7EB] my-2" />
-                      <div className="text-sm text-[##E5E7EB] mb-2">
-                        Pending requests ({pendingParticipants.length})
-                      </div>
-                      <div className="h-px bg-[#E5E7EB] my-2" />
-
-                      {map(pendingParticipants, (p) => (
-                        <div className="flex items-center mb-2 last:mb-0" key={p.id}>
-                          <div className="relative">
-                            <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
-                          </div>
-                          <div className="ml-2 text-[#6B7280]">{p.name}</div>
-
-                          <div className="ml-auto flex">
-                            <ButtonIcon
-                              size="small"
-                              type="text"
-                              loading={isPendingAccept}
-                              onClick={() => onAccept(p)}
-                              icon={<CheckCircleIcon size={16} />}
-                              className="mr-2"
-                            />
-                            <ButtonIcon
-                              size="small"
-                              type="text"
-                              loading={isPendingReject}
-                              onClick={() => onReject(p)}
-                              icon={<XCircleIcon size={16} />}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </>
-                  )}
                 </div>
               </Scrollbars>
             ),

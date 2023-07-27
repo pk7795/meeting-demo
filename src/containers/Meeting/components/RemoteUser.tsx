@@ -41,7 +41,7 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
   return (
     <div className="w-full relative bg-black rounded-lg overflow-hidden aspect-video">
       <div className="rounded-lg overflow-hidden w-full h-full">{_renderView}</div>
-      <div className="absolute bottom-0 left-0 p-2 py-1 text-white bg-[rgba(0,0,0,0.50)] rounded-tr-lg rounded-bl-lg">
+      <div className="absolute bottom-0 left-0 p-2 py-1 text-white flex items-center">
         {isPinned && <Icon className="mr-1" icon={<PinIcon size={12} fill="#fff" />} />}
         {participant.name}
       </div>
