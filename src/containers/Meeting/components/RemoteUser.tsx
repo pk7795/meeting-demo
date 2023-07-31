@@ -17,7 +17,6 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
   const camStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.video.name)
   const micStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.audio.name)
   const screenStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.screen_video.name)
-  console.log('participant', participant) // <--- hand raise status in this object
 
   const _renderView = useMemo(() => {
     if (screenStream && !isPinned) {
