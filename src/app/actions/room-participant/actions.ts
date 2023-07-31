@@ -54,6 +54,7 @@ export async function createRoomParticipantLoginUser({ data }: { data: { passcod
     peer,
     gateway: env.BLUESEA_CONFIG.gateway,
     token: token,
+    log_level: env.BLUESEA_CONFIG.logLevel,
   }
   return {
     blueseaConfig,
@@ -89,6 +90,7 @@ export async function createRoomParticipantGuestUser({ data }: { data: { name: s
     peer,
     gateway: env.BLUESEA_CONFIG.gateway,
     token: token,
+    log_level: env.BLUESEA_CONFIG.logLevel,
   }
   return {
     blueseaConfig,

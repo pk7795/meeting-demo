@@ -69,7 +69,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
     <MediaDeviceProvider>
       {blueseaConfig && roomParticipant && joined ? (
         <BlueseaSessionProvider
-          logLevel={LogLevel.WARN}
+          logLevel={blueseaConfig.log_level}
           gateways={blueseaConfig.gateway}
           room={blueseaConfig.room}
           peer={blueseaConfig.peer}

@@ -1,3 +1,4 @@
+import { LogLevel } from 'bluesea-media-react-sdk'
 import request from 'request'
 
 export interface BlueseaConfig {
@@ -11,6 +12,7 @@ export interface BlueseaSession {
   room: string
   peer: string
   token: string
+  log_level: LogLevel
 }
 
 export async function callLiveApi<T>(api: string, api_path: string, token: string, body: any): Promise<T> {

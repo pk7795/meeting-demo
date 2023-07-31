@@ -1,3 +1,5 @@
+import { LogLevel } from 'bluesea-media-react-sdk'
+
 export const env = {
   SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL as string,
@@ -12,5 +14,6 @@ export const env = {
     api: process.env.BLUESEA_API as string,
     gateway: process.env.BLUESEA_GATEWAY as string,
     appToken: process.env.BLUESEA_APP_TOKEN as string,
+    logLevel: parseInt(process.env.BLUESEA_LOG_LEVEL || '2') as LogLevel,
   },
 } as const
