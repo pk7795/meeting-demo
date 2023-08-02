@@ -65,12 +65,12 @@ export const BigViewer: FC<Props> = ({ participant, stream, micStream, priority,
         <VideoViewer playsInline className={classNameVideo} stream={stream} priority={priority} />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">
-          <Avatar src={participant.user?.image} size={120} className="bg-primary border-none">
-            <span className="text-2xl">{participant.name?.charAt(0)}</span>
+          <Avatar src={participant?.user?.image} size={120} className="bg-primary border-none">
+            <span className="text-2xl">{participant?.name?.charAt(0)}</span>
           </Avatar>
         </div>
       )}
-      <div className="absolute bottom-0 left-0 p-2 py-1 text-white">{participant.name}</div>
+      <div className="absolute bottom-0 left-0 p-2 py-1 text-white">{participant?.name}</div>
       {!isScreenShare && (
         <div className="absolute top-1 right-1 text-white rounded-full w-6 h-6 flex items-center justify-center bg-black bg-opacity-25">
           <Icon

@@ -75,7 +75,10 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
           peer={blueseaConfig.peer}
           token={blueseaConfig.token}
           autoConnect={false}
-          mixMinusAudio={{ mode: MixMinusMode.AllAudioStreams, elements: createAudio }}
+          mixMinusAudio={{
+            mode: MixMinusMode.AllAudioStreams,
+            elements: createAudio,
+          }}
           senders={senders}
           receivers={{ audio: 0, video: 5 }}
         >

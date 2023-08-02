@@ -8,6 +8,7 @@ export const supabase = createClient(
       params: {
         eventsPerSecond: 5000,
       },
+      heartbeatIntervalMs: 10000,
     },
   }
 )
