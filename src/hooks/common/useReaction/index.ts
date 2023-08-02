@@ -66,12 +66,23 @@ export class MapContainer<K, T> extends EventEmitter {
     return this.map.get(key)
   }
 
-  del(key: K) {
+  del(key: K, reactive: boolean = true) {
     this.map.delete(key)
+    this.list = Array.from(this.map.values())
+    if (reactive) {
+      this.emit('list', this.list)
+      this.emit('map', this.map)
+      this.emit('slot_' + key, undefined)
+    }
+  }
+
+  delBatch(keys: K[]) {
+    for (const key of keys) {
+      this.map.delete(key)
+    }
     this.list = Array.from(this.map.values())
     this.emit('list', this.list)
     this.emit('map', this.map)
-    this.emit('slot_' + key, undefined)
   }
 
   onSlotChanged = (slot: K, handler: (data: T) => void) => {
@@ -101,6 +112,7 @@ export class MapContainer<K, T> extends EventEmitter {
 
 export function useReactionList<K, T>(containter: MapContainer<K, T>): T[] {
   const [list, setList] = useState<T[]>(containter.list)
+
   useEffect(() => {
     containter.onListChanged(setList)
     return () => {

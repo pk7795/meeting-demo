@@ -1,9 +1,9 @@
 import { UserType } from '../constants'
-import { useAudioSlotMix } from 'bluesea-media-react-sdk'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
+import { useAudioSlotsQueueContainer } from '@/hooks'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
 import { MeetingParticipant, RoomMessageWithParticipant, RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 
@@ -16,10 +16,10 @@ export const MeetingContext = createContext<{
     participantState: DataContainer<MeetingParticipantStatus>
     joinRequest: DataContainer<{ id: string; name: string; type: UserType } | null>
     pinnedPaticipant: DataContainer<PinnedPaticipant | null>
-    talkingParticipantId: DataContainer<string>
     currentPaticipant: RoomParticipant
     pendingParticipants: MapContainer<string, Partial<RoomParticipantWithUser>>
     roomSupabaseChannel: DataContainer<RealtimeChannel>
+    talkingParticipants: MapContainer<string, { peerId: string; ts: number }>
     destroy: () => void
   }
   setParticipantState: (state: MeetingParticipantStatus) => void
@@ -73,18 +73,8 @@ export const MeetingProvider = ({
     })
     const pinnedPaticipant = new DataContainer<PinnedPaticipant | null>(null)
     const joinRequest = new DataContainer<{ id: string; name: string; type: UserType } | null>(null)
-    const talkingParticipantId = new DataContainer<string>('')
     const pendingParticipants = new MapContainer<string, Partial<RoomParticipantWithUser>>()
     const roomSupabaseChannel = new DataContainer<RealtimeChannel>({} as any)
-
-    talkingParticipantId.addChangeListener((participantId) => {
-      const paticipant = paticipants.get(participantId)
-      if (paticipant && !pinnedPaticipant.data?.force) {
-        pinnedPaticipant.change({
-          p: paticipant,
-        })
-      }
-    })
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -260,7 +250,6 @@ export const MeetingProvider = ({
     return {
       paticipants,
       pinnedPaticipant,
-      talkingParticipantId,
       pendingParticipants,
       messages,
       participantState,
@@ -286,14 +275,6 @@ export const MeetingProvider = ({
     data.joinRequest.change(null)
   }, [data])
 
-  const setTalkingParticipantId = useCallback(
-    (participantId: string) => {
-      if (data.talkingParticipantId.data === participantId) return
-      data.talkingParticipantId.change(participantId)
-    },
-    [data.talkingParticipantId]
-  )
-
   const setPinnedParticipant = useCallback(
     (participant: PinnedPaticipant | null) => {
       data.pinnedPaticipant.change(participant)
@@ -308,39 +289,25 @@ export const MeetingProvider = ({
     [data.pendingParticipants]
   )
 
-  const audioSlot0 = useAudioSlotMix(0)
-  const audioSlot1 = useAudioSlotMix(1)
-  const audioSlot2 = useAudioSlotMix(2)
-
-  useEffect(() => {
-    //find loudest user slot from audioSlot0, audioSlot1, audioSlot2
-    const audioSlot0Level = audioSlot0?.audio_level ?? -Infinity
-    const audioSlot1Level = audioSlot1?.audio_level ?? -Infinity
-    const audioSlot2Level = audioSlot2?.audio_level ?? -Infinity
-
-    const minAudioLevel = -50
-
-    if (audioSlot0Level > minAudioLevel && audioSlot0Level > audioSlot1Level && audioSlot0Level > audioSlot2Level) {
-      setTalkingParticipantId(audioSlot0?.peer_id ?? '')
-    } else if (
-      audioSlot1Level > minAudioLevel &&
-      audioSlot1Level > audioSlot0Level &&
-      audioSlot1Level > audioSlot2Level
-    ) {
-      setTalkingParticipantId(audioSlot1?.peer_id ?? '')
-    } else if (
-      audioSlot2Level > minAudioLevel &&
-      audioSlot2Level > audioSlot0Level &&
-      audioSlot2Level > audioSlot1Level
-    ) {
-      setTalkingParticipantId(audioSlot2?.peer_id ?? '')
+  const talkingParticipants = useAudioSlotsQueueContainer(3, -50)
+  talkingParticipants.onListChanged((list) => {
+    if (list.length > 0 && list[0].peerId) {
+      if (!data.pinnedPaticipant?.data?.force) {
+        setPinnedParticipant({
+          p: data.paticipants.get(list[0].peerId),
+          force: false,
+        })
+      }
     }
-  }, [audioSlot0, audioSlot1, audioSlot2, setTalkingParticipantId])
+  })
 
   return (
     <MeetingContext.Provider
       value={{
-        data,
+        data: {
+          ...data,
+          talkingParticipants,
+        },
         clearJoinRequest,
         deletePendingParticipant,
         setParticipantState,
@@ -394,12 +361,6 @@ export const usePinnedParticipant = () => {
   return [pinnedPaticipant, context.setPinnedParticipant] as const
 }
 
-export const useTalkingParticipantId = () => {
-  const context = useMeeting()
-  const talkingParticipantId = useReactionData<string>(context.data.talkingParticipantId)
-  return talkingParticipantId
-}
-
 export const useCurrentParticipant = () => {
   const context = useMeeting()
   return context.data.currentPaticipant
@@ -417,4 +378,10 @@ export const usePendingParticipants = () => {
     context.data.pendingParticipants
   )
   return [pendingParticipants, context.deletePendingParticipant] as const
+}
+
+export const useTalkingParticipants = () => {
+  const context = useMeeting()
+  const talkingParticipants = useReactionList<string, { peerId: string; ts: number }>(context.data.talkingParticipants)
+  return talkingParticipants
 }

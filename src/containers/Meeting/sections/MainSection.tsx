@@ -25,7 +25,6 @@ type Props = {
 }
 
 export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
-  const { data } = useSession()
   const [api, contextHolder] = notification.useNotification()
   const [layout, setLayout] = useState<'GRID' | 'LEFT'>('GRID')
   const [openChat, setOpenChat] = useState(false)
@@ -117,7 +116,11 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       const channel = supabase.channel(`${id}:room:${room.id}`)
       channel.subscribe((status) => {
         if (status === 'SUBSCRIBED') {
-          channel.send({ type: 'broadcast', event: 'accepted', payload: { token: 'aaaaaa' } })
+          channel.send({
+            type: 'broadcast',
+            event: 'accepted',
+            payload: { token: 'aaaaaa' },
+          })
           delPendingParticipant(id)
         }
       })
