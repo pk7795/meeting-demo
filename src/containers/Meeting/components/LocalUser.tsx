@@ -1,5 +1,5 @@
 import { ViewerWapper } from '.'
-import { BlueseaSenders } from '../constants'
+import { BlueseaSenders, MIN_AUDIO_LEVEL } from '../constants'
 import { Stream } from '../types'
 import { useAudioLevelProducer, usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
@@ -12,8 +12,6 @@ type Props = {
   participant: MeetingParticipant
   isPinned: boolean
 }
-
-const MIN_AUDIO_LEVEL = -50
 
 export const LocalUser = ({ participant, isPinned }: Props) => {
   const camPublisher = usePublisher(BlueseaSenders.video)

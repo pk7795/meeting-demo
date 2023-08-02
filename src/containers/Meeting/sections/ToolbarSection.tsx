@@ -141,7 +141,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
         sendEvent('screen-share', { screenShare: false })
       }
     }
-  }, [currentParticipant.id, prvScreenStream, screenStream, screenVideoPublisher, sendEvent, setUserState, userState])
+  }, [currentParticipant.id, prvScreenStream, screenStream, screenVideoPublisher, sendEvent, setUserState])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
@@ -338,10 +338,19 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
                 size="large"
                 type="primary"
                 className={classNames(
-                  'shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]'
+                  'shadow-none border border-gray-200 dark:border-[#3A4250]',
+                  userState.handRaised ? 'bg-primary' : 'dark:bg-[#28303E] bg-[#F9FAFB]'
                 )}
                 onClick={toggleRaiseHand}
-                icon={<HandIcon size={16} className={classNames('dark:text-white text-primary_text')} />}
+                icon={
+                  <HandIcon
+                    size={16}
+                    className={classNames(
+                      'dark:text-white text-primary_text',
+                      userState.handRaised ? 'text-white' : ''
+                    )}
+                  />
+                }
                 tooltip="Raise Hand"
               />
             </>

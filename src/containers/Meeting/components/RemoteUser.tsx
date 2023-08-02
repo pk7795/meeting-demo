@@ -1,8 +1,9 @@
 import { ViewerWapper } from '.'
-import { BlueseaSenders } from '../constants'
+import { BlueseaSenders, MIN_AUDIO_LEVEL } from '../constants'
 import { Stream } from '../types'
+import { useAudioLevelMix } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
-import { MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
+import { HandIcon, MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
 import { FC, useMemo } from 'react'
 import { Icon } from '@/components'
 import { usePeerRemoteStreamActive } from '@/hooks'
@@ -17,6 +18,9 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
   const camStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.video.name)
   const micStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.audio.name)
   const screenStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.screen_video.name)
+  const audioLevel = useAudioLevelMix(participant.id!, BlueseaSenders.audio.name)
+  const isTalking = useMemo(() => typeof audioLevel === 'number' && audioLevel > MIN_AUDIO_LEVEL, [audioLevel])
+  const isHandRaised = participant?.meetingStatus?.handRaised
 
   const _renderView = useMemo(() => {
     if (screenStream && !isPinned) {
@@ -38,14 +42,22 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
   }, [camStream, isPinned, participant, screenStream])
 
   return (
-    <div className="w-full relative bg-black rounded-lg overflow-hidden aspect-video">
+    <div
+      className={classNames(
+        'w-full relative bg-black rounded-lg overflow-hidden aspect-video',
+        isHandRaised ? 'border-4 border-yellow-400' : ''
+      )}
+    >
       <div className="rounded-lg overflow-hidden w-full h-full">{_renderView}</div>
       <div className="absolute bottom-0 left-0 p-2 py-1 text-white flex items-center">
         {isPinned && <Icon className="mr-1" icon={<PinIcon size={12} fill="#fff" />} />}
         {participant.name}
+        {isHandRaised && <Icon className="ml-1" icon={<HandIcon size={18} />} />}
       </div>
       <div className="absolute top-1 right-1 text-white rounded-full w-6 h-6 flex items-center justify-center bg-black bg-opacity-25">
-        <Icon icon={micStream ? <MicIcon size={16} /> : <MicOffIcon size={16} />} />
+        <Icon
+          icon={micStream ? <MicIcon size={16} color={isTalking ? '#84cc16' : '#ffffff'} /> : <MicOffIcon size={16} />}
+        />
       </div>
     </div>
   )

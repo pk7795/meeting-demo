@@ -33,3 +33,6 @@ export enum UserType {
   Guest = 'guest',
   User = 'user',
 }
+
+// Minimum audio level to consider audible
+export const MIN_AUDIO_LEVEL = -50
