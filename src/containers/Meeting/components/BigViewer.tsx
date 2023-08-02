@@ -73,7 +73,11 @@ export const BigViewer: FC<Props> = ({ participant, stream, micStream, priority,
       <div className="absolute bottom-0 left-0 p-2 py-1 text-white">{participant.name}</div>
       {!isScreenShare && (
         <div className="absolute top-1 right-1 text-white rounded-full w-6 h-6 flex items-center justify-center bg-black bg-opacity-25">
-          icon={micStream ? <MicIcon size={16} color={isTalking ? '#84cc16' : '#ffffff'} /> : <MicOffIcon size={16} />}
+          <Icon
+            icon={
+              micStream ? <MicIcon size={16} color={isTalking ? '#84cc16' : '#ffffff'} /> : <MicOffIcon size={16} />
+            }
+          />
         </div>
       )}
     </div>

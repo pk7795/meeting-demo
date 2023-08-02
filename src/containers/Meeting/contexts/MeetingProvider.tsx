@@ -1,4 +1,4 @@
-import { UserType } from '../constants'
+import { MIN_AUDIO_LEVEL, UserType } from '../constants'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
@@ -289,7 +289,7 @@ export const MeetingProvider = ({
     [data.pendingParticipants]
   )
 
-  const talkingParticipants = useAudioSlotsQueueContainer(3, -50)
+  const talkingParticipants = useAudioSlotsQueueContainer(3, MIN_AUDIO_LEVEL)
   talkingParticipants.onListChanged((list) => {
     if (list.length > 0 && list[0].peerId) {
       if (!data.pinnedPaticipant?.data?.force) {
