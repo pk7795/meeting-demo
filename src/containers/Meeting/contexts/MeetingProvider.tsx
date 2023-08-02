@@ -1,4 +1,4 @@
-import { UserType } from '../constants'
+import { MIN_AUDIO_LEVEL, UserType } from '../constants'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
@@ -20,6 +20,7 @@ export const MeetingContext = createContext<{
     pendingParticipants: MapContainer<string, Partial<RoomParticipantWithUser>>
     roomSupabaseChannel: DataContainer<RealtimeChannel>
     talkingParticipants: MapContainer<string, { peerId: string; ts: number }>
+    isConnected: DataContainer<boolean>
     destroy: () => void
   }
   setParticipantState: (state: MeetingParticipantStatus) => void
@@ -75,6 +76,7 @@ export const MeetingProvider = ({
     const joinRequest = new DataContainer<{ id: string; name: string; type: UserType } | null>(null)
     const pendingParticipants = new MapContainer<string, Partial<RoomParticipantWithUser>>()
     const roomSupabaseChannel = new DataContainer<RealtimeChannel>({} as any)
+    const isConnected = new DataContainer<boolean>(false)
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -196,14 +198,16 @@ export const MeetingProvider = ({
           for (const key in newState) {
             const participantId = (newState[key] as any)[0].id
             if (participantId) {
-              map.set(participantId, {
+              const payload = {
                 is_me: participantId === roomParticipant.id,
                 online_at: (newState[key] as any)[0].online_at,
                 id: participantId,
                 name: (newState[key] as any)[0].name,
                 user: (newState[key] as any)[0].user,
+                connected_at: (newState[key] as any)[0].connected_at,
                 meetingStatus: (newState[key] as any)[0].meetingStatus,
-              })
+              }
+              map.set(participantId, payload)
             }
           }
           paticipants.setBatch(map)
@@ -212,6 +216,7 @@ export const MeetingProvider = ({
           console.log('join', key, newPresences)
         })
         .on('presence', { event: 'leave' }, ({ key }) => {
+          console.log('leave', key)
           const paticipant = paticipants.get(key)
           if (paticipant) {
             paticipants.del(key)
@@ -219,24 +224,36 @@ export const MeetingProvider = ({
         })
 
       presenceChannelSubscription = presenceChannel.subscribe((status) => {
+        console.log('Presence Status:', status)
         if (status === 'SUBSCRIBED') {
+          if (!isConnected.data) {
+            isConnected.change(true)
+          }
           presenceChannel.track({
-            online_at: new Date().toISOString(),
+            online_at: Date.now(),
             id: roomParticipant.id,
             name: roomParticipant.name,
             user: roomParticipant.user,
             meetingStatus: participantState.data,
+            connected_at: Date.now(),
           })
+        } else {
+          if (isConnected.data) {
+            isConnected.change(false)
+          }
         }
       })
 
       participantState.addChangeListener(() => {
+        const state = presenceChannel.presenceState()
+
         presenceChannel.track({
-          online_at: new Date().toISOString(),
+          online_at: Math.floor(Date.now()) / 1000,
           id: roomParticipant.id,
           name: roomParticipant.name,
           user: roomParticipant.user,
           meetingStatus: participantState.data,
+          connected_at: (state[roomParticipant.id][0] as any).connected_at,
         })
       })
     }
@@ -255,6 +272,7 @@ export const MeetingProvider = ({
       participantState,
       joinRequest,
       roomSupabaseChannel,
+      isConnected,
       currentPaticipant: roomParticipant,
       destroy,
     }
@@ -289,7 +307,7 @@ export const MeetingProvider = ({
     [data.pendingParticipants]
   )
 
-  const talkingParticipants = useAudioSlotsQueueContainer(3, -50)
+  const talkingParticipants = useAudioSlotsQueueContainer(3, MIN_AUDIO_LEVEL)
   talkingParticipants.onListChanged((list) => {
     if (list.length > 0 && list[0].peerId) {
       if (!data.pinnedPaticipant?.data?.force) {
@@ -336,12 +354,19 @@ export const useRoomSupabaseChannel = () => {
 
 export const useMeetingParticipantsList = (): MeetingParticipant[] => {
   const context = useMeeting()
-  return useReactionList(context.data.paticipants)
+  const list = useReactionList(context.data.paticipants)
+  return list
 }
 
 export const useOnlineMeetingParticipantsList = (): MeetingParticipant[] => {
   const participants = useMeetingParticipantsList()
-  return participants.filter((paticipant) => (paticipant as MeetingParticipant).meetingStatus?.online)
+  return participants
+    .filter((paticipant) => (paticipant as MeetingParticipant).meetingStatus?.online)
+    .map((paticipant) => ({
+      ...paticipant,
+      connected_at: paticipant.connected_at || 0,
+    }))
+    .sort((a, b) => a.connected_at - b.connected_at)
 }
 
 export const useMeetingParticipants = () => {
@@ -384,4 +409,10 @@ export const useTalkingParticipants = () => {
   const context = useMeeting()
   const talkingParticipants = useReactionList<string, { peerId: string; ts: number }>(context.data.talkingParticipants)
   return talkingParticipants
+}
+
+export const useIsConnected = () => {
+  const context = useMeeting()
+  const isConnected = useReactionData<boolean>(context.data.isConnected)
+  return isConnected
 }

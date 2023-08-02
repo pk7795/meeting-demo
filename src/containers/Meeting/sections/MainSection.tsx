@@ -1,9 +1,9 @@
 'use client'
 
 import { UserType } from '../constants'
-import { useJoinRequest, usePendingParticipants, useRoomSupabaseChannel } from '../contexts'
+import { useIsConnected, useJoinRequest, usePendingParticipants, useRoomSupabaseChannel } from '../contexts'
 import { ChatSection, ToolbarSection, ViewSection } from '../sections'
-import { Button, notification, Space } from 'antd'
+import { Button, Modal, notification, Space, Spin } from 'antd'
 import dayjs from 'dayjs'
 import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -35,6 +35,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [joinRequest, clearJoinRequest] = useJoinRequest()
   const [, delPendingParticipant] = usePendingParticipants()
   const roomSupabaseChannel = useRoomSupabaseChannel()
+  const isConnected = useIsConnected()
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -164,6 +165,11 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   )
   return (
     <>
+      <Modal title="Connecting to Server..." footer={false} closable={false} open={!isConnected}>
+        <div className="flex items-center justify-center h-20">
+          <Spin tip="Connecting..." size="large" />
+        </div>
+      </Modal>
       {contextHolder}
       <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen" id="id--fullScreen">
         <div className="h-full flex items-center">
