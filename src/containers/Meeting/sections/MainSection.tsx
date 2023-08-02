@@ -101,6 +101,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
         btn,
         key,
         onClose: opts.onClose,
+        duration: 0, // never auto close
       })
     },
     [api]
