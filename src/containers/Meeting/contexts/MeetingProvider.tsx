@@ -307,7 +307,7 @@ export const MeetingProvider = ({
     [data.pendingParticipants]
   )
 
-  const talkingParticipants = useAudioSlotsQueueContainer(3, MIN_AUDIO_LEVEL)
+  const talkingParticipants = useAudioSlotsQueueContainer(3, -1000)
   talkingParticipants.onListChanged((list) => {
     if (list.length > 0 && list[0].peerId) {
       const sorted = list.sort((a, b) => a.ts - b.ts)
