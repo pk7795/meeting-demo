@@ -310,9 +310,15 @@ export const MeetingProvider = ({
   const talkingParticipants = useAudioSlotsQueueContainer(3, MIN_AUDIO_LEVEL)
   talkingParticipants.onListChanged((list) => {
     if (list.length > 0 && list[0].peerId) {
+      const sorted = list.sort((a, b) => a.ts - b.ts)
+      let selected = sorted[0].peerId
+      const pinned = sorted.find((p) => p.peerId === data.pinnedPaticipant?.data?.p?.id)
+      if (pinned) {
+        selected = sorted.find((p) => p.audioLevel - pinned.audioLevel > 20)?.peerId || pinned.peerId
+      }
       if (!data.pinnedPaticipant?.data?.force) {
         setPinnedParticipant({
-          p: data.paticipants.get(list[0].peerId),
+          p: data.paticipants.get(selected),
           force: false,
         })
       }
