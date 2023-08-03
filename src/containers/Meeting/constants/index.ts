@@ -35,4 +35,4 @@ export enum UserType {
 }
 
 // Minimum audio level to consider audible
-export const MIN_AUDIO_LEVEL = -50
+export const MIN_AUDIO_LEVEL = -40

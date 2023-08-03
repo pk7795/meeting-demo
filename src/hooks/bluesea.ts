@@ -72,26 +72,40 @@ export const useAudioSlotsContainer = (maxSlots: number, minAudioLevel?: number)
 
 export const useAudioSlotsQueueContainer = (maxSlots: number, minAudioLevel?: number) => {
   const slots = useAudioSlotsContainer(maxSlots, minAudioLevel)
-  const talkingPeerIds = new MapContainer<string, { peerId: string; ts: number }>()
+  const talkingPeerIds = new MapContainer<string, { peerId: string; ts: number; audioLevel: number }>()
 
   slots.onListChanged((list) => {
     const unixTimestamp = Math.floor(Date.now() / 1000)
 
-    const peerIds = list.map((x) => x?.peer_id).filter((x) => x !== undefined) as string[]
+    const peers = list.filter((x) => x !== undefined)
 
     // Delete every key that is not in slots
-    const inActiveIds = Array.from(talkingPeerIds.map.keys()).filter((x) => !peerIds.includes(x))
-    const newIds = peerIds.filter((x) => !talkingPeerIds.has(x))
+    const inActiveIds = Array.from(talkingPeerIds.map.keys()).filter(
+      (x: string) => !peers.find((p) => x === p?.peer_id)
+    )
+    const newPeers = peers.filter((x) => !talkingPeerIds.has(x?.peer_id as string))
     if (inActiveIds.length > 0) {
       talkingPeerIds.delBatch(inActiveIds)
     }
     // Add every key that is not in current map
-    if (newIds.length > 0) {
-      const newMap = new Map<string, { peerId: string; ts: number }>()
-      for (const id of newIds) {
-        newMap.set(id, { peerId: id, ts: unixTimestamp })
+    if (newPeers.length > 0) {
+      const newMap = new Map<string, { peerId: string; ts: number; audioLevel: number }>()
+      for (const p of newPeers) {
+        newMap.set(p!.peer_id, {
+          peerId: p!.peer_id,
+          ts: unixTimestamp,
+          audioLevel: p!.audio_level!,
+        })
       }
       talkingPeerIds.setBatch(newMap)
+    }
+
+    // Update audio level for every key
+    for (const p of peers) {
+      talkingPeerIds.set(p!.peer_id!, {
+        ...talkingPeerIds.get(p!.peer_id)!,
+        audioLevel: p!.audio_level!,
+      })
     }
   })
 
