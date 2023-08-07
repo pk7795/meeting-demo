@@ -141,7 +141,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
         sendEvent('screen-share', { screenShare: false })
       }
     }
-  }, [currentParticipant.id, prvScreenStream, screenStream, screenVideoPublisher, sendEvent, setUserState])
+  }, [currentParticipant.id, prvScreenStream, screenStream, screenVideoPublisher, sendEvent, setUserState, userState])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
@@ -257,25 +257,14 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
     <div className="flex items-center justify-center h-16 bg-white dark:bg-[#17202E] border-t dark:border-t-[#232C3C]">
       <div className="flex items-center justify-between w-full px-6">
         {!isMobile && (
-          <Space>
-            <Copy text={params?.passcode as string}>
-              <div className="border dark:border-[#3A4250] bg-[#F9FAFB] dark:bg-[#28303E] rounded-lg flex items-center px-4 h-8 cursor-pointer">
-                <Typography.Paragraph ellipsis className="text-sm mb-0 mr-2 dark:text-white w-[100px]">
-                  {params?.passcode}
-                </Typography.Paragraph>
-                <CopyIcon size={16} color="#D1D5DB" />
-              </div>
-            </Copy>
-            <ButtonIcon
-              icon={<PlusIcon size={16} />}
-              size="middle"
-              type="primary"
-              className="border dark:border-[#3A4250] dark:bg-[#28303E] shadow-none text-xs px-6"
-              onClick={() => setOpenModalInvites(true)}
-            >
-              Invite
-            </ButtonIcon>
-          </Space>
+          <Copy text={params?.passcode as string}>
+            <div className="border dark:border-[#3A4250] bg-[#F9FAFB] dark:bg-[#28303E] rounded-lg flex items-center px-4 h-8 cursor-pointer">
+              <Typography.Paragraph ellipsis className="text-sm mb-0 mr-2 dark:text-white">
+                {params?.passcode}
+              </Typography.Paragraph>
+              <CopyIcon size={16} />
+            </div>
+          </Copy>
         )}
         <Space>
           <ButtonIcon
@@ -355,65 +344,70 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
               />
             </>
           )}
-          <ButtonIcon
-            size="large"
-            type="primary"
-            className="shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]"
-            onClick={() => setOpenModalSettings(true)}
-            icon={<Settings2Icon size={16} className="dark:text-white text-primary_text" />}
-            tooltip="Settings"
-          />
-          {isMobile && (
-            <Popover
-              placement="top"
-              overlayInnerStyle={{
-                padding: 8,
-              }}
-              content={
-                <div>
-                  <Copy text={params?.code as string}>
+          <Popover
+            placement="top"
+            overlayInnerStyle={{
+              padding: 8,
+            }}
+            content={
+              <div>
+                <div
+                  onClick={() => setOpenModalSettings(true)}
+                  className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
+                >
+                  <Settings2Icon size={16} />
+                  <div className="text-sm ml-2">Settings</div>
+                </div>
+                <div
+                  onClick={() => setOpenModalInvites(true)}
+                  className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
+                >
+                  <PlusIcon size={16} />
+                  <div className="text-sm ml-2">Invite</div>
+                </div>
+                {isMobile && (
+                  <>
+                    <Copy text={params?.code as string}>
+                      <div
+                        className={classNames(
+                          'h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white'
+                        )}
+                      >
+                        <HashIcon size={16} />
+                        <div className="text-sm ml-2">Copy passcode</div>
+                      </div>
+                    </Copy>
                     <div
+                      onClick={() => setOpenDrawerWhiteboard(true)}
                       className={classNames(
                         'h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white'
                       )}
                     >
-                      <HashIcon size={16} />
-                      <div className="text-sm ml-2">Copy passcode</div>
+                      <PenLineIcon size={16} />
+                      <div className="text-sm ml-2">Whiteboard</div>
                     </div>
-                  </Copy>
-                  <div
-                    onClick={() => setOpenModalInvites(true)}
-                    className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
-                  >
-                    <PlusIcon size={16} />
-                    <div className="text-sm ml-2">Invite</div>
-                  </div>
-                  <div
-                    onClick={() => setOpenDrawerWhiteboard(true)}
-                    className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
-                  >
-                    <PenLineIcon size={16} />
-                    <div className="text-sm ml-2">Whiteboard</div>
-                  </div>
-                  <div
-                    onClick={toggleRaiseHand}
-                    className={classNames('h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white')}
-                  >
-                    <HandIcon size={16} />
-                    <div className="text-sm ml-2">Raise Hand</div>
-                  </div>
-                </div>
-              }
-              trigger="hover"
-            >
-              <ButtonIcon
-                size="large"
-                type="primary"
-                className="shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]"
-                icon={<MoreHorizontalIcon size={16} className="dark:text-white text-primary_text" />}
-              />
-            </Popover>
-          )}
+                    <div
+                      onClick={toggleRaiseHand}
+                      className={classNames(
+                        'h-8 px-2 rounded-lg flex items-center cursor-pointer mb-1 dark:text-white'
+                      )}
+                    >
+                      <HandIcon size={16} />
+                      <div className="text-sm ml-2">Raise Hand</div>
+                    </div>
+                  </>
+                )}
+              </div>
+            }
+            trigger="hover"
+          >
+            <ButtonIcon
+              size="large"
+              type="primary"
+              className="shadow-none border border-gray-200 dark:border-[#3A4250] dark:bg-[#28303E] bg-[#F9FAFB]"
+              icon={<MoreHorizontalIcon size={16} className="dark:text-white text-primary_text" />}
+            />
+          </Popover>
           <ButtonIcon size="large" type="primary" className="bg-red-500 shadow-none text-xs px-6" onClick={onEndCall}>
             <PhoneOffIcon size={16} className="text-white" />
           </ButtonIcon>

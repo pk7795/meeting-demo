@@ -4,9 +4,7 @@ import { UserType } from '../constants'
 import { useIsConnected, useJoinRequest, usePendingParticipants, useRoomSupabaseChannel } from '../contexts'
 import { ChatSection, ToolbarSection, ViewSection } from '../sections'
 import { Button, Modal, notification, Space, Spin } from 'antd'
-import dayjs from 'dayjs'
 import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon, MoonIcon, SunIcon } from 'lucide-react'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { useRecoilState } from 'recoil'
@@ -31,7 +29,6 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const { isMaximize, onOpenFullScreen } = useFullScreen()
   const { isMobile } = useDevice()
   const [theme, setTheme] = useRecoilState(themeState)
-  const [date, setDate] = useState(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
   const [joinRequest, clearJoinRequest] = useJoinRequest()
   const [, delPendingParticipant] = usePendingParticipants()
   const roomSupabaseChannel = useRoomSupabaseChannel()
@@ -50,13 +47,6 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       document.body.classList.add('bg-white')
     }
   }, [theme])
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setDate(dayjs().format('hh:mm:ss A • ddd, MMM DD'))
-  //   }, 1000)
-  //   return () => clearInterval(interval)
-  // }, [])
 
   const openNotification = useCallback(
     (opts: {
@@ -182,7 +172,6 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
                 </Link>
                 <div className="pl-2 hidden md:block">
                   <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
-                  <div className="dark:text-gray-400">{date}</div>
                 </div>
               </Space>
               {!isMobile && (

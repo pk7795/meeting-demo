@@ -6,7 +6,6 @@ import { PrepareSection } from '../sections'
 import { MainSection } from '../sections/MainSection'
 import {
   BlueseaSessionProvider,
-  LogLevel,
   MixMinusMode,
   useSharedDisplayMedia,
   useSharedUserMedia,
