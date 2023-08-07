@@ -61,7 +61,7 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
                   <ChevronLeftIcon size={16} className="text-white" />
                 )
               }
-              className="absolute right-2 bg-white bg-opacity-10"
+              className="absolute right-2 bg-black bg-opacity-50"
               shape="circle"
             />
           </div>
