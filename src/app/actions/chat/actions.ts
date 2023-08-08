@@ -17,6 +17,9 @@ export async function fetchMessages({ passcode }: { passcode: string }) {
 }
 
 export async function createMessage({ data }: { data: MessageInput }) {
+  console.log('--------------------------------------------------------')
+  console.log('createMessage start', new Date().getTime())
+  console.log('--------------------------------------------------------')
   const prisma = getPrisma()
 
   const res = await prisma.messages.create({
@@ -24,5 +27,8 @@ export async function createMessage({ data }: { data: MessageInput }) {
       ...data,
     },
   })
+  console.log('--------------------------------------------------------')
+  console.log('createMessage end', new Date().getTime())
+  console.log('--------------------------------------------------------')
   return res
 }

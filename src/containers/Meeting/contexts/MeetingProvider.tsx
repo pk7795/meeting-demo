@@ -104,6 +104,9 @@ export const MeetingProvider = ({
         type: string
       }
     }) => {
+      console.log('--------------------------------------------------------')
+      console.log('onMessageRoomChanged', new Date().getTime())
+      console.log('--------------------------------------------------------')
       const participant = paticipants.get(payload.new.participantId) as any
       const message = {
         ...payload.new,
