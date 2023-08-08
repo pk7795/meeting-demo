@@ -349,6 +349,7 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
             overlayInnerStyle={{
               padding: 8,
             }}
+            getPopupContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
             content={
               <div>
                 <div
@@ -441,7 +442,6 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
           setInviteEmail([])
         }}
         onOk={onInvite}
-        maskClosable={false}
         closable={false}
         okButtonProps={{
           loading: isPendingInviteToRoom,
