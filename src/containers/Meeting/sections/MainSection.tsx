@@ -156,7 +156,13 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   )
   return (
     <>
-      <Modal title="Connecting to Server..." footer={false} closable={false} open={!isConnected}>
+      <Modal
+        getContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
+        title="Connecting to Server..."
+        footer={false}
+        closable={false}
+        open={!isConnected}
+      >
         <div className="flex items-center justify-center h-20">
           <Spin tip="Connecting..." size="large" />
         </div>
