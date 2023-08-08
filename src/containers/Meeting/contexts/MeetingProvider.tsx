@@ -175,18 +175,24 @@ export const MeetingProvider = ({
           const newState = presenceChannel.presenceState()
           const map = new Map<string, MeetingParticipant>()
           for (const key in newState) {
-            const participantId = (newState[key] as any)[0].id
-            if (participantId) {
-              const payload = {
-                is_me: participantId === roomParticipant.id,
-                online_at: (newState[key] as any)[0].online_at,
-                id: participantId,
-                name: (newState[key] as any)[0].name,
-                user: (newState[key] as any)[0].user,
-                connected_at: (newState[key] as any)[0].connected_at,
-                meetingStatus: (newState[key] as any)[0].meetingStatus,
+            if (!(newState[key] as any)) {
+              continue
+            }
+            const value = (newState[key] as any)[0]
+            if (value) {
+              const participantId = value.id
+              if (participantId) {
+                const payload = {
+                  is_me: participantId === roomParticipant.id,
+                  online_at: value.online_at,
+                  id: participantId,
+                  name: value.name,
+                  user: value.user,
+                  connected_at: value.connected_at,
+                  meetingStatus: value.meetingStatus,
+                }
+                map.set(participantId, payload)
               }
-              map.set(participantId, payload)
             }
           }
           paticipants.setBatch(map)
@@ -232,7 +238,7 @@ export const MeetingProvider = ({
           name: roomParticipant.name,
           user: roomParticipant.user,
           meetingStatus: participantState.data,
-          connected_at: (state[roomParticipant.id][0] as any).connected_at,
+          connected_at: (state[roomParticipant.id]?.[0] as any)?.connected_at || Date.now(),
         })
       })
     }
