@@ -154,27 +154,6 @@ export const MeetingProvider = ({
             })
           }
         }
-
-        if (event === 'screen-share') {
-          const screenShare = payload.data.screenShare
-          const participantId = payload.participantId
-          // TODO: Implement a screen queue that dynamically pin the screen share
-          // For now, we just pin the first screen share
-          if (screenShare) {
-            const participant = paticipants.get(participantId)
-            if (participant) {
-              pinnedPaticipant.change({
-                p: participant,
-                force: true,
-              })
-            }
-          } else if (pinnedPaticipant.data?.p.id === participantId) {
-            pinnedPaticipant.change(null)
-          }
-        }
-        if (event === 'interact') {
-          console.log(payload)
-        }
       })
       .subscribe((status) => {})
 
