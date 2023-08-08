@@ -11,7 +11,7 @@
     "gen-key": "jose newkey -s 512 -t oct -a HS512",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && prisma db push && next build"
   },
   "dependencies": {
     "@emotion/css": "^11.11.2",
