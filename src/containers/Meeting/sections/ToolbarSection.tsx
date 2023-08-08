@@ -132,14 +132,8 @@ export const ToolbarSection: React.FC<Props> = ({ openChat, setOpenChat, sendEve
 
   useEffect(() => {
     screenVideoPublisher.switchStream(screenStream)
-    if (screenStream) {
-      setUserState({ ...userState, screenShare: true })
-    } else {
-      if (prvScreenStream) {
-        setUserState({ ...userState, screenShare: false })
-      }
-    }
-  }, [currentParticipant.id, prvScreenStream, screenStream, screenVideoPublisher, sendEvent, setUserState])
+    setUserState({ ...userState, screenShare: !!screenStream })
+  }, [screenStream, screenVideoPublisher, setUserState])
 
   // TODO: refactor or move to actions
   const getAvailableInvites = useCallback(async () => {
