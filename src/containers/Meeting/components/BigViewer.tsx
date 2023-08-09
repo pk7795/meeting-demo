@@ -16,9 +16,18 @@ type Props = {
   priority?: number
   isScreenShare?: boolean
   isTalking?: boolean
+  forceHighQuality?: boolean
 }
 
-export const BigViewer: FC<Props> = ({ participant, stream, micStream, priority, isScreenShare, isTalking }) => {
+export const BigViewer: FC<Props> = ({
+  participant,
+  stream,
+  micStream,
+  priority,
+  isScreenShare,
+  isTalking,
+  forceHighQuality,
+}) => {
   const classNameVideo = classNames('w-full', isScreenShare ? '' : 'h-full object-cover')
   const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
 
@@ -62,7 +71,14 @@ export const BigViewer: FC<Props> = ({ participant, stream, micStream, priority,
         {isPinned ? <PinOffIcon size={16} className="text-white" /> : <PinIcon size={16} className="text-white" />}
       </div>
       {stream ? (
-        <VideoViewer playsInline className={classNameVideo} stream={stream} priority={priority} />
+        <VideoViewer
+          playsInline
+          className={classNameVideo}
+          stream={stream}
+          priority={priority}
+          minSpatial={forceHighQuality ? 2 : 0}
+          maxSpatial={2}
+        />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">
           <Avatar src={participant?.user?.image} size={120} className="bg-primary border-none">

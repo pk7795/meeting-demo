@@ -1,6 +1,7 @@
 import { BigViewer } from '.'
 import { BlueseaSenders } from '../constants'
 import { Stream } from '../types'
+import { Switch } from 'antd'
 import { usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { FC } from 'react'
@@ -20,11 +21,13 @@ export const LocalBigViewer: FC<Props> = ({ participant }) => {
 
   return (
     <>
-      <div className={classNames('w-full h-full', screenStream ? 'block' : 'hidden')}>
-        <BigViewer participant={participant} stream={screenStream as Stream} priority={1000} isScreenShare />
-      </div>
-      <div className={classNames('w-full h-full', !screenStream ? 'block' : 'hidden')}>
-        <BigViewer participant={participant} stream={camStream as Stream} micStream={micStream} priority={100} />
+      <div className="w-full h-full">
+        <BigViewer
+          participant={participant}
+          stream={screenStream || (camStream as Stream)}
+          micStream={micStream}
+          isScreenShare={!!screenStream}
+        />
       </div>
     </>
   )
