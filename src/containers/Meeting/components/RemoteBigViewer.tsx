@@ -3,6 +3,7 @@ import { BlueseaSenders, BlueseaStreamPriority, MIN_AUDIO_LEVEL } from '../const
 import { Stream } from '../types'
 import { Switch } from 'antd'
 import { useAudioLevelMix } from 'bluesea-media-react-sdk'
+import classNames from 'classnames'
 import { FC, useMemo, useState } from 'react'
 import { usePeerRemoteStreamActive } from '@/hooks'
 import { MeetingParticipant } from '@/types/types'
@@ -24,8 +25,8 @@ export const RemoteBigViewer: FC<Props> = ({ participant }) => {
       <div className="w-full h-full">
         {screenStream && (
           <Switch
-            className="absolute top-2 left-2 z-10"
-            checkedChildren="High"
+            className={classNames('absolute bottom-2 right-2 z-50', forceHigh ? 'bg-red-500' : 'bg-blue-500')}
+            checkedChildren="HD"
             unCheckedChildren="Auto"
             checked={forceHigh}
             onChange={setForceHigh}
