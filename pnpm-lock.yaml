@@ -45,8 +45,8 @@ dependencies:
     specifier: ^1.4.0
     version: 1.4.0(debug@4.3.4)
   bluesea-media-react-sdk:
-    specifier: ^1.0.0
-    version: 1.0.0(react-dom@18.2.0)(react@18.2.0)
+    specifier: 1.0.1-alpha.3
+    version: 1.0.1-alpha.3(react-dom@18.2.0)(react@18.2.0)
   class-transformer:
     specifier: ^0.5.1
     version: 0.5.1
@@ -2873,8 +2873,8 @@ packages:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
 
-  /bluesea-media-js-sdk@1.2.0:
-    resolution: {integrity: sha512-EmdeyiNRusWFc2KukVkEYjEJOeY3+7Zk05Ufpix8FHrMDOjZGVgiISzChmPuoaxmwvJrl6m9MNTpcBm1YEvnnw==}
+  /bluesea-media-js-sdk@1.2.1-alpha.3:
+    resolution: {integrity: sha512-w2IVvvU6pj9urUI+kVFEPL9Xr4lovNf6NxNwNoqapZ26Qr7LdjeY6wn4rO2G1kkKIO138Wsj55aAp+Wca6ze+A==}
     dependencies:
       '@noble/secp256k1': 1.7.1
       '@scure/bip32': 1.3.1
@@ -2883,13 +2883,13 @@ packages:
       js-sha256: 0.9.0
     dev: false
 
-  /bluesea-media-react-sdk@1.0.0(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-ujWsLb4UDcXPkPi+ymr6oL22/mq0AxWzMTb2Tdf7AEOI7BXjyKdK5BS6poY22uvmDiy76/FWSRVQZHzn2an+6w==}
+  /bluesea-media-react-sdk@1.0.1-alpha.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-VcEocDFw+1889vtOzOHPflc/r1idFR4qFqFiUg7R4+1Gy+UkpA74Rda0tvIEjS5vlU8pinDOA2Vh5m+R1VMt9Q==}
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
     dependencies:
-      bluesea-media-js-sdk: 1.2.0
+      bluesea-media-js-sdk: 1.2.1-alpha.3
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
