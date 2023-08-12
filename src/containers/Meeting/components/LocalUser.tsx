@@ -48,7 +48,7 @@ export const LocalUser = ({ participant, isPinned }: Props) => {
     <div
       className={classNames(
         'w-full relative bg-black rounded-lg overflow-hidden aspect-video',
-        isHandRaised ? 'border-4 border-yellow-400' : ''
+        isHandRaised ? 'ring-4 ring-yellow-400' : ''
       )}
     >
       <div className="rounded-lg overflow-hidden w-full h-full">{_renderView}</div>

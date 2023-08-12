@@ -1,15 +1,24 @@
 'use client'
 
 import { UserType } from '../constants'
-import { useIsConnected, useJoinRequest, usePendingParticipants, useRoomSupabaseChannel } from '../contexts'
-import { ChatSection, ToolbarSection, ViewSection } from '../sections'
+import {
+  useIsConnected,
+  useJoinRequest,
+  usePendingParticipants,
+  useReceiveMessage,
+  useRoomSupabaseChannel,
+} from '../contexts'
+import { ChatSection, PaticipantSection, ToolbarSection, ViewSection } from '../sections'
 import { Button, Modal, notification, Space, Spin } from 'antd'
+import { throttle } from 'lodash'
 import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon, MoonIcon, SunIcon } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
+import useWindowFocus from 'use-window-focus'
 import { RoomParticipant } from '@prisma/client'
-import { LOGO_SHORT } from '@public'
+import { ADMIT_RINGTONE, LOGO_SHORT, MESSAGE_RINGTONE } from '@public'
 import { acceptParticipant } from '@/app/actions'
 import { ButtonIcon, Drawer } from '@/components'
 import { supabase } from '@/config/supabase'
@@ -26,6 +35,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [api, contextHolder] = notification.useNotification()
   const [layout, setLayout] = useState<'GRID' | 'LEFT'>('GRID')
   const [openChat, setOpenChat] = useState(false)
+  const [openPaticipant, setOpenPaticipant] = useState(false)
   const { isMaximize, onOpenFullScreen } = useFullScreen()
   const { isMobile } = useDevice()
   const [theme, setTheme] = useRecoilState(themeState)
@@ -33,6 +43,37 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [, delPendingParticipant] = usePendingParticipants()
   const roomSupabaseChannel = useRoomSupabaseChannel()
   const isConnected = useIsConnected()
+  const admitRingTone = useMemo(() => new Audio(ADMIT_RINGTONE), [])
+  const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
+  const windowFocused = useWindowFocus()
+
+  const { data: session } = useSession()
+
+  const [receiveMessage, clearReceiveMessage] = useReceiveMessage()
+
+  useEffect(() => {
+    if (openChat && windowFocused) {
+      clearReceiveMessage()
+    }
+  }, [clearReceiveMessage, openChat, windowFocused])
+
+  const throttled = useRef(
+    throttle(
+      () => {
+        return messageRingTone.play()
+      },
+      1000 * 3,
+      { trailing: false, leading: true }
+    )
+  )
+
+  useEffect(() => {
+    if (receiveMessage && !openChat) {
+      if (receiveMessage?.participant?.user?.id !== session?.user.id) {
+        throttled.current()
+      }
+    }
+  }, [session?.user.id, messageRingTone, receiveMessage, openChat, clearReceiveMessage])
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -123,6 +164,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   useEffect(() => {
     if (!joinRequest) return
     const { id, name, type } = joinRequest
+    admitRingTone.play()
     openNotification({
       message: `A ${type} named '${name}' is requesting to join the room`,
       description: 'Do you want to accept this request?',
@@ -132,13 +174,15 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
           sendAcceptJoinRequest(id, type)
         },
         cancel: 'Reject',
-        onCancel: () => {},
+        onCancel: () => {
+          delPendingParticipant(id)
+        },
       },
       onClose: () => {
         clearJoinRequest()
       },
     })
-  }, [clearJoinRequest, joinRequest, openNotification, sendAcceptJoinRequest])
+  }, [admitRingTone, clearJoinRequest, delPendingParticipant, joinRequest, openNotification, sendAcceptJoinRequest])
 
   // TODO: Move every send and receive event to hooks
   const sendRoomEvent = useCallback(
@@ -176,56 +220,78 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
                 <Link href="/">
                   <img src={theme === 'dark' ? LOGO_SHORT : LOGO_SHORT} alt="" className="h-8" />
                 </Link>
-                <div className="pl-2 hidden md:block">
+                <div className="pl-2">
                   <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
                 </div>
               </Space>
-              {!isMobile && (
-                <Space>
-                  <ButtonIcon
-                    onClick={() => setLayout('GRID')}
-                    icon={<LayoutGridIcon size={16} color={layout === 'GRID' ? '#2D8CFF' : '#9ca3af'} />}
-                  />
-                  <ButtonIcon
-                    onClick={() => setLayout('LEFT')}
-                    icon={<LayoutPanelLeftIcon size={16} color={layout === 'LEFT' ? '#2D8CFF' : '#9ca3af'} />}
-                  />
-                  <ButtonIcon
-                    onClick={() => onOpenFullScreen()}
-                    icon={
-                      !isMaximize ? (
-                        <MaximizeIcon size={16} color="#9ca3af" />
-                      ) : (
-                        <MinimizeIcon size={16} color="#9ca3af" />
-                      )
-                    }
-                    className="__bluesea_video_viewer_fullscreen_button"
-                  />
-                  <ButtonIcon
-                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    shape="circle"
-                    icon={theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} color="#000" />}
-                  />
-                </Space>
-              )}
+              <Space>
+                <ButtonIcon
+                  className="hidden lg:flex"
+                  onClick={() => setLayout('GRID')}
+                  icon={<LayoutGridIcon size={16} color={layout === 'GRID' ? '#2D8CFF' : '#9ca3af'} />}
+                />
+                <ButtonIcon
+                  className="hidden lg:flex"
+                  onClick={() => setLayout('LEFT')}
+                  icon={<LayoutPanelLeftIcon size={16} color={layout === 'LEFT' ? '#2D8CFF' : '#9ca3af'} />}
+                />
+                <ButtonIcon
+                  onClick={() => onOpenFullScreen()}
+                  icon={
+                    !isMaximize ? (
+                      <MaximizeIcon size={16} color="#9ca3af" />
+                    ) : (
+                      <MinimizeIcon size={16} color="#9ca3af" />
+                    )
+                  }
+                  className="hidden lg:flex"
+                />
+                <ButtonIcon
+                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  shape="circle"
+                  icon={theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} color="#000" />}
+                />
+              </Space>
             </div>
-            <div className="flex-1 flex flex-col p-4 overflow-y-auto">
-              <ViewSection layout={layout} setLayout={setLayout} />
-            </div>
-            <ToolbarSection sendEvent={sendRoomEvent} openChat={openChat} setOpenChat={setOpenChat} />
+            <ViewSection layout={layout} setLayout={setLayout} />
+            <ToolbarSection
+              sendEvent={sendRoomEvent}
+              openChat={openChat}
+              setOpenChat={setOpenChat}
+              openPaticipant={openPaticipant}
+              setOpenPaticipant={setOpenPaticipant}
+            />
           </div>
           {!isMobile ? (
             <>
               {openChat && (
                 <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
-                  <ChatSection room={room} sendAcceptJoinRequest={sendAcceptJoinRequest} />
+                  <ChatSection room={room} onClose={() => setOpenChat(false)} />
+                </div>
+              )}
+              {openPaticipant && (
+                <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
+                  <PaticipantSection
+                    room={room}
+                    onClose={() => setOpenPaticipant(false)}
+                    sendAcceptJoinRequest={sendAcceptJoinRequest}
+                  />
                 </div>
               )}
             </>
           ) : (
-            <Drawer open={openChat} onClose={() => setOpenChat(false)} bodyStyle={{ padding: 0 }}>
-              <ChatSection room={room} sendAcceptJoinRequest={sendAcceptJoinRequest} />
-            </Drawer>
+            <>
+              <Drawer open={openChat} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
+                <ChatSection room={room} onClose={() => setOpenChat(false)} />
+              </Drawer>
+              <Drawer open={openPaticipant} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
+                <PaticipantSection
+                  room={room}
+                  onClose={() => setOpenPaticipant(false)}
+                  sendAcceptJoinRequest={sendAcceptJoinRequest}
+                />
+              </Drawer>
+            </>
           )}
         </div>
       </div>

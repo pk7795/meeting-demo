@@ -26,7 +26,7 @@ export const ButtonIcon: React.FC<Props> = ({ children, icon, tooltip, className
         icon={icon}
         className={classNames(
           'flex items-center justify-center',
-          disabled ? 'cursor-not-allowed bg-[#0000000a] border-[#d9d9d9] text-[#9b9b9b]' : '',
+          disabled ? 'cursor-not-allowed bg-[#0000000a] border-[#d9d9d9] dark:border-none text-[#9b9b9b]' : '',
           className,
           classNameBtn
         )}

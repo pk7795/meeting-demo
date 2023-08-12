@@ -1,6 +1,8 @@
 import { MIN_AUDIO_LEVEL, UserType } from '../constants'
+import { useSession } from 'next-auth/react'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { RoomParticipant } from '@prisma/client'
+import { MESSAGE_RINGTONE } from '@public'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
 import { useAudioSlotsQueueContainer } from '@/hooks'
@@ -15,6 +17,7 @@ export const MeetingContext = createContext<{
     messages: MapContainer<string, RoomMessageWithParticipant>
     participantState: DataContainer<MeetingParticipantStatus>
     joinRequest: DataContainer<{ id: string; name: string; type: UserType } | null>
+    receiveMessage: DataContainer<RoomMessageWithParticipant | null>
     pinnedPaticipant: DataContainer<PinnedPaticipant | null>
     currentPaticipant: RoomParticipant
     pendingParticipants: MapContainer<string, Partial<RoomParticipantWithUser>>
@@ -26,6 +29,7 @@ export const MeetingContext = createContext<{
   setParticipantState: (state: MeetingParticipantStatus) => void
   setPinnedParticipant: (participant: PinnedPaticipant | null) => void
   clearJoinRequest: () => void
+  clearReceiveMessage: () => void
   deletePendingParticipant: (participantId: string) => void
 }>({} as any)
 
@@ -74,6 +78,7 @@ export const MeetingProvider = ({
     })
     const pinnedPaticipant = new DataContainer<PinnedPaticipant | null>(null)
     const joinRequest = new DataContainer<{ id: string; name: string; type: UserType } | null>(null)
+    const receiveMessage = new DataContainer<RoomMessageWithParticipant | null>(null)
     const pendingParticipants = new MapContainer<string, Partial<RoomParticipantWithUser>>()
     const roomSupabaseChannel = new DataContainer<RealtimeChannel>({} as any)
     const isConnected = new DataContainer<boolean>(false)
@@ -115,6 +120,7 @@ export const MeetingProvider = ({
         createdAt: new Date(payload.new.createdAt + 'Z'),
       }
       messages.set(payload.new.id, message)
+      receiveMessage.change(message)
     }
 
     const roomMessageSubscription = supabase
@@ -259,6 +265,7 @@ export const MeetingProvider = ({
       messages,
       participantState,
       joinRequest,
+      receiveMessage,
       roomSupabaseChannel,
       isConnected,
       currentPaticipant: roomParticipant,
@@ -279,6 +286,10 @@ export const MeetingProvider = ({
 
   const clearJoinRequest = useCallback(() => {
     data.joinRequest.change(null)
+  }, [data])
+
+  const clearReceiveMessage = useCallback(() => {
+    data.receiveMessage.change(null)
   }, [data])
 
   const setPinnedParticipant = useCallback(
@@ -321,6 +332,7 @@ export const MeetingProvider = ({
           talkingParticipants,
         },
         clearJoinRequest,
+        clearReceiveMessage,
         deletePendingParticipant,
         setParticipantState,
         setPinnedParticipant,
@@ -389,6 +401,12 @@ export const useJoinRequest = () => {
   const context = useMeeting()
   const joinRequest = useReactionData<{ id: string; name: string; type: UserType } | null>(context.data.joinRequest)
   return [joinRequest, context.clearJoinRequest] as const
+}
+
+export const useReceiveMessage = () => {
+  const context = useMeeting()
+  const receiveMessage = useReactionData<RoomMessageWithParticipant | null>(context.data.receiveMessage)
+  return [receiveMessage, context.clearReceiveMessage] as const
 }
 
 export const usePendingParticipants = () => {

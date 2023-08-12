@@ -51,7 +51,7 @@ export const BigViewer: FC<Props> = ({
   return (
     <div
       className={classNames(
-        'w-full relative bg-black rounded-lg overflow-hidden h-full flex items-center',
+        'w-full relative bg-black rounded-lg overflow-hidden h-full flex items-center object-contain',
         classNameViewer
       )}
     >

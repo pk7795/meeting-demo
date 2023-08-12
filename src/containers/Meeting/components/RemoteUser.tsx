@@ -3,8 +3,9 @@ import { BlueseaSenders, MIN_AUDIO_LEVEL } from '../constants'
 import { Stream } from '../types'
 import { useAudioLevelMix } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
+import { throttle } from 'lodash'
 import { HandIcon, MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
-import { FC, useMemo } from 'react'
+import { FC, useEffect, useMemo, useRef } from 'react'
 import { Icon } from '@/components'
 import { usePeerRemoteStreamActive } from '@/hooks'
 import { MeetingParticipant } from '@/types/types'
@@ -12,15 +13,32 @@ import { MeetingParticipant } from '@/types/types'
 type Props = {
   participant: MeetingParticipant
   isPinned: boolean
+  raiseRingTone: HTMLAudioElement
 }
 
-export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
+export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone }) => {
   const camStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.video.name)
   const micStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.audio.name)
   const screenStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.screen_video.name)
   const audioLevel = useAudioLevelMix(participant.id!, BlueseaSenders.audio.name)
   const isTalking = useMemo(() => typeof audioLevel === 'number' && audioLevel > MIN_AUDIO_LEVEL, [audioLevel])
   const isHandRaised = participant?.meetingStatus?.handRaised
+
+  const throttled = useRef(
+    throttle(
+      () => {
+        return raiseRingTone.play()
+      },
+      1000 * 3,
+      { trailing: false, leading: true }
+    )
+  )
+
+  useEffect(() => {
+    if (isHandRaised) {
+      throttled.current()
+    }
+  }, [isHandRaised])
 
   const _renderView = useMemo(() => {
     if (screenStream && !isPinned) {
@@ -45,7 +63,7 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned }) => {
     <div
       className={classNames(
         'w-full relative bg-black rounded-lg overflow-hidden aspect-video',
-        isHandRaised ? 'border-4 border-yellow-400' : ''
+        isHandRaised ? 'ring-4 ring-yellow-400' : ''
       )}
     >
       <div className="rounded-lg overflow-hidden w-full h-full">{_renderView}</div>
