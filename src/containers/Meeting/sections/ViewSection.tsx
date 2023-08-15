@@ -80,7 +80,7 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
         <div className={classNames('h-full relative', layout !== 'GRID' ? 'w-56' : 'w-full')}>
           <Row className={classNames(layout !== 'GRID' ? 'overflow-y-auto h-[calc(100%-24px)]' : '')}>
             {map(
-              filter(participants, (_, index) => index >= page && index < (page || 1) * 12),
+              filter(participants, (_, index) => index >= page * 12 && index < (page || 1) * 12),
               (p, index) => {
                 const isPinned = layout !== 'GRID' && p.id === pinnedParticipant?.p?.id
                 return (
