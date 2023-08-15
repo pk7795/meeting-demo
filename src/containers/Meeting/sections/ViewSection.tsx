@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { css } from '@emotion/css'
 import { RAISE_HAND_RINGTONE } from '@public'
 import { ButtonIcon } from '@/components'
+import { useDevice } from '@/hooks'
 
 type Props = {
   layout: 'GRID' | 'LEFT'
@@ -22,6 +23,7 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
   const [showUser, setShowUser] = useState(true)
   const raiseRingTone = useMemo(() => new Audio(RAISE_HAND_RINGTONE), [])
   const [page, setPage] = useState(0)
+  const { isMobile } = useDevice()
 
   useEffect(() => {
     setShowUser(true)
@@ -82,7 +84,7 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
               (p, index) => {
                 const isPinned = layout !== 'GRID' && p.id === pinnedParticipant?.p?.id
                 return (
-                  <Col span={layout !== 'GRID' ? 24 : 6}>
+                  <Col span={layout !== 'GRID' || isMobile ? 24 : 6}>
                     <div
                       key={index}
                       className={classNames(
