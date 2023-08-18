@@ -3,7 +3,7 @@
 import { Col, Form, Input, Modal, Popover, Row, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import { isEmpty, map } from 'lodash'
-import { HashIcon, LogInIcon, XIcon } from 'lucide-react'
+import { CopyIcon, HashIcon, LogInIcon, XIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
@@ -195,7 +195,6 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                     ...r,
                     key: r.id,
                   }))}
-                  showHeader={false}
                   columns={[
                     {
                       title: 'Room name',
@@ -209,9 +208,13 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                       render: (passcode) => (
                         <Space size="small">
                           <Icon icon={<HashIcon size={16} />} />
-                          <Copy text={passcode}>
-                            <div className="whitespace-nowrap">{passcode}</div>
-                          </Copy>
+
+                          <Space>
+                            <div className="whitespace-nowrap w-24">{passcode}</div>
+                            <Copy text={passcode}>
+                              <Icon icon={<CopyIcon size={16} />} />
+                            </Copy>
+                          </Space>
                         </Space>
                       ),
                     },

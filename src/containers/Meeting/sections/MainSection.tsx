@@ -9,18 +9,29 @@ import {
   useRoomSupabaseChannel,
 } from '../contexts'
 import { ChatSection, PaticipantSection, ToolbarSection, ViewSection } from '../sections'
-import { Button, Modal, notification, Space, Spin } from 'antd'
+import { Button, Modal, notification, Space } from 'antd'
+import { useSessionState } from 'bluesea-media-react-sdk'
 import { throttle } from 'lodash'
-import { LayoutGridIcon, LayoutPanelLeftIcon, MaximizeIcon, MinimizeIcon, MoonIcon, SunIcon } from 'lucide-react'
+import {
+  LayoutGridIcon,
+  LayoutPanelLeftIcon,
+  Loader2Icon,
+  MaximizeIcon,
+  MinimizeIcon,
+  MoonIcon,
+  RefreshCwIcon,
+  SunIcon,
+} from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import useWindowFocus from 'use-window-focus'
+import { useTimeout } from 'usehooks-ts'
 import { RoomParticipant } from '@prisma/client'
 import { ADMIT_RINGTONE, LOGO_SHORT, MESSAGE_RINGTONE } from '@public'
 import { acceptParticipant } from '@/app/actions'
-import { ButtonIcon, Drawer } from '@/components'
+import { ButtonIcon, Drawer, Icon } from '@/components'
 import { supabase } from '@/config/supabase'
 import { useDevice, useFullScreen } from '@/hooks'
 import { themeState } from '@/recoil'
@@ -46,6 +57,35 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const admitRingTone = useMemo(() => new Audio(ADMIT_RINGTONE), [])
   const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
   const windowFocused = useWindowFocus()
+  const sessionState = useSessionState()
+  const [visibleRefresh, setVisibleRefresh] = useState(false)
+
+  useTimeout(() => setVisibleRefresh(true), 30000)
+
+  useEffect(() => {
+    let timeout: any = null
+    if (visibleRefresh) {
+      clearTimeout(timeout)
+      return
+    }
+    if (
+      isConnected === false ||
+      sessionState === 'reconnecting' ||
+      sessionState === 'disconnected' ||
+      sessionState === 'error'
+    ) {
+      timeout = setTimeout(() => {
+        setVisibleRefresh(true)
+      }, 10000)
+    }
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [isConnected, sessionState, visibleRefresh])
+
+  console.log('--------------------------------------------------------')
+  console.log('sessionState', sessionState)
+  console.log('--------------------------------------------------------')
 
   const { data: session } = useSession()
 
@@ -202,13 +242,28 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     <>
       <Modal
         getContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
-        title="Connecting to Server..."
         footer={false}
         closable={false}
-        open={!isConnected}
+        open={
+          isConnected === false ||
+          sessionState === 'reconnecting' ||
+          sessionState === 'disconnected' ||
+          sessionState === 'error'
+        }
       >
-        <div className="flex items-center justify-center h-20">
-          <Spin tip="Connecting..." size="large" />
+        <div className="flex flex-col items-center justify-center">
+          <div className="text-lg text-black dark:text-white mb-4">Connecting to Server ...</div>
+          <Icon className="rotate-center text-black dark:text-white" icon={<Loader2Icon />} />
+          {visibleRefresh && (
+            <ButtonIcon
+              onClick={() => window.location.reload()}
+              type="primary"
+              className="mt-4"
+              icon={<RefreshCwIcon size={16} className="" />}
+            >
+              Refresh
+            </ButtonIcon>
+          )}
         </div>
       </Modal>
       {contextHolder}

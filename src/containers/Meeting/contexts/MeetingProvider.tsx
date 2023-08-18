@@ -23,7 +23,7 @@ export const MeetingContext = createContext<{
     pendingParticipants: MapContainer<string, Partial<RoomParticipantWithUser>>
     roomSupabaseChannel: DataContainer<RealtimeChannel>
     talkingParticipants: MapContainer<string, { peerId: string; ts: number }>
-    isConnected: DataContainer<boolean>
+    isConnected: DataContainer<boolean | null>
     destroy: () => void
   }
   setParticipantState: (state: MeetingParticipantStatus) => void
@@ -81,7 +81,7 @@ export const MeetingProvider = ({
     const receiveMessage = new DataContainer<RoomMessageWithParticipant | null>(null)
     const pendingParticipants = new MapContainer<string, Partial<RoomParticipantWithUser>>()
     const roomSupabaseChannel = new DataContainer<RealtimeChannel>({} as any)
-    const isConnected = new DataContainer<boolean>(false)
+    const isConnected = new DataContainer<boolean | null>(null)
 
     const messagesMap = room!.messages.reduce((acc, message) => {
       acc.set(message.id, {
@@ -425,6 +425,6 @@ export const useTalkingParticipants = () => {
 
 export const useIsConnected = () => {
   const context = useMeeting()
-  const isConnected = useReactionData<boolean>(context.data.isConnected)
+  const isConnected = useReactionData<boolean | null>(context.data.isConnected)
   return isConnected
 }
