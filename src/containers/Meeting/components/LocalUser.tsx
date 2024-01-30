@@ -1,7 +1,7 @@
 import { ViewerWapper } from '.'
-import { BlueseaSenders, MIN_AUDIO_LEVEL } from '../constants'
+import { Atm0sSenders, MIN_AUDIO_LEVEL } from '../constants'
 import { Stream } from '../types'
-import { useAudioLevelProducer, usePublisher, usePublisherState } from 'bluesea-media-react-sdk'
+import { useAudioLevelProducer, usePublisher, usePublisherState } from '@8xff/atm0s-media-react'
 import classNames from 'classnames'
 import { HandIcon, MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
 import { useMemo } from 'react'
@@ -14,9 +14,9 @@ type Props = {
 }
 
 export const LocalUser = ({ participant, isPinned }: Props) => {
-  const camPublisher = usePublisher(BlueseaSenders.video)
-  const micPublisher = usePublisher(BlueseaSenders.audio)
-  const screenPublisher = usePublisher(BlueseaSenders.screen_video)
+  const camPublisher = usePublisher(Atm0sSenders.video)
+  const micPublisher = usePublisher(Atm0sSenders.audio)
+  const screenPublisher = usePublisher(Atm0sSenders.screen_video)
   const [, camStream] = usePublisherState(camPublisher)
   const [, micStream] = usePublisherState(micPublisher)
   const [, screenStream] = usePublisherState(screenPublisher)

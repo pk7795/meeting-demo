@@ -1,6 +1,6 @@
-import { ContentHint, StreamKinds } from 'bluesea-media-react-sdk'
+import { ContentHint, StreamKinds } from '@8xff/atm0s-media-react'
 
-export const BlueseaSenders = {
+export const Atm0sSenders = {
   video: {
     kind: StreamKinds.VIDEO,
     name: 'video_main',
@@ -23,7 +23,7 @@ export const BlueseaSenders = {
   },
 }
 
-export const BlueseaStreamPriority = {
+export const Atm0sStreamPriority = {
   SmallVideo: 100,
   BigVideo: 500,
   ScreenShare: 1000,

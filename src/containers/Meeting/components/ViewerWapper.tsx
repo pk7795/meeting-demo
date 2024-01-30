@@ -1,6 +1,6 @@
 import { Stream } from '../types'
+import { VideoViewer } from '@8xff/atm0s-media-react'
 import { Avatar } from 'antd'
-import { VideoViewer } from 'bluesea-media-react-sdk'
 import { FC } from 'react'
 import { MeetingParticipant } from '@/types/types'
 

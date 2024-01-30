@@ -1,18 +1,13 @@
 'use client'
 
-import { BlueseaSenders } from '../constants'
+import { Atm0sSenders } from '../constants'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
 import { PrepareSection } from '../sections'
 import { MainSection } from '../sections/MainSection'
-import {
-  BlueseaSessionProvider,
-  MixMinusMode,
-  useSharedDisplayMedia,
-  useSharedUserMedia,
-} from 'bluesea-media-react-sdk'
+import { MixMinusMode, SessionProvider, useSharedDisplayMedia, useSharedUserMedia } from '@8xff/atm0s-media-react'
 import { useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
-import { BlueseaSession } from '@/lib/bluesea'
+import { Atm0sSession } from '@/lib/atm0s'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 
@@ -24,12 +19,13 @@ type Props = {
 }
 
 export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingParticipants }) => {
-  const [blueseaConfig, setBlueseaConfig] = useState<BlueseaSession>()
+  const [atm0sConfig, setAtm0sConfig] = useState<Atm0sSession>()
   const [joined, setJoined] = useState(false)
   const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
+  console.log('RERENDER HERE')
 
   const senders = useMemo(() => {
-    return [BlueseaSenders.audio, BlueseaSenders.video, BlueseaSenders.screen_audio, BlueseaSenders.screen_video]
+    return [Atm0sSenders.audio, Atm0sSenders.video, Atm0sSenders.screen_audio, Atm0sSenders.screen_video]
   }, [])
 
   const createAudio: [HTMLAudioElement, HTMLAudioElement, HTMLAudioElement] = useMemo(() => {
@@ -60,20 +56,21 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
     }
   }, [createAudio])
 
-  useSharedUserMedia('mic_device')
-  useSharedUserMedia('camera_device')
-  useSharedDisplayMedia('screen_device')
+  // useSharedUserMedia('mic_device')
+  // useSharedUserMedia('camera_device')
+  // useSharedDisplayMedia('screen_device')
 
   return (
     <MediaDeviceProvider>
-      {blueseaConfig && roomParticipant && joined ? (
-        <BlueseaSessionProvider
-          logLevel={blueseaConfig.log_level}
-          gateways={blueseaConfig.gateway}
-          room={blueseaConfig.room}
-          peer={blueseaConfig.peer}
-          token={blueseaConfig.token}
+      {atm0sConfig && roomParticipant && joined ? (
+        <SessionProvider
+          logLevel={atm0sConfig.log_level}
+          gateways={atm0sConfig.gateway}
+          room={atm0sConfig.room}
+          peer={atm0sConfig.peer}
+          token={atm0sConfig.token}
           autoConnect={false}
+          onConnectError={console.error}
           mixMinusAudio={{
             mode: MixMinusMode.AllAudioStreams,
             elements: createAudio,
@@ -84,7 +81,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
           <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
             <MainSection room={room} myParticipant={roomParticipant} />
           </MeetingProvider>
-        </BlueseaSessionProvider>
+        </SessionProvider>
       ) : (
         <PrepareSection
           room={room}
@@ -92,7 +89,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
             setJoined(true)
           }}
           setRoomParticipant={setRoomParticipant}
-          setBlueseaConfig={setBlueseaConfig}
+          setAtm0sConfig={setAtm0sConfig}
           myParticipant={roomParticipant}
           roomAccess={access}
         />

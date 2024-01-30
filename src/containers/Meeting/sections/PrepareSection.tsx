@@ -1,7 +1,7 @@
 import { UserType } from '../constants'
 import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
+import { useSharedUserMedia, VideoViewer } from '@8xff/atm0s-media-react'
 import { Col, Divider, Input, Row, Select, Space, Spin, Typography } from 'antd'
-import { useSharedUserMedia, VideoViewer } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { filter, find, map } from 'lodash'
 import { CameraIcon, MicIcon, MicOffIcon, VideoIcon, VideoOffIcon } from 'lucide-react'
@@ -23,7 +23,7 @@ type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
   setRoomParticipant: (participant: RoomParticipant) => void
-  setBlueseaConfig: (config: any) => void
+  setAtm0sConfig: (config: any) => void
   roomAccess: RoomAccessStatus
 }
 
@@ -31,7 +31,7 @@ export const PrepareSection: React.FC<Props> = ({
   room,
   onJoinMeeting,
   setRoomParticipant,
-  setBlueseaConfig,
+  setAtm0sConfig: setAtm0sConfig,
   roomAccess,
 }) => {
   const { data: user, status } = useSession()
@@ -77,9 +77,7 @@ export const PrepareSection: React.FC<Props> = ({
   useEffect(() => {
     if (camera) {
       camStreamChanger({
-        video: {
-          deviceId: selectedVideoInput?.deviceId,
-        },
+        video: true,
       })
     } else {
       camStreamChanger(undefined)
@@ -150,13 +148,13 @@ export const PrepareSection: React.FC<Props> = ({
         data: {
           passcode: room.passcode as string,
         },
-      }).then(({ blueseaConfig, roomParticipant }) => {
+      }).then(({ atm0sConfig, roomParticipant }) => {
         setRoomParticipant(roomParticipant)
-        setBlueseaConfig(blueseaConfig)
+        setAtm0sConfig(atm0sConfig)
         onJoinMeeting()
       })
     })
-  }, [onJoinMeeting, room.passcode, setBlueseaConfig, setRoomParticipant])
+  }, [onJoinMeeting, room.passcode, setAtm0sConfig, setRoomParticipant])
 
   const onGuestJoin = useCallback(() => {
     startTransitionCreateRoomParticipant(() => {
@@ -165,13 +163,13 @@ export const PrepareSection: React.FC<Props> = ({
           name,
           passcode: room.passcode as string,
         },
-      }).then(({ blueseaConfig, roomParticipant }) => {
+      }).then(({ atm0sConfig, roomParticipant }) => {
         setRoomParticipant(roomParticipant)
-        setBlueseaConfig(blueseaConfig)
+        setAtm0sConfig(atm0sConfig)
         onJoinMeeting()
       })
     })
-  }, [name, onJoinMeeting, room.passcode, setBlueseaConfig, setRoomParticipant])
+  }, [name, onJoinMeeting, room.passcode, setAtm0sConfig, setRoomParticipant])
 
   const onJoin = useCallback(() => {
     if (user) {
@@ -188,9 +186,9 @@ export const PrepareSection: React.FC<Props> = ({
           data: {
             passcode: room.passcode as string,
           },
-        }).then(({ blueseaConfig, roomParticipant }) => {
+        }).then(({ atm0sConfig, roomParticipant }) => {
           setRoomParticipant(roomParticipant)
-          setBlueseaConfig(blueseaConfig)
+          setAtm0sConfig(atm0sConfig)
           sendJoinRequest(roomParticipant.id, user.user.name as string, UserType.User)
           setAcceptSubscription(
             supabase
@@ -215,7 +213,7 @@ export const PrepareSection: React.FC<Props> = ({
         )
       }
     })
-  }, [guestUUID, name, onJoin, room.id, room.passcode, sendJoinRequest, setBlueseaConfig, setRoomParticipant, user])
+  }, [guestUUID, name, onJoin, room.id, room.passcode, sendJoinRequest, setAtm0sConfig, setRoomParticipant, user])
 
   const renderJoinButton = () => {
     switch (access) {

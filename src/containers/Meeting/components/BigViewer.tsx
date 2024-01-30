@@ -1,7 +1,7 @@
 import { usePinnedParticipant } from '../contexts'
 import { MicStream, Stream } from '../types'
+import { VideoViewer } from '@8xff/atm0s-media-react'
 import { Avatar } from 'antd'
-import { VideoViewer } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { MicIcon, MicOffIcon, PinIcon, PinOffIcon } from 'lucide-react'
 import { FC, useMemo } from 'react'
@@ -76,8 +76,8 @@ export const BigViewer: FC<Props> = ({
           className={classNameVideo}
           stream={stream}
           priority={priority}
-          minSpatial={forceHighQuality ? 2 : 0}
-          maxSpatial={2}
+          min_spatial={forceHighQuality ? 2 : 0}
+          max_spatial={2}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">

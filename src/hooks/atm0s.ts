@@ -1,6 +1,6 @@
-import { MapContainer, useReactionList } from './common'
-import { StreamRemote, StreamRemoteEvent, usePeerRemoteStream, useSession } from 'bluesea-media-react-sdk'
-import { AudioMixSlotInfo } from 'bluesea-media-react-sdk/dist/cjs/core/hooks/audio_level'
+import { MapContainer } from './common'
+import { StreamRemote, usePeerRemoteStream, useSession } from '@8xff/atm0s-media-react'
+import { AudioMixSlotInfo } from '@8xff/atm0s-media-react/types/hooks/audio_level'
 import { range } from 'lodash'
 import { useEffect, useState } from 'react'
 
@@ -24,9 +24,9 @@ export const usePeerRemoteStreamActive = (peer_id: string, name: string): Stream
         }
       }
       handler()
-      stream.on(StreamRemoteEvent.STATE, handler)
+      stream.on('state', handler)
       return () => {
-        stream.off(StreamRemoteEvent.STATE, handler)
+        stream.off('state', handler)
       }
     } else {
       setActiveStream(undefined)
@@ -40,16 +40,16 @@ export const useAudioSlotsContainer = (maxSlots: number, minAudioLevel?: number)
 
   const session = useSession()
   useEffect(() => {
-    const mixMinus = session.getMixMinusAudio()
+    const mixMinus = session?.getMixMinusAudio()
     if (mixMinus) {
       const handler = (index: number, info: any | null) => {
         if (info) {
           const sourceId = info[0].split(':')
           if (minAudioLevel !== undefined && info[1] >= minAudioLevel) {
             slots.set(index, {
-              peer_id: sourceId[0],
-              stream_name: sourceId[1],
-              audio_level: info[1],
+              peerId: sourceId[0],
+              streamName: sourceId[1],
+              audioLevel: info[1],
             })
           }
         } else {
@@ -66,7 +66,7 @@ export const useAudioSlotsContainer = (maxSlots: number, minAudioLevel?: number)
         })
       }
     }
-  }, [maxSlots, session.getMixMinusAudio()])
+  }, [maxSlots, session?.getMixMinusAudio()])
   return slots
 }
 
@@ -80,10 +80,8 @@ export const useAudioSlotsQueueContainer = (maxSlots: number, minAudioLevel?: nu
     const peers = list.filter((x) => x !== undefined)
 
     // Delete every key that is not in slots
-    const inActiveIds = Array.from(talkingPeerIds.map.keys()).filter(
-      (x: string) => !peers.find((p) => x === p?.peer_id)
-    )
-    const newPeers = peers.filter((x) => !talkingPeerIds.has(x?.peer_id as string))
+    const inActiveIds = Array.from(talkingPeerIds.map.keys()).filter((x: string) => !peers.find((p) => x === p?.peerId))
+    const newPeers = peers.filter((x) => !talkingPeerIds.has(x?.peerId as string))
     if (inActiveIds.length > 0) {
       talkingPeerIds.delBatch(inActiveIds)
     }
@@ -91,10 +89,10 @@ export const useAudioSlotsQueueContainer = (maxSlots: number, minAudioLevel?: nu
     if (newPeers.length > 0) {
       const newMap = new Map<string, { peerId: string; ts: number; audioLevel: number }>()
       for (const p of newPeers) {
-        newMap.set(p!.peer_id, {
-          peerId: p!.peer_id,
+        newMap.set(p!.peerId, {
+          peerId: p!.peerId,
           ts: unixTimestamp,
-          audioLevel: p!.audio_level!,
+          audioLevel: p!.audioLevel!,
         })
       }
       talkingPeerIds.setBatch(newMap)
@@ -102,9 +100,9 @@ export const useAudioSlotsQueueContainer = (maxSlots: number, minAudioLevel?: nu
 
     // Update audio level for every key
     for (const p of peers) {
-      talkingPeerIds.set(p!.peer_id!, {
-        ...talkingPeerIds.get(p!.peer_id)!,
-        audioLevel: p!.audio_level!,
+      talkingPeerIds.set(p!.peerId!, {
+        ...talkingPeerIds.get(p!.peerId)!,
+        audioLevel: p!.audioLevel!,
       })
     }
   })

@@ -1,13 +1,13 @@
-import { LogLevel } from 'bluesea-media-react-sdk'
+import { LogLevel } from '@8xff/atm0s-media-react'
 import request from 'request'
 
-export interface BlueseaConfig {
+export interface Atm0sConfig {
   api: string
   appToken: string
   gateway: string
 }
 
-export interface BlueseaSession {
+export interface Atm0sSession {
   gateway: string
   room: string
   peer: string
@@ -22,7 +22,7 @@ export async function callLiveApi<T>(api: string, api_path: string, token: strin
     url: url,
     headers: {
       'Content-Type': 'application/json',
-      'User-Agent': 'Bluesea-SDK/1.0.0',
+      'User-Agent': 'Atm0s-SDK/1.0.0',
     },
     body: JSON.stringify(body),
   }
@@ -32,8 +32,9 @@ export async function callLiveApi<T>(api: string, api_path: string, token: strin
         return reject(new Error(error))
       }
       try {
+        console.log('Response', response.body)
         const data = JSON.parse(response.body)
-        if (data.status === true) {
+        if (data.success === true) {
           resolve(data.data)
         } else {
           reject(new Error(data.message || data.error || 'Unknown error'))
@@ -52,7 +53,7 @@ export async function callGatewayApi<T>(gateway: string, api_path: string, body:
     url: url,
     headers: {
       'Content-Type': 'application/json',
-      'User-Agent': 'Bluesea-SDK/1.0.0',
+      'User-Agent': 'Atm0s-SDK/1.0.0',
     },
     body: JSON.stringify(body),
   }
@@ -79,7 +80,7 @@ export async function callGatewayApi<T>(gateway: string, api_path: string, body:
 export async function createLiveWebrtcToken(
   room: string,
   peer: string,
-  config: BlueseaConfig,
+  config: Atm0sConfig,
   record: boolean
 ): Promise<string> {
   const res = await callLiveApi<{ token: string }>(config.api, 'webrtc_session', config.appToken, {
@@ -93,7 +94,7 @@ export async function createLiveWebrtcToken(
 export async function createLiveRtmpToken(
   room: string,
   peer: string,
-  config: BlueseaConfig,
+  config: Atm0sConfig,
   record: boolean
 ): Promise<string> {
   const res = await callLiveApi<{ token: string }>(config.api, 'rtmp_session', config.appToken, {
@@ -109,7 +110,7 @@ export async function createRtmpUrl(
   room: string,
   peer: string,
   token: string,
-  config: BlueseaConfig
+  config: Atm0sConfig
 ): Promise<{ rtmp_uri: string; stream_key: string }> {
   const res = await callGatewayApi<{ rtmp_uri: string; rtmp_shorten_uri: string }>(config.gateway, 'rtmp/connect', {
     room,
@@ -128,14 +129,14 @@ export async function createRtmpUrl(
   }
 }
 
-export async function createComposeToken(room: string, config: BlueseaConfig): Promise<string> {
+export async function createComposeToken(room: string, config: Atm0sConfig): Promise<string> {
   const res = await callLiveApi<{ token: string }>(config.api, 'compose_session', config.appToken, {
     room,
   })
   return res.token
 }
 
-export async function submitComposeRecord(source: string, token: string, config: BlueseaConfig): Promise<string> {
+export async function submitComposeRecord(source: string, token: string, config: Atm0sConfig): Promise<string> {
   const res = await callGatewayApi<string>(config.gateway, 'compose/submit', {
     token,
     source,

@@ -1,8 +1,7 @@
-import { MIN_AUDIO_LEVEL, UserType } from '../constants'
-import { useSession } from 'next-auth/react'
+import { UserType } from '../constants'
+import { useActions } from '@8xff/atm0s-media-react'
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { RoomParticipant } from '@prisma/client'
-import { MESSAGE_RINGTONE } from '@public'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
 import { useAudioSlotsQueueContainer } from '@/hooks'
@@ -273,9 +272,17 @@ export const MeetingProvider = ({
     }
   }, [])
 
+  const actions = useActions()
+
   useEffect(() => {
     return data.destroy
   }, [data])
+
+  console.log(' RENDER --------------------------------------------------------')
+
+  useEffect(() => {
+    actions.connect()
+  }, [actions])
 
   const setParticipantState = useCallback(
     (state: MeetingParticipantStatus) => {

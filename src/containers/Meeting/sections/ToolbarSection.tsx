@@ -1,6 +1,6 @@
 'use client'
 
-import { BlueseaSenders } from '../constants'
+import { Atm0sSenders } from '../constants'
 import {
   useAudioInput,
   useMeetingParticipantState,
@@ -10,7 +10,6 @@ import {
   useSelectedMic,
   useVideoInput,
 } from '../contexts'
-import { Badge, Modal, Popover, Select, Space, Typography } from 'antd'
 import {
   useActions,
   useAudioLevelProducer,
@@ -18,7 +17,8 @@ import {
   usePublisherState,
   useSharedDisplayMedia,
   useSharedUserMedia,
-} from 'bluesea-media-react-sdk'
+} from '@8xff/atm0s-media-react'
+import { Badge, Modal, Popover, Select, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import { find, isEmpty, map } from 'lodash'
 import {
@@ -65,7 +65,6 @@ export const ToolbarSection: React.FC<Props> = ({
   sendEvent,
 }) => {
   const { data: user } = useSession()
-  const actions = useActions()
   const params = useParams()
   const { modal } = useApp()
   const router = useRouter()
@@ -74,10 +73,10 @@ export const ToolbarSection: React.FC<Props> = ({
   const [openDrawerWhiteboard, setOpenDrawerWhiteboard] = useState(false)
   const { isMobile } = useDevice()
 
-  const camPublisher = usePublisher(BlueseaSenders.video)
-  const micPublisher = usePublisher(BlueseaSenders.audio)
-  const screenVideoPublisher = usePublisher(BlueseaSenders.screen_video)
-  const screenAudioPublisher = usePublisher(BlueseaSenders.screen_audio)
+  const camPublisher = usePublisher(Atm0sSenders.video)
+  const micPublisher = usePublisher(Atm0sSenders.audio)
+  const screenVideoPublisher = usePublisher(Atm0sSenders.screen_video)
+  const screenAudioPublisher = usePublisher(Atm0sSenders.screen_audio)
   const [, micPublisherStream] = usePublisherState(micPublisher)
   const [, camPublisherStream] = usePublisherState(camPublisher)
   const [, screenPublisherStream] = usePublisherState(screenVideoPublisher)
@@ -101,10 +100,6 @@ export const ToolbarSection: React.FC<Props> = ({
     () => `https://wbo.ophir.dev/boards/bluesea-meeting-${params?.passcode}`,
     [params?.passcode]
   )
-
-  useEffect(() => {
-    actions.connect()
-  }, [actions])
 
   useEffect(() => {
     micPublisher.switchStream(micStream)

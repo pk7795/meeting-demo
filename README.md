@@ -1,4 +1,4 @@
-This is Bluesea Meet Project.
+This is Atm0s Meet Project.
 
 ## Getting Started
 

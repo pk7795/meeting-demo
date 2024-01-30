@@ -1,4 +1,4 @@
-import { MediaStreamArc, StreamConsumer, StreamConsumerPair, StreamRemote } from 'bluesea-media-react-sdk'
+import { MediaStreamArc, StreamConsumer, StreamConsumerPair, StreamRemote } from '@8xff/atm0s-media-react'
 
 export type Stream = MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer
 

@@ -13,7 +13,7 @@ export const routes = [
     icon: <ListVideoIcon size={16} />,
   },
   {
-    title: 'Bluesea Config',
+    title: 'Atm0s Config',
     href: '/config',
     icon: <Settings2Icon size={16} />,
     roles: [UserRole.SuperAdmin],

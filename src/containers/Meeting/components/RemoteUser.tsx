@@ -1,7 +1,7 @@
 import { ViewerWapper } from '.'
-import { BlueseaSenders, MIN_AUDIO_LEVEL } from '../constants'
+import { Atm0sSenders, MIN_AUDIO_LEVEL } from '../constants'
 import { Stream } from '../types'
-import { useAudioLevelMix } from 'bluesea-media-react-sdk'
+import { useAudioLevelMix } from '@8xff/atm0s-media-react'
 import classNames from 'classnames'
 import { throttle } from 'lodash'
 import { HandIcon, MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
@@ -17,10 +17,10 @@ type Props = {
 }
 
 export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone }) => {
-  const camStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.video.name)
-  const micStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.audio.name)
-  const screenStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.screen_video.name)
-  const audioLevel = useAudioLevelMix(participant.id!, BlueseaSenders.audio.name)
+  const camStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.video.name)
+  const micStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.audio.name)
+  const screenStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.screen_video.name)
+  const audioLevel = useAudioLevelMix(participant.id!, Atm0sSenders.audio.name)
   const isTalking = useMemo(() => typeof audioLevel === 'number' && audioLevel > MIN_AUDIO_LEVEL, [audioLevel])
   const isHandRaised = participant?.meetingStatus?.handRaised
 

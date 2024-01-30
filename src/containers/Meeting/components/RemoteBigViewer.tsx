@@ -1,8 +1,8 @@
 import { BigViewer } from '.'
-import { BlueseaSenders, BlueseaStreamPriority, MIN_AUDIO_LEVEL } from '../constants'
+import { Atm0sSenders, Atm0sStreamPriority, MIN_AUDIO_LEVEL } from '../constants'
 import { Stream } from '../types'
+import { useAudioLevelMix } from '@8xff/atm0s-media-react'
 import { Switch } from 'antd'
-import { useAudioLevelMix } from 'bluesea-media-react-sdk'
 import classNames from 'classnames'
 import { FC, useMemo, useState } from 'react'
 import { usePeerRemoteStreamActive } from '@/hooks'
@@ -14,10 +14,10 @@ type Props = {
 
 export const RemoteBigViewer: FC<Props> = ({ participant }) => {
   const [forceHigh, setForceHigh] = useState(false)
-  const camStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.video.name)
-  const micStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.audio.name)
-  const screenStream = usePeerRemoteStreamActive(participant.id!, BlueseaSenders.screen_video.name)
-  const audioLevel = useAudioLevelMix(participant.id!, BlueseaSenders.audio.name)
+  const camStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.video.name)
+  const micStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.audio.name)
+  const screenStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.screen_video.name)
+  const audioLevel = useAudioLevelMix(participant.id!, Atm0sSenders.audio.name)
   const isTalking = useMemo(() => typeof audioLevel === 'number' && audioLevel > MIN_AUDIO_LEVEL, [audioLevel])
 
   return (
@@ -36,7 +36,7 @@ export const RemoteBigViewer: FC<Props> = ({ participant }) => {
           participant={participant}
           stream={screenStream ? screenStream : (camStream as Stream)}
           micStream={micStream}
-          priority={screenStream ? BlueseaStreamPriority.ScreenShare : BlueseaStreamPriority.BigVideo}
+          priority={screenStream ? Atm0sStreamPriority.ScreenShare : Atm0sStreamPriority.BigVideo}
           isTalking={isTalking}
           forceHighQuality={screenStream && forceHigh}
         />

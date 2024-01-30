@@ -9,8 +9,8 @@ import {
   useRoomSupabaseChannel,
 } from '../contexts'
 import { ChatSection, PaticipantSection, ToolbarSection, ViewSection } from '../sections'
+import { useActions, useSessionState } from '@8xff/atm0s-media-react'
 import { Button, Modal, notification, Space } from 'antd'
-import { useSessionState } from 'bluesea-media-react-sdk'
 import { throttle } from 'lodash'
 import {
   LayoutGridIcon,

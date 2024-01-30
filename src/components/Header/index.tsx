@@ -9,7 +9,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { LOGO_BLACK_LONG, LOGO_WHITE_LONG } from '@public'
 import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react'
 import { ButtonIcon } from '@/components'
 import { themeState } from '@/recoil'
@@ -50,7 +49,9 @@ export const Header: React.FC<Props> = () => {
       <Row align="middle" justify="space-between" className="w-full">
         <Col>
           <Link href="/">
-            <img src={theme === 'dark' ? LOGO_WHITE_LONG : LOGO_BLACK_LONG} alt="" className="h-8" />
+            <Typography.Title level={3} className="mb-0 cursor-pointer dark:text-white text-black">
+              Atm0s Meet
+            </Typography.Title>
           </Link>
         </Col>
         <Col>

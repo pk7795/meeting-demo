@@ -118,12 +118,8 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
             <Typography.Title className="font-semibold text-4xl dark:text-gray-100">
-              Premium video meetings. Now free for everyone.
+              A technical demo of Atm0s Meet
             </Typography.Title>
-            <Typography.Paragraph className="font-extralight text-3xl dark:text-gray-400">
-              We re-engineered the service we built for secure business meetings, Bluesea Meet, to make it free and
-              available for all.
-            </Typography.Paragraph>
             <div className="flex items-center w-full">
               {!user ? (
                 <Popover
