@@ -11,10 +11,10 @@ import {
   useVideoInput,
 } from '../contexts'
 import {
-  useActions,
   useAudioLevelProducer,
   usePublisher,
   usePublisherState,
+  useSessionState,
   useSharedDisplayMedia,
   useSharedUserMedia,
 } from '@8xff/atm0s-media-react'
@@ -73,6 +73,7 @@ export const ToolbarSection: React.FC<Props> = ({
   const [openDrawerWhiteboard, setOpenDrawerWhiteboard] = useState(false)
   const { isMobile } = useDevice()
 
+  const sessionState = useSessionState()
   const camPublisher = usePublisher(Atm0sSenders.video)
   const micPublisher = usePublisher(Atm0sSenders.audio)
   const screenVideoPublisher = usePublisher(Atm0sSenders.screen_video)
@@ -102,23 +103,31 @@ export const ToolbarSection: React.FC<Props> = ({
   )
 
   useEffect(() => {
-    micPublisher.switchStream(micStream)
-  }, [micPublisher, micStream])
+    if (sessionState === 'connected') {
+      micPublisher.switchStream(micStream)
+    }
+  }, [micPublisher, micStream, sessionState])
 
   useEffect(() => {
-    camPublisher.switchStream(camStream)
-  }, [camPublisher, camStream])
+    if (sessionState === 'connected') {
+      camPublisher.switchStream(camStream)
+    }
+  }, [camPublisher, camStream, sessionState])
 
   useEffect(() => {
-    screenAudioPublisher.switchStream(screenStream)
-  }, [screenAudioPublisher, screenStream])
+    if (sessionState === 'connected') {
+      screenAudioPublisher.switchStream(screenStream)
+    }
+  }, [screenAudioPublisher, screenStream, sessionState])
 
   useEffect(() => {
-    screenVideoPublisher.switchStream(screenStream)
-    setUserState({ ...userState, screenShare: !!screenStream })
+    if (sessionState === 'connected') {
+      screenVideoPublisher.switchStream(screenStream)
+      setUserState({ ...userState, screenShare: !!screenStream })
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenStream, screenVideoPublisher, setUserState])
+  }, [screenStream, screenVideoPublisher, setUserState, sessionState])
 
   const onEndedScreenShare = useCallback(() => {
     screenStreamChanger(undefined)
