@@ -1,10 +1,20 @@
 'use client'
 
+import { useParams } from 'next/navigation'
+import { useSession } from '@atm0s-media-sdk/react-hooks/lib'
+import { CameraPreview, CameraSelection } from '@atm0s-media-sdk/react-ui/lib'
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/index'
 import { CopyIcon, MicOffIcon, Settings2Icon, VideoIcon } from '@repo/ui/icons/index'
-import { Logo } from '@/components'
+import { Logo, Username } from '@/components'
 
-export const SettingsMedia = () => {
+type Props = {
+  onConnected: () => void
+}
+
+export const SettingsMedia: React.FC<Props> = ({ onConnected }) => {
+  const params = useParams()
+  const session = useSession()
+
   return (
     <Card className="w-full max-w-xs md:max-w-sm">
       <CardHeader>
@@ -12,15 +22,16 @@ export const SettingsMedia = () => {
           <Logo />
         </CardTitle>
         <CardDescription>
-          Logged in as Cao Havan | <span className="underline cursor-pointer">Logout</span>
+          <Username />
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="grid gap-2">
-          <div className="text-sm font-medium">Room ID: 1234-5678</div>
-          <img src="https://picsum.photos/200" alt="" className="w-full aspect-video rounded-lg object-cover" />
+          <div className="text-sm font-medium">Room ID: {params?.room}</div>
+          <CameraPreview source_name="video_main" />
           <div className="text-sm text-muted-foreground">0 user(s) in the room</div>
         </div>
+        <CameraSelection source_name="video_main" first_page />
         <div className="flex items-center gap-4">
           <Button variant="destructive" size="icon">
             <MicOffIcon size={16} />
@@ -37,7 +48,16 @@ export const SettingsMedia = () => {
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full">Join</Button>
+        <Button
+          className="w-full"
+          onClick={() => {
+            session.connect().then(() => {
+              onConnected()
+            })
+          }}
+        >
+          Join
+        </Button>
       </CardFooter>
     </Card>
   )

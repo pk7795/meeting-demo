@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@atm0s-media-sdk/core": "workspace:*",
+    "@atm0s-media-sdk/react-hooks": "workspace:*",
+    "@atm0s-media-sdk/react-ui": "workspace:*",
     "react": "19.0.0-rc-f994737d14-20240522",
     "react-dom": "19.0.0-rc-f994737d14-20240522",
     "next": "15.0.0-rc.0"
