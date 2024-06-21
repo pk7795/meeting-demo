@@ -1,10 +1,18 @@
 'use client'
 
+import { Actions } from '../components'
 import { useParams } from 'next/navigation'
 import { useSession } from '@atm0s-media-sdk/react-hooks/lib'
-import { CameraPreview, CameraSelection } from '@atm0s-media-sdk/react-ui/lib'
-import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/index'
-import { CopyIcon, MicOffIcon, Settings2Icon, VideoIcon } from '@repo/ui/icons/index'
+import { CameraPreview } from '@atm0s-media-sdk/react-ui-v2/lib'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@atm0s-media-sdk/ui/components/index'
 import { Logo, Username } from '@/components'
 
 type Props = {
@@ -31,20 +39,8 @@ export const SettingsMedia: React.FC<Props> = ({ onConnected }) => {
           <CameraPreview source_name="video_main" />
           <div className="text-sm text-muted-foreground">0 user(s) in the room</div>
         </div>
-        <CameraSelection source_name="video_main" first_page />
         <div className="flex items-center gap-4">
-          <Button variant="destructive" size="icon">
-            <MicOffIcon size={16} />
-          </Button>
-          <Button variant="secondary" size="icon">
-            <VideoIcon size={16} />
-          </Button>
-          <Button variant="secondary" size="icon">
-            <Settings2Icon size={16} />
-          </Button>
-          <Button variant="secondary" size="icon">
-            <CopyIcon size={16} />
-          </Button>
+          <Actions />
         </div>
       </CardContent>
       <CardFooter>
@@ -52,6 +48,8 @@ export const SettingsMedia: React.FC<Props> = ({ onConnected }) => {
           className="w-full"
           onClick={() => {
             session.connect().then(() => {
+              const audio = new Audio('/sound-in.mp3')
+              audio.play()
               onConnected()
             })
           }}

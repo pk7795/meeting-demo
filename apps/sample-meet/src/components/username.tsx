@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { getCookie, removeCookie } from '@repo/ui/lib/cookies'
+import { getCookie, removeCookie } from '@atm0s-media-sdk/ui/lib/cookies'
 
 export const Username = () => {
   const router = useRouter()

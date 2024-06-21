@@ -1,6 +1,6 @@
 'use client'
 
-import { ChangeTheme } from '@repo/ui/providers/index'
+import { ChangeTheme } from '@atm0s-media-sdk/ui/providers/index'
 
 type Props = {
   children: React.ReactNode

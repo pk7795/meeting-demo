@@ -6,6 +6,7 @@ export const setCookie = (key: string, value: any, days: number) => {
 }
 
 export const getCookie = (key: string) => {
+  if (typeof document === 'undefined') return
   const name = `${key}=`
   const decodedCookie = decodeURIComponent(document.cookie)
   const ca = decodedCookie.split(';')

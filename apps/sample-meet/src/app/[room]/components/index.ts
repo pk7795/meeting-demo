@@ -1,2 +1,2 @@
 export * from './bottom-bar'
-export * from './viewer'
+export * from './actions'

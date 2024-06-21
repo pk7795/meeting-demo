@@ -5,7 +5,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { AudioMixerMode, SessionConfig } from '@atm0s-media-sdk/core/lib'
 import { Atm0sMediaProvider } from '@atm0s-media-sdk/react-hooks/lib'
-import { Atm0sMediaUIProvider } from '@atm0s-media-sdk/react-ui/lib'
+import { Atm0sMediaUIProvider } from '@atm0s-media-sdk/react-ui-v2/lib'
 import { env } from '@/config/env'
 
 export default function RoomScreen() {
@@ -15,13 +15,6 @@ export default function RoomScreen() {
   const token = searchParams!.get('token')
   const room = params?.room
   const peer = searchParams!.get('peer')
-
-  console.log('--------------------------------------------------------')
-  console.log('gatewayIndex', env.GATEWAYS[gatewayIndex])
-  console.log('token', token)
-  console.log('room', room)
-  console.log('peer', peer)
-  console.log('--------------------------------------------------------')
 
   const cfg = {
     token,

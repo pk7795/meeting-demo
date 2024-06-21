@@ -12,8 +12,8 @@ import {
   CardTitle,
   Input,
   Label,
-} from '@repo/ui/components/index'
-import { setCookie } from '@repo/ui/lib/cookies'
+} from '@atm0s-media-sdk/ui/components/index'
+import { setCookie } from '@atm0s-media-sdk/ui/lib/cookies'
 import { Logo } from '@/components'
 
 type Inputs = {

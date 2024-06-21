@@ -9,6 +9,7 @@ const config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
+    '../../packages/sdk-react-ui-v2/src/**/*.{ts,tsx}',
   ],
   prefix: '',
   theme: {

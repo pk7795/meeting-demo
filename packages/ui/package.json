@@ -1,5 +1,5 @@
 {
-  "name": "@repo/ui",
+  "name": "@atm0s-media-sdk/ui",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -9,8 +9,8 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@atm0s-media-sdk/eslint-config": "workspace:*",
+    "@atm0s-media-sdk/typescript-config": "workspace:*",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
     "autoprefixer": "^10.4.17",

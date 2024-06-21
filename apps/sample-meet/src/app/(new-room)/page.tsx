@@ -21,9 +21,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@repo/ui/components/index'
-import { generateRandomString } from '@repo/ui/lib/common'
-import { getCookie } from '@repo/ui/lib/cookies'
+} from '@atm0s-media-sdk/ui/components/index'
+import { generateRandomString } from '@atm0s-media-sdk/ui/lib/common'
+import { getCookie } from '@atm0s-media-sdk/ui/lib/cookies'
 import { Logo, Username } from '@/components'
 import { env } from '@/config/env'
 
@@ -81,7 +81,7 @@ export default function NewRoomScreen() {
             <SelectContent>
               <SelectGroup>
                 {map(gateways, (gateway, index) => (
-                  <SelectItem value={String(index)}>{gateway}</SelectItem>
+                  <SelectItem key={index} value={String(index)}>{gateway}</SelectItem>
                 ))}
               </SelectGroup>
             </SelectContent>
