@@ -3,12 +3,14 @@
 import { Actions } from '.'
 import { useParams, useRouter } from 'next/navigation'
 import { Button } from '@atm0s-media-sdk/ui/components/index'
-import { PhoneMissedIcon } from '@atm0s-media-sdk/ui/icons/index'
+import { MaximizeIcon, MinimizeIcon, PhoneMissedIcon } from '@atm0s-media-sdk/ui/icons/index'
 import { Logo } from '@/components'
+import { useFullScreen } from '@/hooks'
 
 export const BottomBar = () => {
   const router = useRouter()
   const params = useParams()
+  const { isMaximize, onOnOffFullScreen } = useFullScreen()
   return (
     <div className="w-full flex items-center justify-between py-3 border-t pl-4 pr-[calc(16px*2+40px)]">
       <div className="flex items-center gap-2">
@@ -17,6 +19,9 @@ export const BottomBar = () => {
       </div>
       <div className="flex items-center gap-4">
         <Actions />
+        <Button variant="secondary" size="icon" onClick={onOnOffFullScreen}>
+          {!isMaximize ? <MaximizeIcon size={16} /> : <MinimizeIcon size={16} />}
+        </Button>
         <Button
           variant="destructive"
           size="icon"
