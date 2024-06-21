@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@atm0s-media-sdk/ui/components/index'
+import { Loader } from '@atm0s-media-sdk/ui/icons/index'
 import { generateRandomString } from '@atm0s-media-sdk/ui/lib/common'
 import { getCookie } from '@atm0s-media-sdk/ui/lib/cookies'
 import { Logo, Username } from '@/components'
@@ -62,6 +63,14 @@ export default function NewRoomScreen() {
     }
   }, [router, username])
 
+  if (!username) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        <Loader className="animate-spin" />
+      </div>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-xs md:max-w-sm">
       <Card>
@@ -81,7 +90,9 @@ export default function NewRoomScreen() {
             <SelectContent>
               <SelectGroup>
                 {map(gateways, (gateway, index) => (
-                  <SelectItem key={index} value={String(index)}>{gateway}</SelectItem>
+                  <SelectItem key={index} value={String(index)}>
+                    {gateway}
+                  </SelectItem>
                 ))}
               </SelectGroup>
             </SelectContent>
