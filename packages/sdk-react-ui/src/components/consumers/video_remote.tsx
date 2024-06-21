@@ -25,5 +25,5 @@ export const VideoRemote: React.FC<Props> = ({ track }) => {
     }
   }, [consumer, videoRef.current])
 
-  return <video muted autoPlay playsInline loop className="h-full aspect-video" ref={videoRef} />
+  return <video muted autoPlay playsInline className="h-full aspect-video" ref={videoRef} />
 }
