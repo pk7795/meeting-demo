@@ -1,10 +1,7 @@
 {
   "extends": "@atm0s-media-sdk/typescript-config/react-library.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@ui/*": ["./src/*"]
-    }
+    "baseUrl": "."
   },
   "include": ["src"],
   "exclude": ["node_modules"]

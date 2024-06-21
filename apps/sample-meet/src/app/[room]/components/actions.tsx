@@ -1,7 +1,7 @@
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useCopyToClipboard } from 'usehooks-ts'
-import { CameraSelection, CameraToggle, MicrophoneSelection, MicrophoneToggle } from '@atm0s-media-sdk/react-ui-v2/lib'
+import { CameraSelection, CameraToggle, MicrophoneSelection, MicrophoneToggle } from '@atm0s-media-sdk/react-ui/lib'
 import {
   Button,
   Dialog,

@@ -3,7 +3,7 @@
 import { Check, ChevronRight, Circle } from 'lucide-react'
 import * as React from 'react'
 import * as MenubarPrimitive from '@radix-ui/react-menubar'
-import { cn } from '@ui/lib/utils'
+import { cn } from '../../lib/utils'
 
 const MenubarMenu = MenubarPrimitive.Menu
 

@@ -3,7 +3,7 @@
 import { Actions } from '../components'
 import { useParams } from 'next/navigation'
 import { useSession } from '@atm0s-media-sdk/react-hooks/lib'
-import { CameraPreview } from '@atm0s-media-sdk/react-ui-v2/lib'
+import { CameraPreview } from '@atm0s-media-sdk/react-ui/lib'
 import {
   Button,
   Card,

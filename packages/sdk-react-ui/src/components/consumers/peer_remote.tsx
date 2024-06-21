@@ -1,48 +1,50 @@
-import {
-  RemotePeer,
-  useRemoteAudioTracks,
-  useRemoteVideoTracks,
-} from "@atm0s-media-sdk/react-hooks/lib";
-import { AudioRemote } from "./audio_remote";
-import { VideoRemote } from "./video_remote";
-import { AudioMixerSpeaking } from "../uis/audio_mixer_speaking";
-import { SpeakingIcon } from "../icons/speaking";
+import { AudioRemote } from './audio_remote'
+import { VideoRemote } from './video_remote'
+import { isEmpty, map } from 'lodash'
+import { RemotePeer, useRemoteAudioTracks, useRemoteVideoTracks } from '@atm0s-media-sdk/react-hooks/lib'
 
-interface Props {
-  peer: RemotePeer;
+type Props = {
+  peer: RemotePeer
 }
 
-export function PeerRemoteDirectAudio({ peer }: Props) {
-  const remote_audios = useRemoteAudioTracks(peer.peer);
-  const remote_videos = useRemoteVideoTracks(peer.peer);
+export const PeerRemoteDirectAudio: React.FC<Props> = ({ peer }) => {
+  const remote_audios = useRemoteAudioTracks(peer.peer)
+  const remote_videos = useRemoteVideoTracks(peer.peer)
 
   return (
-    <div className="relative bg-gray-500">
-      <span className="absolute left-2 top-2">{peer.peer}</span>
-      {remote_videos.map((t) => (
-        <VideoRemote key={t.track} track={t} />
-      ))}
-      {remote_audios.map((t) => (
+    <div className="w-full h-full max-h-[calc(100vh-65px)] flex items-center justify-center bg-zinc-800 rounded-2xl overflow-hidden relative">
+      <div className="absolute left-2 bottom-3 flex items-center gap-1">
+        <div className="bg-slate-950 bg-opacity-30 px-2 py-0.5 rounded-full text-white text-sm">{peer.peer}</div>
+      </div>
+      {!isEmpty(remote_videos) ? (
+        map(remote_videos, (t) => <VideoRemote key={t.track} track={t} />)
+      ) : (
+        <div className="bg-zinc-500 flex items-center justify-center w-28 h-28 rounded-full text-6xl text-white uppercase">
+          {peer.peer?.[0]}
+        </div>
+      )}
+      {map(remote_audios, (t) => (
         <AudioRemote key={t.track} track={t} />
       ))}
     </div>
-  );
+  )
 }
 
-export function PeerRemoteMixerAudio({ peer }: Props) {
-  const remote_videos = useRemoteVideoTracks(peer.peer);
+export const PeerRemoteMixerAudio: React.FC<Props> = ({ peer }) => {
+  const remote_videos = useRemoteVideoTracks(peer.peer)
 
   return (
-    <div className="relative bg-gray-500">
-      <span className="absolute left-2 top-2">
-        {peer.peer}
-        <AudioMixerSpeaking peer={peer.peer}>
-          <SpeakingIcon />
-        </AudioMixerSpeaking>
-      </span>
-      {remote_videos.map((t) => (
-        <VideoRemote key={t.track} track={t} />
-      ))}
+    <div className="w-full h-full max-h-[calc(100vh-65px)] flex items-center justify-center bg-zinc-800 rounded-2xl overflow-hidden relative">
+      <div className="absolute left-2 bottom-3 flex items-center gap-1">
+        <div className="bg-slate-950 bg-opacity-30 px-2 py-0.5 rounded-full text-white text-sm">{peer.peer}</div>
+      </div>
+      {!isEmpty(remote_videos) ? (
+        map(remote_videos, (t) => <VideoRemote key={t.track} track={t} />)
+      ) : (
+        <div className="bg-zinc-500 flex items-center justify-center w-28 h-28 rounded-full text-6xl text-white uppercase">
+          {peer.peer?.[0]}
+        </div>
+      )}
     </div>
-  );
+  )
 }

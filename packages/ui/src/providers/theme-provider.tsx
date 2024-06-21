@@ -1,9 +1,9 @@
 'use client'
 
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../components'
+import { MoonIcon, SunIcon } from '../icons'
 import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes'
 import { type ThemeProviderProps } from 'next-themes/dist/types'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/components'
-import { MoonIcon, SunIcon } from '@ui/icons'
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, ...props }) => {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>

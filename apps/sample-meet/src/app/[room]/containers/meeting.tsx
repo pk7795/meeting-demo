@@ -3,7 +3,7 @@
 import { BottomBar } from '../components'
 import { filter, map, round } from 'lodash'
 import { useRemotePeers, useRoom } from '@atm0s-media-sdk/react-hooks/lib'
-import { AudioMixerPlayer, PeerLocal, PeerRemoteDirectAudio, PeerRemoteMixerAudio } from '@atm0s-media-sdk/react-ui-v2/lib'
+import { AudioMixerPlayer, PeerLocal, PeerRemoteDirectAudio, PeerRemoteMixerAudio } from '@atm0s-media-sdk/react-ui/lib'
 import { cn } from '@atm0s-media-sdk/ui/lib/utils'
 import { css } from '@emotion/css'
 

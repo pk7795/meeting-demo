@@ -1,111 +1,124 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useDeviceStream } from "../../hooks";
-import { Atm0sMediaUIContext } from "../../provider";
-import { usePublisher } from "@atm0s-media-sdk/react-hooks/lib";
-import { Kind } from "@atm0s-media-sdk/core/lib";
-import { MicIcon, MicOffIcon } from "../icons/microphone";
+import { useDeviceStream } from '../../hooks'
+import { Atm0sMediaUIContext } from '../../provider'
+import { filter, map } from 'lodash'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { Kind } from '@atm0s-media-sdk/core/lib'
+import { usePublisher } from '@atm0s-media-sdk/react-hooks/lib'
+import {
+  Button,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@atm0s-media-sdk/ui/components/index'
+import { MicIcon, MicOffIcon } from '@atm0s-media-sdk/ui/icons/index'
 
-interface MicrophonePreviewProps {
-  source_name: string;
+type MicrophonePreviewProps = {
+  source_name: string
 }
 
-export function MicrophonePreview({ source_name }: MicrophonePreviewProps) {
-  const audioRef = useRef<HTMLVideoElement>(null);
-  const stream = useDeviceStream(source_name);
+export const MicrophonePreview: React.FC<MicrophonePreviewProps> = ({ source_name }) => {
+  const audioRef = useRef<HTMLVideoElement>(null)
+  const stream = useDeviceStream(source_name)
   useEffect(() => {
     if (stream && audioRef.current) {
-      audioRef.current.srcObject = stream;
+      audioRef.current.srcObject = stream
       return () => {
         if (audioRef.current?.srcObject) {
-          audioRef.current!.srcObject = null;
+          audioRef.current!.srcObject = null
         }
-      };
+      }
     }
-  }, [stream, audioRef.current]);
+  }, [stream, audioRef.current])
+
+  return <audio ref={audioRef} controls autoPlay muted />
+}
+
+type MicrophoneSelectionProps = {
+  source_name: string
+  first_page?: boolean
+}
+
+export const MicrophoneSelection: React.FC<MicrophoneSelectionProps> = ({ source_name, first_page }) => {
+  const [devices, setDevices] = useState<{ id: string; label: string }[]>([])
+  const [selectedDevice, setSelectedDevice] = useState<string>()
+  const ctx = useContext(Atm0sMediaUIContext)
+
+  useEffect(() => {
+    const init = async () => {
+      const allDevices = await navigator.mediaDevices.enumerateDevices()
+      const devices = map(
+        filter(allDevices, (d) => d.kind == 'audioinput'),
+        (d) => {
+          return { id: d.deviceId, label: d.label }
+        }
+      )
+      setDevices(devices)
+      setSelectedDevice(devices?.[0]?.id)
+    }
+
+    init()
+  }, [ctx, source_name, setDevices, first_page])
+
+  const onChange = useCallback((value: string) => {
+    ctx.requestDevice(source_name, 'audio', value).then(console.log).catch(console.error)
+  }, [])
 
   return (
-    <div className="preview microphone">
-      <audio ref={audioRef} controls autoPlay muted />
-    </div>
-  );
+    <Select value={selectedDevice} onValueChange={onChange}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select microphone" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {map(devices, (device) => (
+            <SelectItem key={device.id} value={device.id}>
+              {device.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
 }
 
-interface MicrophoneSelectionProps {
-  source_name: string;
-  first_page?: boolean;
-}
-
-export function MicrophoneSelection({
-  source_name,
-  first_page,
-}: MicrophoneSelectionProps) {
-  const publisher = usePublisher(source_name, Kind.AUDIO);
-  const [devices, setDevices] = useState<{ id: string; label: string }[]>([]);
-  const ctx = useContext(Atm0sMediaUIContext);
-  const stream = useDeviceStream(source_name);
+export const MicrophoneToggle: React.FC<MicrophoneSelectionProps> = ({ source_name, first_page }) => {
+  const publisher = usePublisher(source_name, Kind.AUDIO)
+  const ctx = useContext(Atm0sMediaUIContext)
+  const stream = useDeviceStream(source_name)
 
   useEffect(() => {
     const init = async () => {
       if (first_page) {
-        await ctx.requestDevice(source_name, "audio");
+        await ctx.requestDevice(source_name, 'audio')
       }
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      console.log(devices);
-      setDevices(
-        devices
-          .filter((d) => d.kind == "audioinput")
-          .map((d) => {
-            return { id: d.deviceId, label: d.label };
-          }),
-      );
-    };
+    }
 
-    init();
-  }, [ctx, source_name, setDevices, first_page]);
+    init()
+  }, [ctx, source_name, first_page])
 
   useEffect(() => {
-    let track = stream?.getAudioTracks()[0];
+    let track = stream?.getAudioTracks()[0]
     if (track && !publisher.attached) {
-      publisher.attach(track);
+      publisher.attach(track)
     } else if (!track && publisher.attached) {
-      publisher.detach();
+      publisher.detach()
     }
-  }, [publisher, stream]);
+  }, [publisher, stream])
 
   const onToggle = useCallback(() => {
     if (stream) {
-      ctx.turnOffDevice(source_name);
+      ctx.turnOffDevice(source_name)
     } else {
-      ctx
-        .requestDevice(source_name, "audio")
-        .then(console.log)
-        .catch(console.error);
+      ctx.requestDevice(source_name, 'audio').then(console.log).catch(console.error)
     }
-  }, [ctx, stream]);
-  const onChange = useCallback((event: any) => {
-    let selected = event.target.options[event.target.selectedIndex].value;
-    ctx
-      .requestDevice(source_name, "audio", selected)
-      .then(console.log)
-      .catch(console.error);
-  }, []);
+  }, [ctx, stream])
 
   return (
-    <div className="flex flex-row h-10">
-      <button className="btn btn-circle" onClick={onToggle}>
-        {stream ? <MicIcon /> : <MicOffIcon />}
-      </button>
-      <select
-        className="devices"
-        defaultValue={stream?.getTracks()[0]?.id}
-        onChange={onChange}
-      >
-        {devices.map((d) => (
-          <option key={d.id} value={d.id}>
-            {d.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
+    <Button variant={stream ? 'secondary' : 'destructive'} size="icon" onClick={onToggle}>
+      {stream ? <MicIcon size={16} /> : <MicOffIcon size={16} />}
+    </Button>
+  )
 }

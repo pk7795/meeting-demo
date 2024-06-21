@@ -46,13 +46,13 @@ export default function NewRoomScreen() {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const room = data.room
     const peer = username
-    const token = await generateToken(room, peer)
+    const token = await generateToken(room, peer as string)
     router.push(`/${room}?gateway=${gatewayIndex}&peer=${peer}&token=${token}`)
   }
   const onCreateNewRoom = async () => {
     const room = generateRandomString(8)
     const peer = username
-    const token = await generateToken(room, peer)
+    const token = await generateToken(room, peer as string)
     router.push(`/${room}?gateway=${gatewayIndex}&peer=${peer}&token=${token}`)
   }
 
