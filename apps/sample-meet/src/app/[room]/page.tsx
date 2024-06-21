@@ -12,9 +12,9 @@ export default function RoomScreen() {
   const params = useParams()
   const searchParams = useSearchParams()
   const gatewayIndex = parseInt(searchParams!.get('gateway') || '0')
-  const token = searchParams!.get('token')
-  const room = params?.room
-  const peer = searchParams!.get('peer')
+  const token = searchParams!.get('token') || ''
+  const room = params?.room as string
+  const peer = searchParams!.get('peer') || ''
 
   const cfg = {
     token,

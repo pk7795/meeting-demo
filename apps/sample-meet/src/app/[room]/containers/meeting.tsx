@@ -39,13 +39,7 @@ export const Meeting = () => {
         {map(
           filter(remote_peers, (p) => p.peer != room?.peer),
           (p) => (
-            <div>
-              {audio_direct ? (
-                <PeerRemoteDirectAudio key={p.peer} peer={p} />
-              ) : (
-                <PeerRemoteMixerAudio key={p.peer} peer={p} />
-              )}
-            </div>
+            <div key={p.peer}>{audio_direct ? <PeerRemoteDirectAudio peer={p} /> : <PeerRemoteMixerAudio peer={p} />}</div>
           )
         )}
       </div>

@@ -13,13 +13,17 @@ import {
 } from '@atm0s-media-sdk/ui/components/index'
 import { CopyIcon, Settings2Icon } from '@atm0s-media-sdk/ui/icons/index'
 
-export const Actions: React.FC = () => {
+type Props = {
+  first_page?: boolean
+}
+
+export const Actions: React.FC<Props> = ({ first_page }) => {
   const params = useParams()
   const [, onCopy] = useCopyToClipboard()
   return (
     <>
-      <MicrophoneToggle source_name="audio_main" first_page />
-      <CameraToggle source_name="video_main" first_page />
+      <MicrophoneToggle source_name="audio_main" first_page={first_page} />
+      <CameraToggle source_name="video_main" first_page={first_page} />
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="secondary" size="icon">

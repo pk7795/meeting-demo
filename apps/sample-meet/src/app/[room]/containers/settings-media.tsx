@@ -40,7 +40,7 @@ export const SettingsMedia: React.FC<Props> = ({ onConnected }) => {
           <div className="text-sm text-muted-foreground">0 user(s) in the room</div>
         </div>
         <div className="flex items-center gap-4">
-          <Actions />
+          <Actions first_page />
         </div>
       </CardContent>
       <CardFooter>
