@@ -36,7 +36,15 @@ export const CameraPreview: React.FC<CameraPreviewProps> = ({ source_name }) => 
   return (
     <>
       {stream ? (
-        <video className="rounded-lg" ref={videoRef} autoPlay muted />
+        <video
+          className="rounded-lg"
+          ref={videoRef}
+          autoPlay
+          muted
+          style={{
+            transform: 'rotateY(180deg)',
+          }}
+        />
       ) : (
         <div className="w-full h-[250px] bg-black rounded-lg" />
       )}

@@ -27,7 +27,17 @@ export const PeerLocal: React.FC<Props> = ({ source_name }) => {
         <div className="bg-slate-950 bg-opacity-30 px-2 py-0.5 rounded-full text-white text-sm">{username}</div>
       </div>
       {stream ? (
-        <video muted autoPlay playsInline controls={false} className="h-full aspect-video" ref={videoRef} />
+        <video
+          muted
+          autoPlay
+          playsInline
+          controls={false}
+          className="h-full aspect-video"
+          ref={videoRef}
+          style={{
+            transform: 'rotateY(180deg)',
+          }}
+        />
       ) : (
         <div className="bg-zinc-500 flex items-center justify-center w-28 h-28 rounded-full text-6xl text-white uppercase">
           {username?.[0]}
