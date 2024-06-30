@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@atm0s-media-sdk/ui/components/index'
-import { Loader } from '@atm0s-media-sdk/ui/icons/index'
+import { LoaderIcon } from '@atm0s-media-sdk/ui/icons/index'
 import { generateRandomString } from '@atm0s-media-sdk/ui/lib/common'
 import { getCookie } from '@atm0s-media-sdk/ui/lib/cookies'
 import { Logo, Username } from '@/components'
@@ -40,21 +40,27 @@ export default function NewRoomScreen() {
     formState: { errors },
   } = useForm<Inputs>()
   const [gatewayIndex, setGatewayIndex] = useState('0')
+  const [isLoadingJoin, setIsLoadingJoin] = useState(false)
+  const [isLoadingCreate, setIsLoadingCreate] = useState(false)
 
   const username = getCookie('username')
   const gateways = env.GATEWAYS
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const room = data.room
-    const peer = username
-    const token = await generateToken(room, peer as string)
-    router.push(`/${room}?gateway=${gatewayIndex}&peer=${peer}&token=${token}`)
+  const onGenerateToken = async (room: string) => {
+    const token = await generateToken(room, username as string)
+    return router.push(`/${room}?gateway=${gatewayIndex}&peer=${username}&token=${token}`)
   }
-  const onCreateNewRoom = async () => {
-    const room = generateRandomString(8)
-    const peer = username
-    const token = await generateToken(room, peer as string)
-    router.push(`/${room}?gateway=${gatewayIndex}&peer=${peer}&token=${token}`)
+
+  const onJoin: SubmitHandler<Inputs> = async (data) => {
+    setIsLoadingJoin(true)
+    await onGenerateToken(data.room)
+    setIsLoadingJoin(false)
+  }
+
+  const onCreate: SubmitHandler<Inputs> = async (data) => {
+    setIsLoadingCreate(true)
+    await onGenerateToken(data.room)
+    setIsLoadingCreate(false)
   }
 
   useEffect(() => {
@@ -66,13 +72,13 @@ export default function NewRoomScreen() {
   if (!username) {
     return (
       <div className="w-screen h-screen flex items-center justify-center">
-        <Loader className="animate-spin" />
+        <LoaderIcon className="animate-spin" />
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-xs md:max-w-sm">
+    <form onSubmit={handleSubmit(onJoin)} className="w-full max-w-xs md:max-w-sm">
       <Card>
         <CardHeader>
           <CardTitle>
@@ -97,7 +103,17 @@ export default function NewRoomScreen() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <Button type="button" className="w-full" variant="destructive" onClick={onCreateNewRoom}>
+          <Button
+            isLoading={isLoadingCreate}
+            type="button"
+            className="w-full"
+            variant="destructive"
+            onClick={() =>
+              onCreate({
+                room: generateRandomString(8),
+              })
+            }
+          >
             Create new room
           </Button>
           <div className="flex items-center justify-between gap-2">
@@ -112,7 +128,7 @@ export default function NewRoomScreen() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
+          <Button isLoading={isLoadingJoin} type="submit" className="w-full">
             Join
           </Button>
         </CardFooter>

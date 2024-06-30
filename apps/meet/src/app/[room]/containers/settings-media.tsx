@@ -2,6 +2,7 @@
 
 import { Actions } from '../components'
 import { useParams } from 'next/navigation'
+import { useState } from 'react'
 import { useSession } from '@atm0s-media-sdk/react-hooks/lib'
 import { CameraPreview } from '@atm0s-media-sdk/react-ui/lib'
 import {
@@ -22,6 +23,22 @@ type Props = {
 export const SettingsMedia: React.FC<Props> = ({ onConnected }) => {
   const params = useParams()
   const session = useSession()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const onJoin = () => {
+    setIsLoading(true)
+    session
+      .connect()
+      .then(() => {
+        const audio = new Audio('/sound-in.mp3')
+        audio.play()
+        setIsLoading(false)
+        onConnected()
+      })
+      .catch(() => {
+        setIsLoading(false)
+      })
+  }
 
   return (
     <Card className="w-full max-w-xs md:max-w-sm">
@@ -44,16 +61,7 @@ export const SettingsMedia: React.FC<Props> = ({ onConnected }) => {
         </div>
       </CardContent>
       <CardFooter>
-        <Button
-          className="w-full"
-          onClick={() => {
-            session.connect().then(() => {
-              const audio = new Audio('/sound-in.mp3')
-              audio.play()
-              onConnected()
-            })
-          }}
-        >
+        <Button isLoading={isLoading} className="w-full" onClick={onJoin}>
           Join
         </Button>
       </CardFooter>
