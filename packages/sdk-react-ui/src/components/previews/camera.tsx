@@ -2,8 +2,8 @@ import { useDeviceStream } from '../../hooks'
 import { Atm0sMediaUIContext } from '../../provider'
 import { filter, map } from 'lodash'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { BitrateControlMode, Kind } from '@atm0s-media-sdk/core/lib'
-import { usePublisher } from '@atm0s-media-sdk/react-hooks/lib'
+import { BitrateControlMode, Kind } from '@atm0s-media-sdk/core'
+import { usePublisher } from '@atm0s-media-sdk/react-hooks'
 import {
   Button,
   Select,

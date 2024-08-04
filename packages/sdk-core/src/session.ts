@@ -6,7 +6,7 @@ import {
 } from "./generated/protobuf/gateway";
 import { TrackReceiver } from "./receiver";
 import { TrackSender, TrackSenderConfig } from "./sender";
-import { EventEmitter, post_protobuf } from "./utils";
+import { EventEmitter, postProtobuf } from "./utils";
 import { Datachannel, DatachannelEvent } from "./data";
 import {
   Request_Session_UpdateSdp,
@@ -14,11 +14,13 @@ import {
 } from "./generated/protobuf/session";
 import * as mixer from "./features/audio_mixer";
 import { Kind } from "./generated/protobuf/shared";
-import { kind_to_string } from "./types";
+import { kindToString } from "./types";
+import config from "../package.json";
 
 export interface JoinInfo {
   room: string;
   peer: string;
+  metadata?: string;
   publish: { peer: boolean; tracks: boolean };
   subscribe: { peers: boolean; tracks: boolean };
   features?: {
@@ -43,6 +45,7 @@ export enum SessionEvent {
 
 export class Session extends EventEmitter {
   ice_lite: boolean = false;
+  restarting_ice: boolean = false;
   created_at: number;
   version?: string;
   conn_id?: string;
@@ -65,7 +68,7 @@ export class Session extends EventEmitter {
     console.warn("Create session", this.created_at);
     this.peer = new RTCPeerConnection();
     this.dc = new Datachannel(
-      this.peer.createDataChannel("data", { negotiated: true, id: 1000 }),
+      this.peer.createDataChannel("data", { negotiated: true, id: 0 }),
     );
     this.dc.on(DatachannelEvent.ROOM, (event: ServerEvent_Room) => {
       if (event.peerJoined) {
@@ -84,9 +87,10 @@ export class Session extends EventEmitter {
     });
 
     //TODO add await to throtle for avoiding too much update in short time
-    this.peer.onnegotiationneeded = () => {
-      if (this.dc.connected)
-        this.sync_sdp().then(console.log).catch(console.error);
+    this.peer.onnegotiationneeded = (event) => {
+      console.log("[Session] RTCPeer negotiation needed", event);
+      if (this.dc.connected && !this.restarting_ice)
+        this.syncSdp().then(console.log).catch(console.error);
     };
 
     this.peer.onconnectionstatechange = (_event) => {
@@ -106,13 +110,13 @@ export class Session extends EventEmitter {
     this.peer.ontrack = (event) => {
       for (let i = 0; i < this.receivers.length; i++) {
         const receiver = this.receivers[i]!;
-        if (!receiver.has_track()) {
+        if (receiver.webrtcTrackId == event.track.id) {
           console.log(
             "[Session] found receiver for track",
             receiver.name,
             event.track,
           );
-          receiver.set_track(event.track);
+          receiver.setTrackReady();
           return;
         }
       }
@@ -125,7 +129,7 @@ export class Session extends EventEmitter {
           candidates: [event.candidate.candidate],
         });
         console.log("Send ice-candidate", event.candidate.candidate);
-        const res = await post_protobuf(
+        const res = await postProtobuf(
           RemoteIceRequest,
           RemoteIceResponse,
           this.gateway + "/webrtc/" + this.conn_id + "/ice-candidate",
@@ -157,7 +161,7 @@ export class Session extends EventEmitter {
   }
 
   receiver(kind: Kind): TrackReceiver {
-    const kind_str = kind_to_string(kind);
+    const kind_str = kindToString(kind);
     const track_name = kind_str + "_" + this.receivers.length;
     const receiver = new TrackReceiver(this.dc, track_name, kind);
     if (!this.prepareState) {
@@ -205,13 +209,13 @@ export class Session extends EventEmitter {
       offerToReceiveVideo: true,
     });
     const req = ConnectRequest.create({
-      version: version || "pure-ts@0.0.0", //TODO auto get from package.json
+      version: version || "pure-ts@" + config.version,
       join: this.cfg.join && {
-        room: this.cfg.join?.room,
-        peer: this.cfg.join?.peer,
-        metadata: undefined,
-        publish: this.cfg.join?.publish,
-        subscribe: this.cfg.join?.subscribe,
+        room: this.cfg.join.room,
+        peer: this.cfg.join.peer,
+        metadata: this.cfg.join.metadata,
+        publish: this.cfg.join.publish,
+        subscribe: this.cfg.join.subscribe,
         features: { mixer: this.mixer?.state() },
       },
       tracks: {
@@ -221,7 +225,7 @@ export class Session extends EventEmitter {
       sdp: local_desc.sdp,
     });
     console.log("Connecting");
-    const res = await post_protobuf(
+    const res = await postProtobuf(
       ConnectRequest,
       ConnectResponse,
       this.gateway + "/webrtc/connect",
@@ -241,18 +245,20 @@ export class Session extends EventEmitter {
 
   async restartIce() {
     //TODO detect disconnect state and call restart-ice
+    this.restarting_ice = true;
+    this.peer.restartIce();
     const local_desc = await this.peer.createOffer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
     });
     const req = ConnectRequest.create({
-      version: this.version || "pure-ts@0.0.0", //TODO auto get from package.json
-      join: {
-        room: this.cfg.join?.room,
-        peer: this.cfg.join?.peer,
-        metadata: undefined,
-        publish: this.cfg.join?.publish,
-        subscribe: this.cfg.join?.subscribe,
+      version: this.version || "pure-ts@" + config.version,
+      join: this.cfg.join && {
+        room: this.cfg.join.room,
+        peer: this.cfg.join.peer,
+        metadata: this.cfg.join.metadata,
+        publish: this.cfg.join.publish,
+        subscribe: this.cfg.join.subscribe,
         features: { mixer: this.mixer?.state() },
       },
       tracks: {
@@ -262,7 +268,7 @@ export class Session extends EventEmitter {
       sdp: local_desc.sdp,
     });
     console.log("Sending restart-ice request");
-    const res = await post_protobuf(
+    const res = await postProtobuf(
       ConnectRequest,
       ConnectResponse,
       this.gateway + "/webrtc/" + this.conn_id + "/restart-ice",
@@ -280,11 +286,12 @@ export class Session extends EventEmitter {
       );
       this.conn_id = res.connId;
       this.receivers.map((r) => {
-        r.media_stream.removeTrack(r.media_stream.getTracks()[0]!);
+        r.afterRestartIce();
       }, []);
     }
     await this.peer.setLocalDescription(local_desc);
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
+    this.restarting_ice = false;
   }
 
   async join(info: JoinInfo, token: string) {
@@ -298,12 +305,12 @@ export class Session extends EventEmitter {
         this._mixer = new mixer.AudioMixer(this, this.dc, info.features.mixer);
       }
     }
-    await this.dc.request_session({
+    await this.dc.requestSession({
       join: {
         info: {
           room: info.room,
           peer: info.peer,
-          metadata: undefined,
+          metadata: info.metadata,
           publish: info.publish,
           subscribe: info.subscribe,
           features: { mixer: this.mixer?.state() },
@@ -316,7 +323,7 @@ export class Session extends EventEmitter {
     this.emit(SessionEvent.ROOM_CHANGED, info);
   }
 
-  async sync_sdp() {
+  async syncSdp() {
     const local_desc = await this.peer.createOffer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
@@ -330,7 +337,7 @@ export class Session extends EventEmitter {
     });
 
     console.log("Requesting update sdp", update_sdp);
-    const res = await this.dc.request_session({
+    const res = await this.dc.requestSession({
       sdp: update_sdp,
     });
     console.log("Request update sdp success", res);
@@ -340,18 +347,22 @@ export class Session extends EventEmitter {
 
   async leave() {
     //reset local here
-    this.receivers.map((r) => r.leave_room());
+    this.receivers.map((r) => r.leaveRoom());
     this.mixer?.leave_room();
 
-    await this.dc.request_session({
+    await this.dc.requestSession({
       leave: {},
     });
     this.cfg.join = undefined;
     this.emit(SessionEvent.ROOM_CHANGED, undefined);
   }
 
-  disconnect() {
-    console.warn("Disconnect session", this.created_at);
+  async disconnect() {
+    console.warn("Disconnecting session", this.created_at);
+    await this.dc.requestSession({
+      disconnect: {},
+    });
+    console.warn("Disconnected session", this.created_at);
     this.peer.close();
   }
 }

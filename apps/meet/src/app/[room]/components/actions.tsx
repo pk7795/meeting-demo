@@ -1,7 +1,13 @@
 import { useParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useCopyToClipboard } from 'usehooks-ts'
-import { CameraSelection, CameraToggle, MicrophoneSelection, MicrophoneToggle } from '@atm0s-media-sdk/react-ui/lib'
+import {
+  CameraSelection,
+  CameraToggle,
+  MicrophoneSelection,
+  MicrophoneToggle,
+  ScreenToggle,
+} from '@atm0s-media-sdk/react-ui/lib'
 import {
   Button,
   Dialog,
@@ -57,6 +63,7 @@ export const Actions: React.FC<Props> = ({ first_page }) => {
       >
         <CopyIcon size={16} />
       </Button>
+      <ScreenToggle source_name="video_screen" />
     </>
   )
 }

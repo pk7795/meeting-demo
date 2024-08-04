@@ -2,28 +2,28 @@
 
 import { BottomBar } from '../components'
 import { filter, map, round } from 'lodash'
-import { useRemotePeers, useRoom } from '@atm0s-media-sdk/react-hooks/lib'
-import { AudioMixerPlayer, PeerLocal, PeerRemoteDirectAudio, PeerRemoteMixerAudio } from '@atm0s-media-sdk/react-ui/lib'
+import { useRemotePeers, useRoom } from '@atm0s-media-sdk/react-hooks'
+import { AudioMixerPlayer, PeerLocal, PeerRemoteMixerAudio, useDeviceStream } from '@atm0s-media-sdk/react-ui/lib'
 import { cn } from '@atm0s-media-sdk/ui/lib/utils'
 import { css } from '@emotion/css'
-
-const audio_direct = false
 
 export const Meeting = () => {
   const room = useRoom()
   const remote_peers = useRemotePeers()
+  const stream_video_screen = useDeviceStream('video_screen')
   const peers_length = remote_peers.length
   const shape = round(Math.sqrt(peers_length))
   let calc_cols = 1
   let calc_rows = 1
-  if (peers_length === 2) {
+  if (!stream_video_screen && peers_length === 2) {
     calc_cols = 2
     calc_rows = 1
   }
-  if (peers_length > 2) {
+  if (!stream_video_screen && peers_length > 2) {
     calc_cols = shape
     calc_rows = shape
   }
+
   return (
     <div className="w-full h-full flex flex-col">
       <div
@@ -35,15 +35,17 @@ export const Meeting = () => {
           })
         )}
       >
-        <PeerLocal source_name="video_main" />
-        {map(
+        <PeerLocal source_name="video_main" stream_video_screen={stream_video_screen} />
+        {!stream_video_screen && map(
           filter(remote_peers, (p) => p.peer != room?.peer),
           (p) => (
-            <div key={p.peer}>{audio_direct ? <PeerRemoteDirectAudio peer={p} /> : <PeerRemoteMixerAudio peer={p} />}</div>
+            <div key={p.peer}>
+              <PeerRemoteMixerAudio peer={p} />
+            </div>
           )
         )}
       </div>
-      {!audio_direct && <AudioMixerPlayer />}
+      <AudioMixerPlayer />
       <BottomBar />
     </div>
   )

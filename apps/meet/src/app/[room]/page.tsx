@@ -3,8 +3,8 @@
 import { Meeting, SettingsMedia } from './containers'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { AudioMixerMode, SessionConfig } from '@atm0s-media-sdk/core/lib'
-import { Atm0sMediaProvider } from '@atm0s-media-sdk/react-hooks/lib'
+import { AudioMixerMode, SessionConfig } from '@atm0s-media-sdk/core'
+import { Atm0sMediaProvider } from '@atm0s-media-sdk/react-hooks'
 import { Atm0sMediaUIProvider } from '@atm0s-media-sdk/react-ui/lib'
 import { env } from '@/config/env'
 

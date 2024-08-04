@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { EventEmitter } from '@atm0s-media-sdk/core/lib'
+import { EventEmitter } from '@atm0s-media-sdk/core'
 
 export enum ContextEvent {
   DeviceChanged = 'device.changed.',
@@ -9,7 +9,7 @@ export class Context extends EventEmitter {
   streams: Map<string, MediaStream> = new Map()
   streams_history: Map<string, string> = new Map()
 
-  async requestDevice(source_name: string, kind: 'audio' | 'video', deviceId?: string): Promise<MediaStream> {
+  async requestDevice(source_name: string, kind: 'audio' | 'video' | 'screen', deviceId?: string): Promise<MediaStream> {
     const old_stream = this.streams.get(source_name)
     if (old_stream) {
       old_stream.getTracks().map((t) => t.stop())
@@ -31,6 +31,14 @@ export class Context extends EventEmitter {
       case 'video': {
         let stream = await navigator.mediaDevices.getUserMedia({
           video: deviceId2 ? { deviceId: deviceId2 } : true,
+        })
+        this.streams.set(source_name, stream)
+        break
+      }
+      case 'screen': {
+        let stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: true,
         })
         this.streams.set(source_name, stream)
         break

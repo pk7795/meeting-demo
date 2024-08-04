@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useMixer } from '@atm0s-media-sdk/react-hooks/lib'
+import { useMixer } from '@atm0s-media-sdk/react-hooks'
 
 export const AudioMixerPlayer = () => {
   const mixer = useMixer()
