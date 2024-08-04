@@ -4,7 +4,7 @@ import { useCallback, useContext, useEffect } from 'react'
 import { Kind } from '@atm0s-media-sdk/core'
 import { usePublisher } from '@atm0s-media-sdk/react-hooks'
 import { Button } from '@atm0s-media-sdk/ui/components/index'
-import { ShareIcon } from '@atm0s-media-sdk/ui/icons/index'
+import { ScreenShareIcon, ScreenShareOffIcon } from '@atm0s-media-sdk/ui/icons/index'
 
 type MicrophoneSelectionProps = {
   source_name: string
@@ -35,7 +35,7 @@ export const ScreenToggle: React.FC<MicrophoneSelectionProps> = ({ source_name }
 
   return (
     <Button variant={stream ? 'default' : 'secondary'} size="icon" onClick={onToggle}>
-      <ShareIcon size={16} />
+      {!stream ? <ScreenShareIcon size={16} /> : <ScreenShareOffIcon size={16} />}
     </Button>
   )
 }

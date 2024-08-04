@@ -1,12 +1,4 @@
-import { useParams } from 'next/navigation'
-import { toast } from 'sonner'
-import { useCopyToClipboard } from 'usehooks-ts'
-import {
-  CameraSelection,
-  CameraToggle,
-  MicrophoneSelection,
-  MicrophoneToggle,
-} from '@atm0s-media-sdk/react-ui/lib'
+import { CameraSelection, CameraToggle, MicrophoneSelection, MicrophoneToggle } from '@atm0s-media-sdk/react-ui/lib'
 import {
   Button,
   Dialog,
@@ -16,15 +8,13 @@ import {
   DialogTrigger,
   Label,
 } from '@atm0s-media-sdk/ui/components/index'
-import { CopyIcon, Settings2Icon } from '@atm0s-media-sdk/ui/icons/index'
+import { Settings2Icon } from '@atm0s-media-sdk/ui/icons/index'
 
 type Props = {
   first_page?: boolean
 }
 
 export const Actions: React.FC<Props> = ({ first_page }) => {
-  const params = useParams()
-  const [, onCopy] = useCopyToClipboard()
   return (
     <>
       <MicrophoneToggle source_name="audio_main" first_page={first_page} />
@@ -51,17 +41,6 @@ export const Actions: React.FC<Props> = ({ first_page }) => {
           </div>
         </DialogContent>
       </Dialog>
-      <Button
-        variant="secondary"
-        size="icon"
-        onClick={() =>
-          onCopy(params?.room as string).then(() => {
-            toast.success('Room ID copied to clipboard')
-          })
-        }
-      >
-        <CopyIcon size={16} />
-      </Button>
     </>
   )
 }
