@@ -1,11 +1,15 @@
 'use client'
 
+import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 import { useRouter } from 'next/navigation'
-import { getCookie, removeCookie } from '@atm0s-media-sdk/ui/lib/cookies'
+import { removeCookie } from '@atm0s-media-sdk/ui/lib/cookies'
 
-export const Username = () => {
+type Props = {
+  username?: RequestCookie
+}
+
+export const Username: React.FC<Props> = ({ username }) => {
   const router = useRouter()
-  const username = getCookie('username')
 
   const onLogout = () => {
     removeCookie('username')
@@ -13,7 +17,7 @@ export const Username = () => {
   }
   return (
     <>
-      Logged in as {username} |{' '}
+      Logged in as {username?.value} |{' '}
       <span className="underline cursor-pointer" onClick={onLogout}>
         Logout
       </span>

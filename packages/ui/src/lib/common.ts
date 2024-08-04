@@ -2,7 +2,7 @@ export const generateRandomString = (length: number) => {
   const date = Date.now().toString()
 
   let charset = ''
-  charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  charset += '1234567890'
   charset += 'abcdefghijklmnopqrstuvwxyz'
   charset += date
 

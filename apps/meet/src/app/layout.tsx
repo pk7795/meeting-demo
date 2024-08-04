@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import '@atm0s-media-sdk/ui/globals.css'
-import { ThemeProvider } from '@atm0s-media-sdk/ui/providers/index'
-import { MainLayout } from '@/layouts'
 import { Toaster } from 'sonner'
+import '@atm0s-media-sdk/ui/globals.css'
+import { RecoilProvider, ThemeProvider } from '@atm0s-media-sdk/ui/providers/index'
+import { MainLayout } from '@/layouts'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -28,7 +28,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`} id="id--full-screen">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <MainLayout>{children}</MainLayout>
+          <RecoilProvider>
+            <MainLayout>{children}</MainLayout>
+          </RecoilProvider>
         </ThemeProvider>
         <Toaster />
       </body>
