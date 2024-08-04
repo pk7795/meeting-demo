@@ -6,6 +6,7 @@ import { Button } from '@atm0s-media-sdk/ui/components/index'
 import { MaximizeIcon, MinimizeIcon, PhoneMissedIcon } from '@atm0s-media-sdk/ui/icons/index'
 import { Logo } from '@/components'
 import { useFullScreen } from '@/hooks'
+import { ScreenToggle } from '@atm0s-media-sdk/react-ui/lib'
 
 export const BottomBar = () => {
   const router = useRouter()
@@ -19,6 +20,7 @@ export const BottomBar = () => {
       </div>
       <div className="flex items-center gap-4">
         <Actions />
+        <ScreenToggle source_name="video_screen" />
         <Button variant="secondary" size="icon" onClick={onOnOffFullScreen}>
           {!isMaximize ? <MaximizeIcon size={16} /> : <MinimizeIcon size={16} />}
         </Button>

@@ -6,7 +6,6 @@ import {
   CameraToggle,
   MicrophoneSelection,
   MicrophoneToggle,
-  ScreenToggle,
 } from '@atm0s-media-sdk/react-ui/lib'
 import {
   Button,
@@ -63,7 +62,6 @@ export const Actions: React.FC<Props> = ({ first_page }) => {
       >
         <CopyIcon size={16} />
       </Button>
-      <ScreenToggle source_name="video_screen" />
     </>
   )
 }
