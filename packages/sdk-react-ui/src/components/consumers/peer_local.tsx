@@ -57,7 +57,7 @@ export const PeerLocal: React.FC<Props> = ({ source_name, stream_video_screen })
           }}
         />
       ) : (
-        <div className="bg-zinc-500 flex items-center justify-center w-28 h-28 rounded-full text-6xl text-white uppercase">
+        <div className="bg-zinc-500 flex items-center justify-center max-w-28 max-h-28 w-1/3 aspect-square rounded-full text-3xl text-white uppercase">
           {username?.[0]}
         </div>
       )}

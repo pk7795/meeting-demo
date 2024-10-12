@@ -3,17 +3,22 @@ import { VideoRemote } from './video_remote'
 import { find, isEmpty } from 'lodash'
 import { RemotePeer, RemoteTrack, useRemoteVideoTracks } from '@atm0s-media-sdk/react-hooks'
 import { cn } from '@atm0s-media-sdk/ui/lib/utils'
+import { useEffect } from 'react'
 
 type Props = {
   peer: RemotePeer
+  setVideoScreen?: (v: any) => void
 }
 
-export const PeerRemoteMixerAudio: React.FC<Props> = ({ peer }) => {
+export const PeerRemoteMixerAudio: React.FC<Props> = ({ peer ,setVideoScreen}) => {
   const remote_videos = useRemoteVideoTracks(peer.peer)
   const { speaking } = useAudioMixerSpeaking(peer.peer)
-
   const video_main = find(remote_videos, (t) => t.track === 'video_main')
   const video_screen = find(remote_videos, (t) => t.track === 'video_screen')
+
+  useEffect(() => {
+    setVideoScreen?.(video_screen)
+  }, [video_screen])
 
   return (
     <div
@@ -36,7 +41,7 @@ export const PeerRemoteMixerAudio: React.FC<Props> = ({ peer }) => {
           )}
         </>
       ) : (
-        <div className="bg-zinc-500 flex items-center justify-center w-28 h-28 rounded-full text-6xl text-white uppercase">
+        <div className="bg-zinc-500 flex items-center justify-center max-w-28 max-h-28 w-1/3 aspect-square rounded-full text-3xl text-white uppercase">
           {peer.peer?.[0]}
         </div>
       )}
