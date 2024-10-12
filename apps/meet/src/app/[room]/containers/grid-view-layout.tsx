@@ -1,7 +1,6 @@
 import { FC } from 'react'
 import { map } from 'lodash'
 
-const GAP = 16;
 
 type Props = {
   renderItem: (item: number) => React.ReactNode;
@@ -21,8 +20,8 @@ export const GridViewLayout:FC<Props> = ({renderItem,items}) => {
       style={{
         gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-        padding: `${GAP}px`,
-        gap: `${GAP}px`,
+        padding: `16px`,
+        gap: `16px`,
       }}
     >
       {map(items,(item, index) => {
@@ -30,7 +29,7 @@ export const GridViewLayout:FC<Props> = ({renderItem,items}) => {
         const transformValue =
           leftoverItems > 0 && isLeftover
             ? `translateX(calc(${50 * (rows * columns - totalUser)}% + ${
-              (rows * columns - totalUser) * (GAP / 2)
+              (rows * columns - totalUser) * 8
             }px))`
             : "unset";
 
