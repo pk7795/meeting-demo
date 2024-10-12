@@ -18,7 +18,7 @@ export const PeerRemoteMixerAudio: React.FC<Props> = ({ peer }) => {
   return (
     <div
       className={cn(
-        'w-full h-full max-h-[calc(100vh-65px)] flex items-center justify-center bg-zinc-800 rounded-2xl overflow-hidden relative',
+        'w-full h-full flex items-center justify-center bg-zinc-800 rounded-2xl overflow-hidden relative',
         {
           'ring-4 ring-green-500 ring-opacity-70': speaking,
         }

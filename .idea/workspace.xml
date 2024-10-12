@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4d43b67d-b3f6-4d84-a230-2baddccf7bea" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/apps/meet/src/app/[room]/containers/grid-view-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/meet/src/app/[room]/containers/meeting.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/apps/meet/src/app/[room]/containers/meeting.tsx" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2nLRpqVA0HdcLnUfw8CKof32Rpn" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/Users/tuanna/Workspace/atm0s-meet",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "pnpm",
+    "prettierjs.PrettierConfiguration.Package": "/Users/tuanna/Workspace/atm0s-meet/node_modules/prettier",
+    "ts.external.directory.path": "/Users/tuanna/Workspace/atm0s-meet/node_modules/typescript/lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23339.15" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4d43b67d-b3f6-4d84-a230-2baddccf7bea" name="Changes" comment="" />
+      <created>1728750555275</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1728750555275</updated>
+      <workItem from="1728750556306" duration="493000" />
+      <workItem from="1728751067116" duration="6000" />
+      <workItem from="1728751079783" duration="352000" />
+      <workItem from="1728751437229" duration="845000" />
+      <workItem from="1728752297620" duration="205000" />
+      <workItem from="1728752511923" duration="2294000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
