@@ -16,12 +16,10 @@ export const GridViewLayout: React.FC<Props> = ({ renderItem, items }) => {
 
   return (
     <div
-      className={'grid h-full max-h-[calc(100vh-65px)] w-screen duration-300'}
+      className={'grid h-full max-h-[calc(100vh-65px)] w-full gap-4 duration-300'}
       style={{
         gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
-        padding: `16px`,
-        gap: `16px`,
       }}
     >
       {map(items, (item, index) => {

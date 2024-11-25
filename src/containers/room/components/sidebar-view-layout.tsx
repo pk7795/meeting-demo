@@ -41,9 +41,7 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, items }) => {
   }, [items, renderItem, totalUser])
 
   return (
-    <div
-      className={'grid h-full max-h-[calc(100vh-65px)] w-screen grid-cols-[minmax(auto,_1fr)_220px] gap-4 p-4 duration-300'}
-    >
+    <div className={'grid h-full max-h-[calc(100vh-65px)] w-full grid-cols-[minmax(auto,_1fr)_220px] gap-4 duration-300'}>
       {renderItems}
     </div>
   )
