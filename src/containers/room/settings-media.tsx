@@ -37,7 +37,7 @@ export const SettingsMedia: React.FC<Props> = ({ onConnected, username }) => {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="flex items-center justify-center">
       <Card className="w-full max-w-xs md:max-w-sm">
         <CardHeader>
           <CardTitle>

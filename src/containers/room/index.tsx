@@ -1,6 +1,7 @@
 'use client'
 
 import { env } from '@/config'
+import { Layout } from '@/layouts'
 import { MediaProvider } from '@/providers'
 import { AudioMixerMode, SessionConfig } from '@atm0s-media-sdk/core'
 import { Atm0sMediaProvider } from '@atm0s-media-sdk/react-hooks'
@@ -41,11 +42,13 @@ export const Room: React.FC<Props> = ({ host, username }) => {
   const [inRoom, setInRoom] = useState(false)
 
   return (
-    <Atm0sMediaProvider gateway={env.GATEWAYS} cfg={cfg} prepareAudioReceivers={3} prepareVideoReceivers={3}>
-      <MediaProvider>
-        {!inRoom && <SettingsMedia onConnected={() => setInRoom(true)} username={username} />}
-        {inRoom && <Meeting host={host} />}
-      </MediaProvider>
-    </Atm0sMediaProvider>
+    <Layout>
+      <Atm0sMediaProvider gateway={env.GATEWAYS} cfg={cfg} prepareAudioReceivers={3} prepareVideoReceivers={3}>
+        <MediaProvider>
+          {!inRoom && <SettingsMedia onConnected={() => setInRoom(true)} username={username} />}
+          {inRoom && <Meeting host={host} />}
+        </MediaProvider>
+      </Atm0sMediaProvider>
+    </Layout>
   )
 }
