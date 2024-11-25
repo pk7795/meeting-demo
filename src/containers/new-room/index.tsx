@@ -1,7 +1,7 @@
 'use client'
 
 import { generateToken } from '@/app/actions/token'
-import { Logo, Username } from '@/components'
+import { Logo } from '@/components'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -11,10 +11,9 @@ import { env } from '@/config'
 import { Layout } from '@/layouts'
 import { generateRandomString } from '@/lib'
 import { isCreateNewRoomState } from '@/recoils'
+import { useUser } from '@clerk/nextjs'
 import { map } from 'lodash'
-import { LoaderIcon } from 'lucide-react'
-import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies'
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useSetRecoilState } from 'recoil'
@@ -23,15 +22,10 @@ type Inputs = {
   room: string
 }
 
-type Props = {
-  username?: RequestCookie
-}
+type Props = {}
 
-export const NewRoom: React.FC<Props> = ({ username }) => {
-  if (!username) {
-    redirect('/settings-username')
-  }
-
+export const NewRoom: React.FC<Props> = () => {
+  const { user } = useUser()
   const router = useRouter()
   const {
     register,
@@ -46,8 +40,8 @@ export const NewRoom: React.FC<Props> = ({ username }) => {
   const gateways = env.GATEWAYS
 
   const onGenerateToken = async (room: string) => {
-    const token = await generateToken(room, username?.value as string)
-    return router.push(`/${room}?gateway=${gatewayIndex}&peer=${username?.value}&token=${token}`)
+    const token = await generateToken(room, user?.id as string)
+    return router.push(`/${room}?gateway=${gatewayIndex}&peer=${user?.id}&token=${token}`)
   }
 
   const onJoin: SubmitHandler<Inputs> = async (data) => {
@@ -63,14 +57,6 @@ export const NewRoom: React.FC<Props> = ({ username }) => {
     setIsLoadingCreate(false)
   }
 
-  if (!username) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        <LoaderIcon className="animate-spin" />
-      </div>
-    )
-  }
-
   return (
     <Layout>
       <div className="flex items-center justify-center">
@@ -80,9 +66,7 @@ export const NewRoom: React.FC<Props> = ({ username }) => {
               <CardTitle>
                 <Logo />
               </CardTitle>
-              <CardDescription>
-                <Username username={username} />
-              </CardDescription>
+              <CardDescription></CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <Select value={gatewayIndex} onValueChange={setGatewayIndex}>

@@ -43,7 +43,7 @@ export const Meeting: React.FC<Props> = ({ host }) => {
   }, [peerLocal, remotePeers, room?.peer, videoScreen])
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
       <div className="flex h-full w-full flex-col">
         {streamVideoScreen || videoScreen ? (
           <SidebarViewLayout items={[peerScreenShare, ...(peerRemoteMixerAudio || [])]} renderItem={(i) => i} />

@@ -2,13 +2,15 @@
 
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import dynamic from 'next/dynamic'
 import { ReactQueryProvider } from './react-query-provider'
 import { RecoilProvider } from './recoil-provider'
-import { ThemeProvider } from './theme-provider'
 
 type Props = {
   children: React.ReactNode
 }
+
+const ThemeProvider = dynamic(() => import('./theme-provider').then((mod) => mod.ThemeProvider), { ssr: false })
 
 export const AppProvider: React.FC<Props> = ({ children }) => {
   return (

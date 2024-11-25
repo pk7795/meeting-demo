@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
-import { useUser } from '@clerk/nextjs'
+import { useClerk, useUser } from '@clerk/nextjs'
 import { BadgeCheck, Bell, ChevronsUpDown, LogOut, SunMoonIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
@@ -36,6 +36,7 @@ type UserInfoProps = {}
 export const UserInfo: React.FC<UserInfoProps> = () => {
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
+  const { signOut } = useClerk()
 
   return (
     <DropdownMenu>
@@ -85,7 +86,7 @@ export const UserInfo: React.FC<UserInfoProps> = () => {
           </DropdownMenuPortal>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => {}}>
+        <DropdownMenuItem onClick={() => signOut()}>
           <LogOut />
           Log out
         </DropdownMenuItem>
