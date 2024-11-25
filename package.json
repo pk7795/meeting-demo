@@ -51,6 +51,7 @@
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.12",
     "embla-carousel-react": "^8.5.1",
+    "framer-motion": "^11.11.17",
     "generate-api-key": "^1.0.2",
     "input-otp": "^1.4.1",
     "jose": "^5.9.3",
