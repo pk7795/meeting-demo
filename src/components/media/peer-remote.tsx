@@ -1,9 +1,9 @@
+import { VideoRemote } from '@/components'
 import { useAudioMixerSpeaking } from '@/hooks'
 import { cn } from '@/lib'
 import { RemotePeer, RemoteTrack, useRemoteVideoTracks } from '@atm0s-media-sdk/react-hooks'
 import { find, isEmpty } from 'lodash'
 import { useEffect } from 'react'
-import { VideoRemote } from './video-remote'
 
 type Props = {
   peer: RemotePeer
@@ -12,6 +12,7 @@ type Props = {
 
 export const PeerRemote: React.FC<Props> = ({ peer, setVideoScreen }) => {
   const remote_videos = useRemoteVideoTracks(peer.peer)
+  console.log('peer', peer)
   const { speaking } = useAudioMixerSpeaking(peer.peer)
   const video_main = find(remote_videos, (t) => t.track === 'video_main')
   const video_screen = find(remote_videos, (t) => t.track === 'video_screen')
@@ -26,7 +27,7 @@ export const PeerRemote: React.FC<Props> = ({ peer, setVideoScreen }) => {
         'ring-4 ring-green-500 ring-opacity-70': speaking,
       })}
     >
-      <div className="absolute bottom-3 left-2 flex items-center gap-1">
+      <div className="absolute bottom-3 left-2 z-[1] flex items-center gap-1">
         <div className="rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">{peer.peer}</div>
       </div>
       {!isEmpty(remote_videos) ? (

@@ -9,14 +9,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { useMenu } from '@/hooks'
 import Link from 'next/link'
-import { NavMain } from './nav-main'
-import { NavSecondary } from './nav-secondary'
 import { NavUser } from './nav-user'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { menu } = useMenu()
+  // const { menu } = useMenu()
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
@@ -37,8 +34,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={menu.navMain} />
-        <NavSecondary items={menu.navSecondary} className="mt-auto" />
+        {/*<NavMain items={[]} />*/}
+        {/*<NavSecondary items={[]} className="mt-auto" />*/}
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

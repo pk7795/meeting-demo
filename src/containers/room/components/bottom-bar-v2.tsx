@@ -1,23 +1,21 @@
 import { CameraToggleV2, MicrophoneToggleV2, ScreenToggleV2 } from '@/components'
 import BlurFade from '@/components/ui/blur-fade'
 import { Button } from '@/components/ui/button'
-import { useSidebar } from '@/components/ui/sidebar'
-import { useFullScreen } from '@/hooks'
-import { MaximizeIcon, MinimizeIcon, PhoneMissedIcon } from 'lucide-react'
+import { PhoneMissedIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useCallback } from 'react'
+import React from 'react'
 
 type Props = {}
 
 export const BottomBarV2: React.FC<Props> = () => {
-  const { isMaximize, onOnOffFullScreen } = useFullScreen()
+  // const { isMaximize, onOnOffFullScreen } = useFullScreen()
   const router = useRouter()
-  const { setOpen } = useSidebar()
-
-  const onToggleFullScreen = useCallback(() => {
-    setOpen(isMaximize)
-    onOnOffFullScreen()
-  }, [isMaximize, onOnOffFullScreen, setOpen])
+  // const { setOpen } = useSidebar()
+  //
+  // const onToggleFullScreen = useCallback(() => {
+  //   setOpen(isMaximize)
+  //   onOnOffFullScreen()
+  // }, [isMaximize, onOnOffFullScreen, setOpen])
 
   return (
     <BlurFade
@@ -45,14 +43,14 @@ export const BottomBarV2: React.FC<Props> = () => {
           </Button>
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggleFullScreen}
-          className={'absolute bottom-0 right-0 h-7 w-7 text-background'}
-        >
-          {!isMaximize ? <MaximizeIcon size={16} /> : <MinimizeIcon size={16} />}
-        </Button>
+        {/*<Button*/}
+        {/*  variant="ghost"*/}
+        {/*  size="icon"*/}
+        {/*  onClick={onToggleFullScreen}*/}
+        {/*  className={'absolute bottom-0 right-0 h-7 w-7 text-background'}*/}
+        {/*>*/}
+        {/*  {!isMaximize ? <MaximizeIcon size={16} /> : <MinimizeIcon size={16} />}*/}
+        {/*</Button>*/}
       </div>
     </BlurFade>
   )
