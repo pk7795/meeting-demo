@@ -1,5 +1,3 @@
-'use client'
-
 import { map, slice } from 'lodash'
 
 type Props = {
