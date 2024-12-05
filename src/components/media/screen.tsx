@@ -62,7 +62,7 @@ export const ScreenToggleV2: React.FC<MicrophoneSelectionProps> = ({ sourceName 
   }, [ctx, sourceName, stream])
 
   return (
-    <Button variant={stream ? 'default' : 'secondary'} size={'full'} onClick={onToggle} className={'[&_svg]:!size-full'}>
+    <Button variant={stream ? 'blue' : 'secondary'} size={'full'} onClick={onToggle} className={'[&_svg]:!size-full'}>
       {!stream ? <ScreenShareIcon size={16} /> : <ScreenShareOffIcon size={16} />}
     </Button>
   )

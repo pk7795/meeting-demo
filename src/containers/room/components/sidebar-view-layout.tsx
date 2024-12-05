@@ -1,5 +1,5 @@
 import { cn } from '@/lib'
-import { map } from 'lodash'
+import { map, slice } from 'lodash'
 import { useMemo } from 'react'
 
 type Props = {
@@ -13,21 +13,17 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, items }) => {
   const renderItems = useMemo(() => {
     if (totalUser > 1) {
       return (
-        <>
-          <div className={'h-full w-full duration-300'}>{renderItem(items?.[0])}</div>
+        <div className={'grid h-full w-full grid-cols-[1fr_220px] gap-4'}>
+          <div className={'h-full w-full'}>{renderItem(items?.[0])}</div>
 
           <div className={'h-full overflow-auto'}>
-            {map(items, (item, index) => {
-              return (
-                index != 0 && (
-                  <div key={index} className={cn('h-36 w-full duration-300', items?.[index + 1] && 'mb-4')}>
-                    {renderItem(item)}
-                  </div>
-                )
-              )
-            })}
+            {map(slice(items, 0, 1), (item, index) => (
+              <div key={index} className={cn('h-36 w-full', items?.[index + 1] && 'mb-4')}>
+                {renderItem(item)}
+              </div>
+            ))}
           </div>
-        </>
+        </div>
       )
     }
 
@@ -40,9 +36,5 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, items }) => {
     })
   }, [items, renderItem, totalUser])
 
-  return (
-    <div className={'grid h-full max-h-[calc(100vh-65px)] w-full grid-cols-[minmax(auto,_1fr)_220px] gap-4 duration-300'}>
-      {renderItems}
-    </div>
-  )
+  return <div className={'h-full max-h-[calc(100vh-144px)] w-full duration-300'}>{renderItems}</div>
 }

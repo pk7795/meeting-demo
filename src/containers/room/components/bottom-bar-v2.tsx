@@ -26,7 +26,7 @@ export const BottomBarV2: React.FC<Props> = () => {
       yOffset={4}
       className={'absolute -bottom-1 z-10 h-fit w-full rounded-b-2xl bg-gradient-to-t from-foreground/50 to-transparent p-4'}
     >
-      <div className={'relative py-4'}>
+      <div className={'relative py-2'}>
         <div className={'mx-auto flex h-11 w-max items-start gap-2'}>
           <MicrophoneToggleV2 sourceName={'audio_main'} />
           <CameraToggleV2 sourceName={'video_main'} />

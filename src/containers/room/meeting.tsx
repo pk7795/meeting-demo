@@ -65,9 +65,6 @@ export const Meeting: React.FC<Props> = ({ host }) => {
     return mapRemotePeers
   }, [peerLocal, remotePeers, room?.peer, videoScreen])
 
-  console.log('peerLocal', peerLocal)
-  console.log('peerScreenShare', peerScreenShare)
-  console.log('remotePeers', remotePeers)
   return (
     <div
       ref={containerRef}
