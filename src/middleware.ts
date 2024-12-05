@@ -1,18 +1,16 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { includes, last, split } from 'lodash'
+import { last } from 'lodash'
 import { NextResponse } from 'next/server'
 
 const isProtectedRoute = createRouteMatcher(['/', '/invite(.*)'])
 
 export default clerkMiddleware((auth, req) => {
-  console.log('Redirecting to sign-in page', req.url)
   if (!auth().userId && isProtectedRoute(req)) {
-    console.log('Redirecting to sign-in page', req.url)
     // Add custom logic to run before redirecting
     let query = ''
 
-    if (includes(req.url, 'invite')) {
-      const roomId = last(split(req.url, '/') || '')
+    if (req.url.includes('invite')) {
+      const roomId = last(req.url.split('/'))
       query = `?prev=invite&roomId=${roomId}`
     }
     // Redirect to sign-in page
