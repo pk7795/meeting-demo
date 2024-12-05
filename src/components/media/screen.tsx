@@ -39,13 +39,19 @@ export const ScreenToggle: React.FC<MicrophoneSelectionProps> = ({ sourceName })
   )
 }
 
-export const ScreenToggleV2: React.FC<MicrophoneSelectionProps> = ({ sourceName }) => {
-  const publisher = usePublisher(sourceName, Kind.VIDEO)
+export const ScreenToggleV2: React.FC<MicrophoneSelectionProps> = ({}) => {
+  const publisher = usePublisher('video_screen', Kind.VIDEO)
   const ctx = useContext(MediaContext)
-  const stream = useDeviceStream(sourceName)
+  const stream = useDeviceStream('video_screen')
 
   useEffect(() => {
-    const track = stream?.getVideoTracks()[0]
+    stream?.getVideoTracks()[0].addEventListener('ended', () => {
+      ctx.turnOffDevice('video_screen')
+    })
+  }, [ctx, stream])
+
+  useEffect(() => {
+    const track = stream?.getVideoTracks()?.[0]
     if (track && !publisher.attached) {
       publisher.attach(track)
     } else if (!track && publisher.attached) {
@@ -55,11 +61,11 @@ export const ScreenToggleV2: React.FC<MicrophoneSelectionProps> = ({ sourceName 
 
   const onToggle = useCallback(() => {
     if (stream) {
-      ctx.turnOffDevice(sourceName)
+      ctx.turnOffDevice('video_screen')
     } else {
-      ctx.requestDevice(sourceName, 'screen').then(console.log).catch(console.error)
+      ctx.requestDevice('video_screen', 'screen').then(console.log).catch(console.error)
     }
-  }, [ctx, sourceName, stream])
+  }, [ctx, stream])
 
   return (
     <Button variant={stream ? 'blue' : 'secondary'} size={'full'} onClick={onToggle} className={'[&_svg]:!size-full'}>

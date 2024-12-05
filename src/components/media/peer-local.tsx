@@ -4,24 +4,19 @@ import { getCookie } from '@/lib'
 import { useContext, useEffect, useRef } from 'react'
 
 type Props = {
-  sourceName: string
-  streamVideoScreen?: MediaStream
+  // sourceName: string
 }
 
-export const PeerLocal: React.FC<Props> = ({ sourceName, streamVideoScreen }) => {
+export const PeerLocal: React.FC<Props> = ({}) => {
   const username = getCookie('username')
-  const stream = useDeviceStream(sourceName)
+  const streamVideoMain = useDeviceStream('video_main')
   const videoRef = useRef<HTMLVideoElement>(null)
   const ctx = useContext(MediaContext)
-  console.log('username', username)
+  const streamVideoScreen = useDeviceStream('video_screen')
 
   useEffect(() => {
     if (videoRef.current) {
-      if (streamVideoScreen) {
-        videoRef.current.srcObject = streamVideoScreen
-      } else {
-        videoRef.current.srcObject = stream || null
-      }
+      videoRef.current.srcObject = streamVideoScreen || streamVideoMain || null
       return () => {
         if (videoRef.current) {
           // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -29,11 +24,11 @@ export const PeerLocal: React.FC<Props> = ({ sourceName, streamVideoScreen }) =>
         }
       }
     }
-  }, [stream, streamVideoScreen])
+  }, [streamVideoMain, streamVideoScreen])
 
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-800">
-      <div className="absolute bottom-3 left-2 flex items-center gap-1">
+      <div className="absolute bottom-3 left-2 z-[1] flex items-center gap-1">
         <div className="rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">
           {username || 'You'} {streamVideoScreen && `(You, presenting)`}
         </div>
@@ -46,7 +41,7 @@ export const PeerLocal: React.FC<Props> = ({ sourceName, streamVideoScreen }) =>
           Stop presenting
         </div>
       )}
-      {stream ? (
+      {streamVideoMain || streamVideoScreen ? (
         <video
           muted
           autoPlay
