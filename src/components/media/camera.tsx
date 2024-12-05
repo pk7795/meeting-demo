@@ -1,10 +1,13 @@
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { MediaContext } from '@/context'
+import { useDeviceStream } from '@/hooks'
 import { BitrateControlMode, Kind } from '@atm0s-media-sdk/core'
 import { usePublisher } from '@atm0s-media-sdk/react-hooks'
+import { DropdownMenu, DropdownMenuArrow } from '@radix-ui/react-dropdown-menu'
 import { filter, map } from 'lodash'
-import { VideoIcon, VideoOffIcon } from 'lucide-react'
+import { ChevronDown, ChevronUp, VideoIcon, VideoOffIcon } from 'lucide-react'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { useDeviceStream } from '../../hooks'
 import { Button } from '../ui/button'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
@@ -143,6 +146,81 @@ export const CameraToggle: React.FC<CameraSelectionProps> = ({ sourceName, isFir
   return (
     <Button variant={stream ? 'secondary' : 'destructive'} size="icon" onClick={onToggle}>
       {stream ? <VideoIcon size={16} /> : <VideoOffIcon size={16} />}
+    </Button>
+  )
+}
+
+export const CameraToggleV2: React.FC<CameraSelectionProps> = ({ sourceName, isFirstPage }) => {
+  const publisher = usePublisher(sourceName, Kind.VIDEO, PUBLISHER_CONFIG)
+  const ctx = useContext(MediaContext)
+  const stream = useDeviceStream(sourceName)
+  const [isOpenSetting, setIsOpenSetting] = useState(false)
+
+  useEffect(() => {
+    const init = async () => {
+      if (isFirstPage) {
+        await ctx.requestDevice(sourceName, 'video')
+      }
+    }
+
+    init()
+  }, [ctx, sourceName, isFirstPage])
+
+  useEffect(() => {
+    const track = stream?.getVideoTracks()[0]
+    if (track && !publisher.attached) {
+      publisher.attach(track)
+    } else if (!track && publisher.attached) {
+      publisher.detach()
+    }
+  }, [publisher, stream])
+
+  const onToggle = useCallback(() => {
+    if (stream) {
+      ctx.turnOffDevice(sourceName)
+    } else {
+      ctx.requestDevice(sourceName, 'video').then(console.log).catch(console.error)
+    }
+  }, [ctx, sourceName, stream])
+  return (
+    <Button
+      variant={'secondary'}
+      size="full"
+      className={'gap-0 bg-secondary/90 p-0'}
+      onClick={() => setIsOpenSetting((prev) => !prev)}
+    >
+      <DropdownMenu open={isOpenSetting} onOpenChange={(v) => setIsOpenSetting(v)}>
+        <DropdownMenuTrigger className={'aspect-square h-full'}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={'flex aspect-square h-full items-center justify-center'}>
+                {!isOpenSetting ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Camera setting</p>
+            </TooltipContent>
+          </Tooltip>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className={'w-80 border-none'}>
+          <DropdownMenuLabel>Settings camera</DropdownMenuLabel>
+          <DropdownMenuItem>
+            <CameraSelection sourceName="video_main" />
+          </DropdownMenuItem>
+          <DropdownMenuArrow className="fill-white" />
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Button
+        onClick={(e) => {
+          e.stopPropagation()
+          onToggle()
+        }}
+        variant={stream ? 'secondary' : 'destructive'}
+        size="full"
+        className={'aspect-square h-full [&_svg]:!size-full'}
+      >
+        {stream ? <VideoIcon size={16} /> : <VideoOffIcon size={16} />}
+      </Button>
     </Button>
   )
 }

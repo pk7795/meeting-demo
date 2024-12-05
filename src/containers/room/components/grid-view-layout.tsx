@@ -1,6 +1,6 @@
 'use client'
 
-import { map } from 'lodash'
+import { map, slice } from 'lodash'
 
 type Props = {
   renderItem: (item: number) => React.ReactNode
@@ -16,13 +16,13 @@ export const GridViewLayout: React.FC<Props> = ({ renderItem, items }) => {
 
   return (
     <div
-      className={'grid h-full max-h-[calc(100vh-65px)] w-full gap-4 duration-300'}
+      className={'grid h-full max-h-[calc(100vh-0px)] w-full gap-4 duration-300'}
       style={{
         gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
         gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
       }}
     >
-      {map(items, (item, index) => {
+      {map(slice(items, 0, 25), (item, index) => {
         const isLeftover = index >= totalUser - leftoverItems
         const transformValue =
           leftoverItems > 0 && isLeftover

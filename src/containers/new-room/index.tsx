@@ -8,15 +8,15 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { env } from '@/config'
+import { isCreateNewRoomAtom } from '@/jotai'
 import { Layout } from '@/layouts'
 import { generateRandomString } from '@/lib'
-import { isCreateNewRoomState } from '@/recoils'
 import { useUser } from '@clerk/nextjs'
+import { useSetAtom } from 'jotai'
 import { map } from 'lodash'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useSetRecoilState } from 'recoil'
 
 type Inputs = {
   room: string
@@ -35,7 +35,7 @@ export const NewRoom: React.FC<Props> = () => {
   const [gatewayIndex, setGatewayIndex] = useState('0')
   const [isLoadingJoin, setIsLoadingJoin] = useState(false)
   const [isLoadingCreate, setIsLoadingCreate] = useState(false)
-  const setIsCreateNewRoom = useSetRecoilState(isCreateNewRoomState)
+  const setIsCreateNewRoom = useSetAtom(isCreateNewRoomAtom)
 
   const gateways = env.GATEWAYS
 

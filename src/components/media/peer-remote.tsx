@@ -22,7 +22,7 @@ export const PeerRemote: React.FC<Props> = ({ peer, setVideoScreen }) => {
 
   return (
     <div
-      className={cn('relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl bg-zinc-800', {
+      className={cn('relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-800', {
         'ring-4 ring-green-500 ring-opacity-70': speaking,
       })}
     >

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6dddb4ae-1b97-4a11-9efc-b3af929706d7" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/containers/room/components/bottom-bar-v2.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jotai/layout.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/jotai/user.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/layouts/header.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/layouts/sidebar-right.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/providers/jotai-provider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/media/camera.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/media/camera.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/media/microphone.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/media/microphone.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/media/peer-local.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/media/peer-local.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/media/peer-remote.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/media/peer-remote.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/media/screen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/media/screen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/new-room/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/new-room/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/room/components/grid-view-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/components/grid-view-layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/room/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/containers/room/meeting.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/meeting.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/layouts/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/layouts/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/providers/app-provider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/providers/app-provider.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/providers/recoil-provider.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/recoils/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/jotai/index.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;tuAnnG-Anh&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:8xFF/atm0s-meet.git&quot;,
+    &quot;accountId&quot;: &quot;1a4424db-9d6a-473b-b01b-0346a7ed02ea&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2pLbdXJs75yBnSvD1qHrpkIWiWe" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/tuanna/Workspace/8xFF/atm0s-meet&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/tuanna/Workspace/8xFF/atm0s-meet/node_modules/prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/tuanna/Workspace/8xFF/atm0s-meet/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23339.15" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6dddb4ae-1b97-4a11-9efc-b3af929706d7" name="Changes" comment="" />
+      <created>1732548390124</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1732548390124</updated>
+      <workItem from="1732548391594" duration="2694000" />
+      <workItem from="1732803839760" duration="1284000" />
+      <workItem from="1733191255598" duration="3505000" />
+      <workItem from="1733194838466" duration="816000" />
+      <workItem from="1733195661630" duration="3135000" />
+      <workItem from="1733198829588" duration="5760000" />
+      <workItem from="1733212447769" duration="11105000" />
+      <workItem from="1733251880193" duration="11199000" />
+      <workItem from="1733283386433" duration="3948000" />
+      <workItem from="1733297249899" duration="420000" />
+      <workItem from="1733297817896" duration="10120000" />
+      <workItem from="1733310096451" duration="4902000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

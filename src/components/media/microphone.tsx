@@ -1,8 +1,11 @@
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { MediaContext } from '@/context'
 import { Kind } from '@atm0s-media-sdk/core'
 import { usePublisher } from '@atm0s-media-sdk/react-hooks'
+import { DropdownMenu, DropdownMenuArrow } from '@radix-ui/react-dropdown-menu'
 import { filter, map } from 'lodash'
-import { MicIcon, MicOffIcon } from 'lucide-react'
+import { ChevronDown, ChevronUp, MicIcon, MicOffIcon } from 'lucide-react'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useDeviceStream } from '../../hooks'
 import { Button } from '../ui/button'
@@ -58,7 +61,12 @@ export const MicrophoneSelection: React.FC<MicrophoneSelectionProps> = ({ source
 
   const onChange = useCallback(
     (value: string) => {
-      ctx.requestDevice(sourceName, 'audio', value).then(console.log).catch(console.error)
+      ctx
+        .requestDevice(sourceName, 'audio', value)
+        .then(() => {
+          setSelectedDevice(value)
+        })
+        .catch(console.error)
     },
     [ctx, sourceName]
   )
@@ -116,6 +124,84 @@ export const MicrophoneToggle: React.FC<MicrophoneSelectionProps> = ({ sourceNam
   return (
     <Button variant={stream ? 'secondary' : 'destructive'} size="icon" onClick={onToggle}>
       {stream ? <MicIcon size={16} /> : <MicOffIcon size={16} />}
+    </Button>
+  )
+}
+
+export const MicrophoneToggleV2: React.FC<MicrophoneSelectionProps> = ({ sourceName, isFirstPage }) => {
+  const publisher = usePublisher(sourceName, Kind.AUDIO)
+  const ctx = useContext(MediaContext)
+  const stream = useDeviceStream(sourceName)
+
+  const [isOpenSetting, setIsOpenSetting] = useState(false)
+
+  useEffect(() => {
+    const init = async () => {
+      if (isFirstPage) {
+        await ctx.requestDevice(sourceName, 'audio')
+      }
+    }
+
+    init()
+  }, [ctx, sourceName, isFirstPage])
+
+  useEffect(() => {
+    const track = stream?.getAudioTracks()[0]
+    if (track && !publisher.attached) {
+      publisher.attach(track)
+    } else if (!track && publisher.attached) {
+      publisher.detach()
+    }
+  }, [publisher, stream])
+
+  const onToggle = useCallback(() => {
+    if (stream) {
+      ctx.turnOffDevice(sourceName)
+    } else {
+      ctx.requestDevice(sourceName, 'audio').then(console.log).catch(console.error)
+    }
+  }, [ctx, sourceName, stream])
+
+  return (
+    <Button
+      variant={'secondary'}
+      size="full"
+      className={'gap-0 bg-secondary/90 p-0'}
+      onClick={() => setIsOpenSetting((prev) => !prev)}
+    >
+      <DropdownMenu open={isOpenSetting} onOpenChange={(v) => setIsOpenSetting(v)}>
+        <DropdownMenuTrigger className={'aspect-square h-full'}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={'flex aspect-square h-full items-center justify-center'}>
+                {!isOpenSetting ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Audio setting</p>
+            </TooltipContent>
+          </Tooltip>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className={'w-80 border-none'}>
+          <DropdownMenuLabel>Settings audio input</DropdownMenuLabel>
+          <DropdownMenuItem>
+            <MicrophoneSelection sourceName="audio_main" />
+          </DropdownMenuItem>
+          <DropdownMenuArrow className="fill-white" />
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Button
+        onClick={(e) => {
+          e.stopPropagation()
+          onToggle()
+        }}
+        variant={stream ? 'secondary' : 'destructive'}
+        size="full"
+        className={'aspect-square h-full [&_svg]:!size-full'}
+      >
+        {stream ? <MicIcon size={16} /> : <MicOffIcon size={16} />}
+      </Button>
     </Button>
   )
 }
