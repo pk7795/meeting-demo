@@ -42,13 +42,13 @@ export const Room: React.FC<Props> = ({ host, username }) => {
   const [inRoom, setInRoom] = useState(false)
 
   return (
-    <Layout>
-      <Atm0sMediaProvider gateway={env.GATEWAYS} cfg={cfg} prepareAudioReceivers={3} prepareVideoReceivers={3}>
+    <Atm0sMediaProvider gateway={env.GATEWAYS} cfg={cfg} prepareAudioReceivers={3} prepareVideoReceivers={3}>
+      <Layout>
         <MediaProvider>
           {!inRoom && <SettingsMedia onConnected={() => setInRoom(true)} username={username} />}
           {inRoom && <Meeting host={host} />}
         </MediaProvider>
-      </Atm0sMediaProvider>
-    </Layout>
+      </Layout>
+    </Atm0sMediaProvider>
   )
 }

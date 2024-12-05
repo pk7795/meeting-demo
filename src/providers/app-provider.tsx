@@ -2,10 +2,9 @@
 
 import { Toaster } from '@/components/ui/toaster'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { JotaiProvider } from '@/providers/jotai-provider'
+import { ReactQueryProvider } from '@/providers/react-query-provider'
 import dynamic from 'next/dynamic'
-import { ReactQueryProvider } from './react-query-provider'
-import { RecoilProvider } from './recoil-provider'
-
 type Props = {
   children: React.ReactNode
 }
@@ -17,9 +16,9 @@ export const AppProvider: React.FC<Props> = ({ children }) => {
     <>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <ReactQueryProvider>
-          <RecoilProvider>
+          <JotaiProvider>
             <TooltipProvider>{children}</TooltipProvider>
-          </RecoilProvider>
+          </JotaiProvider>
         </ReactQueryProvider>
       </ThemeProvider>
       <Toaster />

@@ -13,6 +13,7 @@ export const PeerLocal: React.FC<Props> = ({ sourceName, streamVideoScreen }) =>
   const stream = useDeviceStream(sourceName)
   const videoRef = useRef<HTMLVideoElement>(null)
   const ctx = useContext(MediaContext)
+  console.log('username', username)
 
   useEffect(() => {
     if (videoRef.current) {
@@ -31,10 +32,10 @@ export const PeerLocal: React.FC<Props> = ({ sourceName, streamVideoScreen }) =>
   }, [stream, streamVideoScreen])
 
   return (
-    <div className="relative flex h-full max-h-[calc(100vh-65px)] w-full items-center justify-center overflow-hidden rounded-2xl bg-zinc-800">
+    <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-800">
       <div className="absolute bottom-3 left-2 flex items-center gap-1">
         <div className="rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">
-          {username} {streamVideoScreen && `(You, presenting)`}
+          {username || 'You'} {streamVideoScreen && `(You, presenting)`}
         </div>
       </div>
       {streamVideoScreen && (
