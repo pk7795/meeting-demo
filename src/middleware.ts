@@ -10,7 +10,7 @@ export default clerkMiddleware((auth, req) => {
     let query = ''
 
     if (req.url.includes('invite')) {
-      const roomId = last(req.url.split('/'))
+      const roomId = last(req.url.split('/') || '')
       query = `?prev=invite&roomId=${roomId}`
     }
     // Redirect to sign-in page
