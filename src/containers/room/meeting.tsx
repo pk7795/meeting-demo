@@ -62,20 +62,14 @@ export const Meeting: React.FC<Props> = ({ host }) => {
   const peerRemoteMixerAudio = useMemo(() => {
     let mapRemotePeers = []
     if (checkPeerPinned.check && checkPeerPinned.peer === 'remote') {
-      const peerRemoteScreen: any = filter(remotePeers, (p) => p.peer != checkPeerPinned?.peerItem?.peer)
-      return [peerLocal, ...peerRemoteScreen]
+      const peerRemote: any = filter(filterRemotePeers, (p) => p.peer != checkPeerPinned?.peerItem?.peer)
+      const peerRemoteScreen = map(peerRemote, (p) => <PeerRemote key={p.peer} peer={p} />)
+      mapRemotePeers = [peerLocal, ...peerRemoteScreen]
     } else {
       mapRemotePeers = map(filterRemotePeers, (p) => <PeerRemote key={p.peer} peer={p} />)
     }
     return mapRemotePeers
-  }, [
-    checkPeerPinned.check,
-    checkPeerPinned.peer,
-    checkPeerPinned?.peerItem?.peer,
-    filterRemotePeers,
-    peerLocal,
-    remotePeers,
-  ])
+  }, [checkPeerPinned.check, checkPeerPinned.peer, checkPeerPinned?.peerItem?.peer, filterRemotePeers, peerLocal])
 
   return (
     <div

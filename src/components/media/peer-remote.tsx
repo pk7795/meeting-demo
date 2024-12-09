@@ -39,7 +39,7 @@ export const PeerRemote: React.FC<Props> = ({ peer }) => {
       </Button>
 
       <div className="absolute bottom-3 left-2 z-[1] flex items-center gap-1">
-        <div className="rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">{peer.peer}</div>
+        <div className="truncate rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">{peer.peer}</div>
       </div>
       {!isEmpty(remote_videos) ? (
         <>

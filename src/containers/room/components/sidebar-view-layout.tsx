@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import { cn } from '@/lib'
 import { isEmpty, map, size } from 'lodash'
 import { ChevronDown, ChevronUp, UsersRound } from 'lucide-react'
@@ -13,7 +12,7 @@ type Props = {
 }
 
 export const SidebarViewLayout: React.FC<Props> = ({ renderItem, remotePeerScreens, mainPeerScreen, showButtonExpand }) => {
-  const [isExpand, setIsExpand] = useState(false)
+  const [isExpand, setIsExpand] = useState(true)
 
   if (isEmpty(remotePeerScreens)) {
     return (
@@ -24,54 +23,28 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, remotePeerScree
   }
 
   return (
-    <div
-      className={cn(
-        'grid h-full w-full grid-rows-[1fr_140px] gap-4 duration-300',
-        isExpand ? 'grid-rows-[1fr_140px]' : 'grid-rows-1'
-      )}
-    >
-      <>{renderItem?.(mainPeerScreen || <></>) || mainPeerScreen}</>
-      <div className={'mx-12'}>
-        <Carousel
-          opts={{
-            slidesToScroll: 1,
-          }}
-          className="mx-auto h-full duration-300"
-        >
-          <CarouselContent
-            className={cn(
-              'w-fit duration-300',
-              size(remotePeerScreens) > 5 ? '-ml-4' : 'mx-auto',
-              !isExpand && 'h-0 overflow-hidden'
-            )}
-          >
-            {map(remotePeerScreens, (peer, index) => (
-              <CarouselItem
-                key={index}
-                className={cn('aspect-video h-[140px] w-full basis-[calc((100vw-384px)/5)] pl-0 duration-300')}
-              >
-                <div className={'h-full p-1'}>{renderItem?.(peer || <></>) || peer}</div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
+    <div className={'relative flex h-full w-full flex-col gap-4 duration-300'}>
+      <div className={'flex-1'}>{renderItem?.(mainPeerScreen || <></>) || mainPeerScreen}</div>
+
+      <div className={cn('h-[140px] overflow-hidden duration-300', !isExpand && 'h-0')}>
+        <div className={cn('no-scrollbar flex h-[140px] w-full space-x-4 overflow-x-auto duration-300')}>
+          {map(remotePeerScreens, (peer, index) => (
+            <div key={index} className={'flex h-full flex-shrink-0 items-center justify-center p-1'}>
+              {renderItem?.(peer || <></>) || peer}
+            </div>
+          ))}
 
           {showButtonExpand && size(remotePeerScreens) >= 1 && (
             <Button
               size={'auto'}
               onClick={() => setIsExpand((prev) => !prev)}
-              className={cn('absolute right-1/2 translate-x-1/2 rounded-2xl p-2', isExpand ? 'top-2' : '-top-10')}
+              className={cn('absolute right-1/2 z-[2] translate-x-1/2 rounded-2xl p-2', isExpand ? 'bottom-36' : 'bottom-0')}
             >
               {isExpand ? <ChevronDown /> : <ChevronUp />}
               <UsersRound />
             </Button>
           )}
-          {size(remotePeerScreens) > 5 && (
-            <>
-              <CarouselPrevious />
-              <CarouselNext />
-            </>
-          )}
-        </Carousel>
+        </div>
       </div>
     </div>
   )
