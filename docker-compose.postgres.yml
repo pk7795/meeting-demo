@@ -1,0 +1,12 @@
+services:
+  db-stream:
+    image: postgres:15.3-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: meeting-demo
+      POSTGRES_USER: khoa
+      POSTGRES_PASSWORD: 123
+    ports:
+      - 5678:5432
+    volumes:
+      - ./data-demo:/var/lib/postgresql/data

@@ -13,7 +13,7 @@ export const routes = [
     icon: <ListVideoIcon size={16} />,
   },
   {
-    title: 'Atm0s Config',
+    title: 'Ermis Config',
     href: '/config',
     icon: <Settings2Icon size={16} />,
     roles: [UserRole.SuperAdmin],

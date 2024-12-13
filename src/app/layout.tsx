@@ -3,8 +3,8 @@ import 'antd/dist/reset.css'
 import { AppProvider } from '@/providers'
 
 export const metadata = {
-  title: 'Atm0s Meet',
-  description: 'Atm0s Meet',
+  title: 'Ermis Meet',
+  description: 'Ermis Meet',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

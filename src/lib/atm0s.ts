@@ -20,19 +20,24 @@ export async function callLiveApi<T>(api: string, api_path: string, token: strin
   const options = {
     method: 'POST',
     url: url,
+    rejectUnauthorized: false,
     headers: {
       'Content-Type': 'application/json',
       'User-Agent': 'Atm0s-SDK/1.0.0',
     },
     body: JSON.stringify(body),
   }
+  console.log('-------------------------url on callLiveApi', url);
+
   return await new Promise((resolve, reject) => {
     request(options, function (error: any, response: any) {
       if (error) {
+        console.error('Error on callLiveApi', error)
         return reject(new Error(error))
       }
+      console.log('-------------------------Response', response.body)
+
       try {
-        console.log('Response', response.body)
         const data = JSON.parse(response.body)
         if (data.success === true) {
           resolve(data.data)
@@ -57,6 +62,9 @@ export async function callGatewayApi<T>(gateway: string, api_path: string, body:
     },
     body: JSON.stringify(body),
   }
+  console.log('-------------------------Request on callGatewayApi', options);
+  console.log('-------------------------url on callGatewayApi', url);
+
   return await new Promise((resolve, reject) => {
     request(options, function (error: any, response: any) {
       if (error) {
@@ -83,6 +91,8 @@ export async function createLiveWebrtcToken(
   config: Atm0sConfig,
   record: boolean
 ): Promise<string> {
+  console.log('-------------------------webrtc_session');
+
   const res = await callLiveApi<{ token: string }>(config.api, 'webrtc_session', config.appToken, {
     room,
     peer,
@@ -97,6 +107,8 @@ export async function createLiveRtmpToken(
   config: Atm0sConfig,
   record: boolean
 ): Promise<string> {
+  console.log('-------------------------rtmp_session');
+
   const res = await callLiveApi<{ token: string }>(config.api, 'rtmp_session', config.appToken, {
     room,
     peer,
@@ -112,6 +124,8 @@ export async function createRtmpUrl(
   token: string,
   config: Atm0sConfig
 ): Promise<{ rtmp_uri: string; stream_key: string }> {
+  console.log('-------------------------rtmp/connect');
+
   const res = await callGatewayApi<{ rtmp_uri: string; rtmp_shorten_uri: string }>(config.gateway, 'rtmp/connect', {
     room,
     peer,
@@ -130,6 +144,8 @@ export async function createRtmpUrl(
 }
 
 export async function createComposeToken(room: string, config: Atm0sConfig): Promise<string> {
+  console.log('-------------------------compose_session');
+
   const res = await callLiveApi<{ token: string }>(config.api, 'compose_session', config.appToken, {
     room,
   })
@@ -137,6 +153,8 @@ export async function createComposeToken(room: string, config: Atm0sConfig): Pro
 }
 
 export async function submitComposeRecord(source: string, token: string, config: Atm0sConfig): Promise<string> {
+  console.log('-------------------------compose/submit');
+
   const res = await callGatewayApi<string>(config.gateway, 'compose/submit', {
     token,
     source,

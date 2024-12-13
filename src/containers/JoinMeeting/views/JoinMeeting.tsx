@@ -118,7 +118,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
         <Row align="middle" gutter={[24, 24]}>
           <Col span={24} lg={12}>
             <Typography.Title className="font-semibold text-4xl dark:text-gray-100">
-              A technical demo of Atm0s
+              A technical demo of Ermis
             </Typography.Title>
             <div className="flex items-center w-full">
               {!user ? (

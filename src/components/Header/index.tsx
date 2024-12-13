@@ -50,7 +50,7 @@ export const Header: React.FC<Props> = () => {
         <Col>
           <Link href="/">
             <Typography.Title level={3} className="mb-0 cursor-pointer dark:text-white text-black">
-              Atm0s Meet
+              Ermis Meet
             </Typography.Title>
           </Link>
         </Col>

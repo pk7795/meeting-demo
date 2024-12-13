@@ -29,7 +29,7 @@ import { useRecoilState } from 'recoil'
 import useWindowFocus from 'use-window-focus'
 import { useTimeout } from 'usehooks-ts'
 import { RoomParticipant } from '@prisma/client'
-import { ADMIT_RINGTONE, LOGO_SHORT, MESSAGE_RINGTONE } from '@public'
+import { ADMIT_RINGTONE, MESSAGE_RINGTONE, ERMIS_LOGO } from '@public'
 import { acceptParticipant } from '@/app/actions'
 import { ButtonIcon, Drawer, Icon } from '@/components'
 import { supabase } from '@/config/supabase'
@@ -273,7 +273,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
             <div className="flex items-center justify-between border-b dark:border-b-[#232C3C] h-16 px-4 bg-white dark:bg-[#17202E]">
               <Space>
                 <Link href="/">
-                  <img src={theme === 'dark' ? LOGO_SHORT : LOGO_SHORT} alt="" className="h-8" />
+                  <img src={theme === 'dark' ? ERMIS_LOGO : ERMIS_LOGO} alt="" className="h-8" />
                 </Link>
                 <div className="pl-2">
                   <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>

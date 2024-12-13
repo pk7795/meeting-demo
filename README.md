@@ -1,4 +1,4 @@
-This is Atm0s Meet Project.
+This is Ermis Meet Project.
 
 ## Getting Started
 
