@@ -72,6 +72,7 @@
     "reflect-metadata": "^0.2.1",
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.4",
+    "tailwind-safelist-generator": "^1.0.0",
     "tailwindcss-animate": "^1.0.7",
     "usehooks-ts": "^3.1.0",
     "vaul": "^0.9.9",
