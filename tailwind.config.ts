@@ -3,7 +3,7 @@ import type { Config } from 'tailwindcss'
 
 export default {
   darkMode: ['class'],
-  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}', './safe-list.txt'],
   theme: {
     extend: {
       colors: {
@@ -87,5 +87,16 @@ export default {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    require('tailwind-safelist-generator')({
+      path: 'safe-list.txt',
+      patterns: [
+        '{screens}:grid-rows-{spacing}',
+        'grid-rows-{spacing}',
+        'grid-cols-{spacing}',
+        '{screens}:grid-cols-{spacing}',
+      ],
+    }),
+  ],
 } satisfies Config

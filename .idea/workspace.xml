@@ -5,17 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6dddb4ae-1b97-4a11-9efc-b3af929706d7" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/app/[room]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/[room]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/media/peer-local.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/media/peer-local.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/media/peer-remote.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/media/peer-remote.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/username.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/username.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/containers/room/components/grid-view-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/components/grid-view-layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/containers/room/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/components/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/containers/room/components/sidebar-view-layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/components/sidebar-view-layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/containers/room/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/containers/room/meeting.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/meeting.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/containers/room/settings-media.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/settings-media.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/layouts/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/containers/room/components/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,9 +26,34 @@
     &quot;assignee&quot;: &quot;tuAnnG-Anh&quot;
   }
 }</component>
+  <component name="GitToolBoxStore">
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1733711634" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="feat/old" />
+                    <option name="lastUsedInstant" value="1733711454" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;git@github.com:8xFF/atm0s-meet.git&quot;,
+    &quot;url&quot;: &quot;git@github.com:angtuaan/atm0s-meet.git&quot;,
     &quot;accountId&quot;: &quot;1a4424db-9d6a-473b-b01b-0346a7ed02ea&quot;
   }
 }</component>
@@ -48,6 +68,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "last_opened_file_path": "/Users/tuanna/Workspace/8xFF/atm0s-meet/src/containers/room/components",
     "node.js.detected.package.eslint": "true",
@@ -69,7 +90,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-WS-242.23339.15" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.112" />
       </set>
     </attachedChunks>
   </component>
@@ -93,6 +114,9 @@
       <workItem from="1733297249899" duration="420000" />
       <workItem from="1733297817896" duration="10120000" />
       <workItem from="1733310096451" duration="4902000" />
+      <workItem from="1733474491581" duration="24221000" />
+      <workItem from="1733883270529" duration="4507000" />
+      <workItem from="1734314259546" duration="978000" />
     </task>
     <servers />
   </component>
