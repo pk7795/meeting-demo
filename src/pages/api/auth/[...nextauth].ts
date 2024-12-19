@@ -18,6 +18,37 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // jwt: async ({ token, account, user }: any) => {
+    //   console.log('-----------------jwt', { token, account, user });
+
+    //   // Persist the OAuth access token to the token right after signin
+    //   if (account) {
+    //     token.accessToken = account.access_token
+    //     token.id_Token = account.id_token
+    //   }
+
+    //   // Add user information to the token
+    //   if (user) {
+    //     token.id = user.id
+    //     token.role = user.role
+    //     token.status = user.status
+    //   }
+
+    //   return token
+    // },
+    // session: async ({ session, token }: any) => {
+    //   console.log('--------------------------token', token);
+
+    //   if (token) {
+    //     session.accessToken = token.accessToken
+    //     session.user.id = token.id
+    //     session.user.role = token.role
+    //     session.user.status = token.status
+    //     session.idToken = token.id_Token
+    //   }
+
+    //   return session
+    // },
     session: async ({ user, session }: any) => {
       if (user) {
         session.user.role = user.role
@@ -27,6 +58,9 @@ const authOptions: NextAuthOptions = {
       return session
     },
   },
+  // session: {
+  //   strategy: 'jwt',
+  // },
 }
 
 export default NextAuth(authOptions)
