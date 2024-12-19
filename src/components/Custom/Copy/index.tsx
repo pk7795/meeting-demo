@@ -9,14 +9,14 @@ type Props = {
   text?: string
   tooltip?: string
 }
-
+const CopyToClipboardAny = CopyToClipboard as any;
 export const Copy: React.FC<Props> = ({ children, text = '' }) => {
   const { message } = useApp()
   return (
-    <CopyToClipboard text={text} onCopy={() => message.info('Copied')}>
+    <CopyToClipboardAny text={text} onCopy={() => message.info('Copied')}>
       <Tooltip title="Click to copy">
         <span className="cursor-pointer">{children}</span>
       </Tooltip>
-    </CopyToClipboard>
+    </CopyToClipboardAny>
   )
 }

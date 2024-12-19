@@ -29,6 +29,7 @@
     "@tanstack/react-query": "^4.29.19",
     "antd": "^5.6.3",
     "axios": "^1.4.0",
+    "bufferutil": "^4.0.8",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "classnames": "^2.3.2",
@@ -58,7 +59,7 @@
     "typescript": "5.1.6",
     "use-window-focus": "^1.4.2",
     "usehooks-ts": "^2.9.1",
-    "utf-8-validate": "^6.0.3",
+    "utf-8-validate": "^6.0.5",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
