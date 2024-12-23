@@ -25,6 +25,14 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
   const [page, setPage] = useState(0)
   const { isMobile } = useDevice()
 
+
+  const getColSpan = (userCount: number) => {
+    if (layout !== 'GRID' || isMobile || userCount === 1) return 24;
+    if (userCount <= 4) return 12;
+    if (userCount <= 9) return 8;
+    return 6;
+  };
+
   useEffect(() => {
     setShowUser(true)
   }, [layout])
@@ -80,11 +88,11 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
         <div className={classNames('h-full relative', layout !== 'GRID' ? 'w-56' : 'w-full')}>
           <Row className={classNames(layout !== 'GRID' ? 'overflow-y-auto h-[calc(100%-24px)]' : '')}>
             {map(
-              filter(participants, (_, index) => index >= page * 12 && index < (page || 1) * 12),
+              filter(participants, (_: any, index) => index >= page * 12 && index < (page || 1) * 12),
               (p, index) => {
                 const isPinned = layout !== 'GRID' && p.id === pinnedParticipant?.p?.id
                 return (
-                  <Col span={layout !== 'GRID' || isMobile ? 24 : 6}>
+                  <Col span={getColSpan(participants.length)} key={p.id}>
                     <div
                       key={index}
                       className={classNames(

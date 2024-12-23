@@ -71,6 +71,7 @@ model User {
   roomInvites      RoomInvite[]
   roomParticipants RoomParticipant[]
   rooms            Room[]
+  chatTokens ChatToken[]
 }
 
 model VerificationToken {
@@ -162,4 +163,18 @@ model Messages {
 
   @@index([roomId])
   @@index([participantId])
+}
+
+model ChatToken {
+  id           String   @id @default(cuid()) // ID duy nhất
+  userId       String   // Liên kết tới người dùng
+  access_token String?  @db.Text // Token dùng để gọi API
+  refresh_token String? @db.Text // Token dùng để lấy access_token mới
+  expires_at   Int?     // Thời điểm hết hạn access_token
+  createdAt    DateTime @default(now()) // Ngày tạo
+  updatedAt    DateTime @updatedAt // Tự động cập nhật khi thay đổi
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Quan hệ với bảng User
+
+  @@index([userId]) // Index để tìm kiếm theo userId
 }

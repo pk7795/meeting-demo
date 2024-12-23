@@ -106,6 +106,8 @@ export const ToolbarSection: React.FC<Props> = ({
     if (sessionState === 'connected') {
       micPublisher.switchStream(micStream)
     }
+    console.log("audio-micStream:", micStream?.stream.getAudioTracks());
+
   }, [micPublisher, micStream, sessionState])
 
   useEffect(() => {
@@ -209,11 +211,17 @@ export const ToolbarSection: React.FC<Props> = ({
     })
   }, [modal, router])
 
+  // get meeting url
+  const meetingUrl = useMemo(() => {
+    const baseUrl = window.location.origin
+    return `${baseUrl}/meeting/${params?.passcode}`
+  }, [params?.passcode])
+
   return (
-    <div className="flex items-center justify-center h-16 bg-white dark:bg-[#17202E] border-t dark:border-t-[#232C3C]">
+    <div className="flex items-center justify-center h-16 ">
       <div className="flex items-center justify-between w-full px-6">
         {!isMobile && (
-          <Copy text={params?.passcode as string}>
+          <Copy text={meetingUrl}>
             <div className="border dark:border-[#3A4250] bg-[#F9FAFB] dark:bg-[#28303E] rounded-lg flex items-center px-4 h-8 cursor-pointer">
               <Typography.Paragraph ellipsis className="text-sm mb-0 mr-2 dark:text-white">
                 {params?.passcode}

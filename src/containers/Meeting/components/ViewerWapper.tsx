@@ -14,7 +14,7 @@ export const ViewerWapper: FC<Props> = ({ participant, stream, priority }) => {
   return (
     <>
       {stream ? (
-        <VideoViewer playsInline className="w-full h-full object-cover" stream={stream} priority={priority} />
+        <VideoViewer playsInline className="w-full h-full object-cover" stream={stream} priority={priority} style={{ transform: 'scaleX(-1)' }} />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">
           <Avatar src={participant?.user?.image} size={50} className="bg-primary border-none">

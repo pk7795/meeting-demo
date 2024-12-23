@@ -16,4 +16,6 @@ export const env = {
     appToken: process.env.ATM0S_APP_TOKEN as string,
     logLevel: parseInt(process.env.ATM0S_LOG_LEVEL || '2') as LogLevel,
   },
+  ERMIS_API: process.env.ERMIS_API,
+  ERMIS_API_KEY: process.env.ERMIS_API_KEY
 } as const

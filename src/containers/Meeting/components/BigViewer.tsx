@@ -78,6 +78,7 @@ export const BigViewer: FC<Props> = ({
           priority={priority}
           min_spatial={forceHighQuality ? 2 : 0}
           max_spatial={2}
+          style={{ transform: 'scaleX(-1)' }}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-black">

@@ -12,6 +12,7 @@ import { useRecoilState } from 'recoil'
 import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react'
 import { ButtonIcon } from '@/components'
 import { themeState } from '@/recoil'
+import { ERMIS_LOGO } from '@public'
 
 type Props = {}
 
@@ -48,10 +49,13 @@ export const Header: React.FC<Props> = () => {
     <div className="h-16 flex items-center w-full">
       <Row align="middle" justify="space-between" className="w-full">
         <Col>
-          <Link href="/">
-            <Typography.Title level={3} className="mb-0 cursor-pointer dark:text-white text-black">
-              Ermis Meet
-            </Typography.Title>
+          <Link href="/" style={{ justifyContent: 'center', flex: 'row' }}>
+            <div className='flex'>
+              <img src={theme === 'dark' ? ERMIS_LOGO : ERMIS_LOGO} alt="" className="h-8 mr-4" />
+              <Typography.Title level={3} className="mb-0 cursor-pointer dark:text-white text-black">
+                Ermis Meet
+              </Typography.Title>
+            </div>
           </Link>
         </Col>
         <Col>

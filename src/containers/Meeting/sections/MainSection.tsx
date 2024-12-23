@@ -249,6 +249,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
           sessionState === 'reconnecting' ||
           sessionState === 'disconnected' ||
           sessionState === 'error'
+          // false
         }
       >
         <div className="flex flex-col items-center justify-center">
@@ -270,7 +271,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen" id="id--fullScreen">
         <div className="h-full flex items-center">
           <div className="flex-1 h-full flex flex-col">
-            <div className="flex items-center justify-between border-b dark:border-b-[#232C3C] h-16 px-4 bg-white dark:bg-[#17202E]">
+            <div className="flex items-center justify-between h-16 px-4 ">
               <Space>
                 <Link href="/">
                   <img src={theme === 'dark' ? ERMIS_LOGO : ERMIS_LOGO} alt="" className="h-8" />
