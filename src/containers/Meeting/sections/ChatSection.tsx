@@ -6,13 +6,12 @@ import dayjs from 'dayjs'
 import { map } from 'lodash'
 import { SendIcon, XIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
 import { createMessage } from '@/app/actions/chat'
 import { ButtonIcon } from '@/components'
 import { formatDateChat } from '@/utils'
-
 type Props = {
   room: Partial<Room> | null
   onClose: () => void

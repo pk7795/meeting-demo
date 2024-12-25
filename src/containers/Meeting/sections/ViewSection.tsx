@@ -32,7 +32,12 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
     if (userCount <= 9) return 8;
     return 6;
   };
-
+  const getColHeight = (userCount: number) => {
+    if (layout !== 'GRID' || isMobile) return 'auto';
+    if (userCount <= 2) return '100%';
+    if (userCount <= 6) return '50%';
+    return '33.3333%';
+  }
   useEffect(() => {
     setShowUser(true)
   }, [layout])
@@ -59,16 +64,34 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
       },
     },
   })
+  const isAnyoneSharing = useMemo(() => {
+    return participants.some(p => p.meetingStatus?.screenShare)
+  }, [participants])
+  useEffect(() => {
+    const sharingParticipant = participants.find(p => p.meetingStatus?.screenShare)
+
+    if (isAnyoneSharing && layout !== 'LEFT') {
+      setLayout('LEFT')
+      setPinnedParticipant({
+        p: sharingParticipant,
+        force: true,
+      })
+    } else if (!isAnyoneSharing && layout === 'LEFT') {
+      setLayout('GRID')
+      setPinnedParticipant(null)
+    }
+  }, [participants, isAnyoneSharing, layout, setLayout, setPinnedParticipant])
 
   return (
     <div
       className={classNames(
-        'flex items-center justify-center w-full h-[calc(100vh-160px)] flex-1 p-4',
+        'flex items-center justify-center w-full flex-1 p-4 wrapper',
         layout !== 'GRID' ? 'flex-row' : 'flex-col'
       )}
+      style={{ height: 'calc(100% - 8rem)' }}
     >
       {layout !== 'GRID' && (
-        <div className={classNames('h-full hidden relative lg:flex items-center bg-black rounded-lg w-full mr-2')}>
+        <div className={classNames('h-full hidden relative lg:flex items-center bg-black rounded-lg w-full mr-2 content')}>
           {renderBigViewer()}
           <ButtonIcon
             onClick={() => setShowUser(!showUser)}
@@ -85,18 +108,25 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
         </div>
       )}
       {showUser && (
-        <div className={classNames('h-full relative', layout !== 'GRID' ? 'w-56' : 'w-full')}>
-          <Row className={classNames(layout !== 'GRID' ? 'overflow-y-auto h-[calc(100%-24px)]' : '')}>
+        <div className={
+          classNames('h-full relative',
+            layout !== 'GRID' ? 'w-56' : 'w-full',
+          )}
+        >
+          <Row className={classNames(layout !== 'GRID' ? 'overflow-y-auto' : 'h-full')}
+          >
             {map(
               filter(participants, (_: any, index) => index >= page * 12 && index < (page || 1) * 12),
               (p, index) => {
                 const isPinned = layout !== 'GRID' && p.id === pinnedParticipant?.p?.id
+
                 return (
-                  <Col span={getColSpan(participants.length)} key={p.id}>
+                  <Col span={getColSpan(participants.length)} key={p.id}
+                    style={{ height: getColHeight(participants.length), padding: '0.5rem' }}>
                     <div
                       key={index}
                       className={classNames(
-                        'rounded-lg relative flex items-start justify-center mx-2 mb-4',
+                        'rounded-lg relative flex items-start justify-center h-full',
                         classNameViewer
                       )}
                     >
@@ -123,9 +153,9 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
                         )}
                       </div>
                       {p.is_me ? (
-                        <LocalUser key={p.id} participant={p} isPinned={isPinned} />
+                        <LocalUser key={p.id} participant={p} isPinned={isPinned} layout={layout} />
                       ) : (
-                        <RemoteUser raiseRingTone={raiseRingTone} key={p.id} participant={p} isPinned={isPinned} />
+                        <RemoteUser raiseRingTone={raiseRingTone} key={p.id} participant={p} isPinned={isPinned} layout={layout} />
                       )}
                     </div>
                   </Col>

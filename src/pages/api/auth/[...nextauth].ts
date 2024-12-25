@@ -22,14 +22,15 @@ const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === "google" && account.id_token) {
         try {
-          // Gọi API chat để lấy accessToken và refreshToken
-          // const response = await axios.post(CHAT_API_URL, {
-          //   idToken: account.id_token,
-          //   apikey: "kUCqqbfEQxkZge7HHDFcIxfoHzqSZUam"
-          // });
+          const response = await axios.post(CHAT_API_URL, {
+            token: account.id_token,
+            apikey: env.ERMIS_API_KEY,
+          });
+          console.log('response: ', response.data);
+
           const existingChatToken = await getPrisma().chatToken.findFirst({
             where: {
-              userId: user.id,  // Tìm bản ghi có userId
+              gUserId: user.id,
             },
           });
           if (existingChatToken) {
@@ -38,21 +39,25 @@ const authOptions: NextAuthOptions = {
                 id: existingChatToken.id,
               },
               data: {
-                access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
-                refresh_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
-                // access_token: response.data.access_token,
-                // refresh_token: response.data.refresh_token,
+                // access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
+                // refresh_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
+                userId: response.data.user_id,
+                projectId: response.data.project_id,
+                accessToken: response.data.token,
+                refreshToken: response.data.refresh_token,
               },
             });
           } else {
             // Nếu không tìm thấy ChatToken, tạo mới
             await getPrisma().chatToken.create({
               data: {
-                userId: user.id,
-                access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
-                refresh_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
-                // access_token: response.data.access_token,
-                // refresh_token: response.data.refresh_token,
+                gUserId: user.id,
+                // access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
+                // refresh_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
+                userId: response.data.user_id,
+                projectId: response.data.project_id,
+                accessToken: response.data.token,
+                refreshToken: response.data.refresh_token,
               },
             });
           }
@@ -69,35 +74,44 @@ const authOptions: NextAuthOptions = {
         session.user.status = user.status
         session.user.id = user.id
       }
+      session.chat = session.chat || {};
+
       const existingChatToken = await getPrisma().chatToken.findFirst({
         where: {
-          userId: user.id,
+          gUserId: user.id,
         },
       });
 
       // Kiểm tra và gắn thông tin vào session
       if (existingChatToken) {
-        session.chatAccessToken = existingChatToken.access_token;
-        session.chatRefreshToken = existingChatToken.refresh_token;
+        session.chat.accessToken = existingChatToken.accessToken;
+        session.chat.userId = existingChatToken.userId;
+        session.chat.projectId = existingChatToken.projectId;
+        session.chat.gUserId = existingChatToken.gUserId;
+        session.chat.refreshToken = existingChatToken.refreshToken;
 
         // Kiểm tra nếu accessToken hết hạn và làm mới nó
-        if ((!existingChatToken.access_token || hasTokenExpired(existingChatToken.access_token)) && existingChatToken.refresh_token) {
-          const newToken = await refreshChatTokens(existingChatToken.refresh_token);
-          session.chatAccessToken = newToken.accessToken;
+        if ((!existingChatToken.accessToken || hasTokenExpired(existingChatToken.accessToken)) && existingChatToken.refreshToken) {
+          const newToken = await refreshChatTokens(existingChatToken.refreshToken);
+          session.chat.accessToken = newToken.accessToken;
 
           await getPrisma().chatToken.update({
             where: { id: existingChatToken.id },
             data: {
-              access_token: newToken.accessToken,
-              refresh_token: newToken.refreshToken,
+              accessToken: newToken.accessToken,
+              refreshToken: newToken.refreshToken,
             },
           });
 
-          session.chatAccessToken = newToken.accessToken;
+          session.chat.accessToken = newToken.accessToken;
         } else {
-          session.chatAccessToken = existingChatToken.access_token;
+          session.chat.accessToken = existingChatToken.accessToken;
+          session.chat.userId = existingChatToken.userId;
+          session.chat.projectId = existingChatToken.projectId;
+          session.chat.gUserId = existingChatToken.gUserId;
         }
       }
+      console.log('session: ', session);
 
       return session
     },

@@ -268,88 +268,86 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
         </div>
       </Modal>
       {contextHolder}
-      <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen" id="id--fullScreen">
-        <div className="h-full flex items-center">
-          <div className="flex-1 h-full flex flex-col">
-            <div className="flex items-center justify-between h-16 px-4 ">
-              <Space>
-                <Link href="/">
-                  <img src={theme === 'dark' ? ERMIS_LOGO : ERMIS_LOGO} alt="" className="h-8" />
-                </Link>
-                <div className="pl-2">
-                  <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
-                </div>
-              </Space>
-              <Space>
-                <ButtonIcon
-                  className="hidden lg:flex"
-                  onClick={() => setLayout('GRID')}
-                  icon={<LayoutGridIcon size={16} color={layout === 'GRID' ? '#2D8CFF' : '#9ca3af'} />}
-                />
-                <ButtonIcon
-                  className="hidden lg:flex"
-                  onClick={() => setLayout('LEFT')}
-                  icon={<LayoutPanelLeftIcon size={16} color={layout === 'LEFT' ? '#2D8CFF' : '#9ca3af'} />}
-                />
-                <ButtonIcon
-                  onClick={() => onOpenFullScreen()}
-                  icon={
-                    !isMaximize ? (
-                      <MaximizeIcon size={16} color="#9ca3af" />
-                    ) : (
-                      <MinimizeIcon size={16} color="#9ca3af" />
-                    )
-                  }
-                  className="hidden lg:flex"
-                />
-                <ButtonIcon
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  shape="circle"
-                  icon={theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} color="#000" />}
-                />
-              </Space>
-            </div>
-            <ViewSection layout={layout} setLayout={setLayout} />
-            <ToolbarSection
-              sendEvent={sendRoomEvent}
-              openChat={openChat}
-              setOpenChat={setOpenChat}
-              openPaticipant={openPaticipant}
-              setOpenPaticipant={setOpenPaticipant}
-            />
+      <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen flex items-center" id="id--fullScreen">
+        <div className="flex-1 h-full flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between h-16 px-4 ">
+            <Space>
+              <Link href="/">
+                <img src={theme === 'dark' ? ERMIS_LOGO : ERMIS_LOGO} alt="" className="h-8" />
+              </Link>
+              <div className="pl-2">
+                <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
+              </div>
+            </Space>
+            <Space>
+              <ButtonIcon
+                className="hidden lg:flex"
+                onClick={() => setLayout('GRID')}
+                icon={<LayoutGridIcon size={16} color={layout === 'GRID' ? '#2D8CFF' : '#9ca3af'} />}
+              />
+              <ButtonIcon
+                className="hidden lg:flex"
+                onClick={() => setLayout('LEFT')}
+                icon={<LayoutPanelLeftIcon size={16} color={layout === 'LEFT' ? '#2D8CFF' : '#9ca3af'} />}
+              />
+              <ButtonIcon
+                onClick={() => onOpenFullScreen()}
+                icon={
+                  !isMaximize ? (
+                    <MaximizeIcon size={16} color="#9ca3af" />
+                  ) : (
+                    <MinimizeIcon size={16} color="#9ca3af" />
+                  )
+                }
+                className="hidden lg:flex"
+              />
+              <ButtonIcon
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                shape="circle"
+                icon={theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} color="#000" />}
+              />
+            </Space>
           </div>
-          {!isMobile ? (
-            <>
-              {openChat && (
-                <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
-                  <ChatSection room={room} onClose={() => setOpenChat(false)} />
-                </div>
-              )}
-              {openPaticipant && (
-                <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
-                  <PaticipantSection
-                    room={room}
-                    onClose={() => setOpenPaticipant(false)}
-                    sendAcceptJoinRequest={sendAcceptJoinRequest}
-                  />
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              <Drawer open={openChat} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
+          <ViewSection layout={layout} setLayout={setLayout} />
+          <ToolbarSection
+            sendEvent={sendRoomEvent}
+            openChat={openChat}
+            setOpenChat={setOpenChat}
+            openPaticipant={openPaticipant}
+            setOpenPaticipant={setOpenPaticipant}
+          />
+        </div>
+        {!isMobile ? (
+          <>
+            {openChat && (
+              <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
                 <ChatSection room={room} onClose={() => setOpenChat(false)} />
-              </Drawer>
-              <Drawer open={openPaticipant} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
+              </div>
+            )}
+            {openPaticipant && (
+              <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
                 <PaticipantSection
                   room={room}
                   onClose={() => setOpenPaticipant(false)}
                   sendAcceptJoinRequest={sendAcceptJoinRequest}
                 />
-              </Drawer>
-            </>
-          )}
-        </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <Drawer open={openChat} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
+              <ChatSection room={room} onClose={() => setOpenChat(false)} />
+            </Drawer>
+            <Drawer open={openPaticipant} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
+              <PaticipantSection
+                room={room}
+                onClose={() => setOpenPaticipant(false)}
+                sendAcceptJoinRequest={sendAcceptJoinRequest}
+              />
+            </Drawer>
+          </>
+        )}
       </div>
     </>
   )

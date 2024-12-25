@@ -1,30 +1,25 @@
+import type { LiteralStringForUnion } from 'ermis-chat-js-sdk';
 
-export type LocalAttachmentType = {
-    file_size?: number;
-    mime_type?: string;
-};
-export type LocalChannelType = Record<string, unknown>;
-export type LocalCommandType = string;
-export type LocalEventType = Record<string, unknown>;
-export type LocalMessageType = Record<string, unknown>;
-export type LocalReactionType = Record<string, unknown>;
-export type LocalUserType = {
-    image?: string;
-};
-type LocalPollOptionType = Record<string, unknown>;
-type LocalPollType = Record<string, unknown>;
+export type AttachmentType = {};
+export type ChannelType = { demo?: string };
+export type CommandType = LiteralStringForUnion;
+export type EventType = {};
+export type MessageType = {};
+export type ReactionType = {};
+export type UserType = { image?: string };
 
 export type ErmisChatGenerics = {
-    attachmentType: LocalAttachmentType;
-    channelType: LocalChannelType;
-    commandType: LocalCommandType;
-    eventType: LocalEventType;
-    messageType: LocalMessageType;
-    pollOptionType: LocalPollOptionType;
-    pollType: LocalPollType;
-    reactionType: LocalReactionType;
-    userType: LocalUserType;
+    attachmentType: AttachmentType;
+    channelType: ChannelType;
+    commandType: CommandType;
+    eventType: EventType;
+    messageType: MessageType;
+    reactionType: ReactionType;
+    userType: UserType;
+    pollOptionType: Record<string, unknown>;
+    pollType: Record<string, unknown>;
 };
+
 
 export type LoginConfig = {
     userId: string;

@@ -75,6 +75,7 @@ export const ToolbarSection: React.FC<Props> = ({
 
   const sessionState = useSessionState()
   const camPublisher = usePublisher(Atm0sSenders.video)
+
   const micPublisher = usePublisher(Atm0sSenders.audio)
   const screenVideoPublisher = usePublisher(Atm0sSenders.screen_video)
   const screenAudioPublisher = usePublisher(Atm0sSenders.screen_audio)
@@ -106,7 +107,6 @@ export const ToolbarSection: React.FC<Props> = ({
     if (sessionState === 'connected') {
       micPublisher.switchStream(micStream)
     }
-    console.log("audio-micStream:", micStream?.stream.getAudioTracks());
 
   }, [micPublisher, micStream, sessionState])
 

@@ -10,7 +10,6 @@ import { RoomParticipant } from '@prisma/client'
 import { Atm0sSession } from '@/lib/atm0s'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
-
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null

@@ -158,23 +158,25 @@ model Messages {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  room        Room            @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  participant RoomParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  room          Room            @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  participant   RoomParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
 
   @@index([roomId])
   @@index([participantId])
 }
 
 model ChatToken {
-  id           String   @id @default(cuid()) // ID duy nhất
-  userId       String   // Liên kết tới người dùng
-  access_token String?  @db.Text // Token dùng để gọi API
-  refresh_token String? @db.Text // Token dùng để lấy access_token mới
-  expires_at   Int?     // Thời điểm hết hạn access_token
-  createdAt    DateTime @default(now()) // Ngày tạo
-  updatedAt    DateTime @updatedAt // Tự động cập nhật khi thay đổi
+  id            String   @id @default(cuid())
+  gUserId       String  
+  userId        String?   
+  projectId     String?   
+  accessToken   String?  @db.Text
+  refreshToken  String? @db.Text 
+  expiresAt     Int?     
+  createdAt     DateTime @default(now()) 
+  updatedAt     DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // Quan hệ với bảng User
+  user User @relation(fields: [gUserId], references: [id], onDelete: Cascade)
 
-  @@index([userId]) // Index để tìm kiếm theo userId
+  @@index([gUserId]) // Index để tìm kiếm theo gUserId
 }

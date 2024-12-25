@@ -14,9 +14,10 @@ type Props = {
   participant: MeetingParticipant
   isPinned: boolean
   raiseRingTone: HTMLAudioElement
+  layout: 'GRID' | 'LEFT'
 }
 
-export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone }) => {
+export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone, layout }) => {
   const camStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.video.name)
   const micStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.audio.name)
   const screenStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.screen_video.name)
@@ -62,7 +63,7 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone }) 
   return (
     <div
       className={classNames(
-        'w-full relative bg-black rounded-lg overflow-hidden aspect-video',
+        'w-full relative bg-black rounded-lg overflow-hidden aspect-video', layout !== 'GRID' ? '' : 'h-full',
         isHandRaised ? 'ring-4 ring-yellow-400' : ''
       )}
     >

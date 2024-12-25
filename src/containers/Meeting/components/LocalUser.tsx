@@ -4,22 +4,24 @@ import { Stream } from '../types'
 import { useAudioLevelProducer, usePublisher, usePublisherState } from '@8xff/atm0s-media-react'
 import classNames from 'classnames'
 import { HandIcon, MicIcon, MicOffIcon, PinIcon } from 'lucide-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Icon } from '@/components'
 import { MeetingParticipant } from '@/types/types'
 
 type Props = {
   participant: MeetingParticipant
   isPinned: boolean
+  layout: 'GRID' | 'LEFT'
 }
 
-export const LocalUser = ({ participant, isPinned }: Props) => {
+export const LocalUser = ({ participant, isPinned, layout }: Props) => {
   const camPublisher = usePublisher(Atm0sSenders.video)
   const micPublisher = usePublisher(Atm0sSenders.audio)
   const screenPublisher = usePublisher(Atm0sSenders.screen_video)
   const [, camStream] = usePublisherState(camPublisher)
   const [, micStream] = usePublisherState(micPublisher)
   const [, screenStream] = usePublisherState(screenPublisher)
+  console.log("micStream", micStream);
 
   const audioLevel = useAudioLevelProducer(micPublisher)
   const isTalking = useMemo(() => typeof audioLevel === 'number' && audioLevel > MIN_AUDIO_LEVEL, [audioLevel])
@@ -44,10 +46,21 @@ export const LocalUser = ({ participant, isPinned }: Props) => {
     return <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} />
   }, [camStream, isPinned, participant, screenStream])
 
+  // useEffect(() => {
+  //   console.log("micPublisher", micPublisher);
+  //   const handler = (level: number) => {
+  //     console.log("audio_level", level);
+
+  //   };
+  //   micPublisher.on('audio_level', handler);
+  //   return () => {
+  //     micPublisher.off('audio_level', handler);
+  //   };
+  // }, [micPublisher])
   return (
     <div
       className={classNames(
-        'w-full relative bg-black rounded-lg overflow-hidden aspect-video',
+        'w-full relative bg-black rounded-lg overflow-hidden aspect-video ', layout !== 'GRID' ? '' : 'h-full',
         isHandRaised ? 'ring-4 ring-yellow-400' : ''
       )}
     >
