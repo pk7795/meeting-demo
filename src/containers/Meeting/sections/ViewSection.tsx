@@ -70,17 +70,13 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
   useEffect(() => {
     const sharingParticipant = participants.find(p => p.meetingStatus?.screenShare)
 
-    if (isAnyoneSharing && layout !== 'LEFT') {
+    if (isAnyoneSharing) {
       setLayout('LEFT')
-      setPinnedParticipant({
-        p: sharingParticipant,
-        force: true,
-      })
-    } else if (!isAnyoneSharing && layout === 'LEFT') {
-      setLayout('GRID')
+      setPinnedParticipant({ p: sharingParticipant, force: true })
+    } else {
       setPinnedParticipant(null)
     }
-  }, [participants, isAnyoneSharing, layout, setLayout, setPinnedParticipant])
+  }, [participants, isAnyoneSharing])
 
   return (
     <div
