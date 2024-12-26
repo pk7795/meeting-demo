@@ -163,7 +163,7 @@ export const MeetingProvider = ({
           }
         }
       })
-      .subscribe((status) => {})
+      .subscribe((status) => { })
 
     let presenceChannelSubscription: RealtimeChannel | null = null
     if (roomParticipant.id) {

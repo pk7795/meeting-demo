@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ErmisChat } from 'ermis-chat-js-sdk';
 import type { LoginConfig, ErmisChatGenerics } from './types';
-import { env } from '@/lib'
 export const useChatClient = () => {
     const [chatClient, setChatClient] = useState<ErmisChat<ErmisChatGenerics> | null>(null);
     const [isConnecting, setIsConnecting] = useState(true);
@@ -13,16 +12,16 @@ export const useChatClient = () => {
      * @returns function to unsubscribe from listeners
      */
     const loginUser = async (config: LoginConfig) => {
-        let api_key = env.ERMIS_API_KEY || "VskVZNX0ouKF1751699014812";
+        let api_key = process.env.ERMIS_API_KEY || "VskVZNX0ouKF1751699014812";
         let project_id = "b44937e4-c0d4-4a73-847c-3730a923ce83";
         // unsubscribe from previous push listeners
         unsubscribePushListenersRef.current?.();
         const client = ErmisChat.getInstance<ErmisChatGenerics>(api_key, project_id, {
             timeout: 6000,
             logger: (type, msg) => console.log(type, msg),
-            baseURL: env.ERMIS_API || 'https://api.ermis.network',
+            baseURL: process.env.ERMIS_API || 'https://api-stagging.ermis.network',
         });
-        console.log('api url: ', env.ERMIS_API, "   api key: ", env.ERMIS_API_KEY)
+        console.log('api url: ', process.env.ERMIS_API, "   api key: ", process.env.ERMIS_API_KEY)
 
         setChatClient(client);
         const user = {

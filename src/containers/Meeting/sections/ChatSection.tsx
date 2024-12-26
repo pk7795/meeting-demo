@@ -12,6 +12,8 @@ import { Room } from '@prisma/client'
 import { createMessage } from '@/app/actions/chat'
 import { ButtonIcon } from '@/components'
 import { formatDateChat } from '@/utils'
+import { useChatClient } from '@/hooks/common/useChatClient'
+import { Message } from 'ermis-chat-js-sdk'
 type Props = {
   room: Partial<Room> | null
   onClose: () => void
@@ -21,15 +23,22 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
   const ref = useRef<Scrollbars>(null)
   const refInput = useRef<any>(null)
   const [form] = Form.useForm()
-  const { data } = useSession()
-
-  const messages = useMeetingMessages()
+  const { chatClient, loginUser } = useChatClient();
+  const { data: session } = useSession()
+  const [messages, setMessages] = useState<Message[]>([])
+  // const messages = useMeetingMessages()
   const currentParticipant = useCurrentParticipant()
-
+  // useEffect(() => {
+  //   ref.current?.scrollToBottom()
+  // }, [data, messages])
   useEffect(() => {
-    ref.current?.scrollToBottom()
-  }, [data, messages])
-
+    if (session?.chat) {
+      loginUser({
+        userId: session.chat.userId,
+        userToken: session.chat.accessToken
+      });
+    }
+  }, [session]);
   const onSend = useCallback(
     (values: { input: string }) => {
       if (!values?.input) return
@@ -57,7 +66,7 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
         <Scrollbars ref={ref} className="h-full flex-1 dark:bg-[#1D2431] bg-white">
           {map(messages, (message) => (
             <div key={message.id} className="p-2">
-              <div className="flex items-end">
+              {/* <div className="flex items-end">
                 <Avatar className="mr-2" src={message.participant.user?.image}>
                   {message.participant.name?.charAt(0)}
                 </Avatar>
@@ -73,7 +82,7 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
                     dangerouslySetInnerHTML={{ __html: message.content }}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
           ))}
         </Scrollbars>

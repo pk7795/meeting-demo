@@ -92,8 +92,7 @@ export function LoginUserByWallet(data) {
 export function LoginUserByToken(data) {
   return async (dispatch, getState) => {
     dispatch(UpdateIsLoading({ isLoading: true }));
-    const { token, user_id, refresh_token, channel_id, whep_domain, whep_token } = data;
-    const project_id = 'b44937e4-c0d4-4a73-847c-3730a923ce83'
+    const { token, user_id, refresh_token, channel_id, project_id } = data;
     dispatch(
       slice.actions.logIn({
         isLoggedIn: true,
@@ -107,8 +106,6 @@ export function LoginUserByToken(data) {
     window.localStorage.setItem(LocalStorageKey.AccessToken, token);
     window.localStorage.setItem(LocalStorageKey.RefreshToken, refresh_token);
     window.localStorage.setItem(LocalStorageKey.ChannelId, channel_id);
-    window.localStorage.setItem(LocalStorageKey.WhepDomain, whep_domain);
-    window.localStorage.setItem(LocalStorageKey.WhepToken, whep_token);
     dispatch(UpdateIsLoading({ isLoading: false }));
 
   }
