@@ -1,6 +1,6 @@
 'use client'
 
-import { useCurrentParticipant, useMeetingMessages } from '../contexts'
+import { useChatChannelContext, useChatClientContext, useCurrentParticipant, useMeetingMessages } from '../contexts'
 import { Avatar, Form, Input, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import { map } from 'lodash'
@@ -23,7 +23,6 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
   const ref = useRef<Scrollbars>(null)
   const refInput = useRef<any>(null)
   const [form] = Form.useForm()
-  const { chatClient, loginUser } = useChatClient();
   const { data: session } = useSession()
   const [messages, setMessages] = useState<Message[]>([])
   // const messages = useMeetingMessages()
@@ -31,14 +30,11 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
   // useEffect(() => {
   //   ref.current?.scrollToBottom()
   // }, [data, messages])
-  useEffect(() => {
-    if (session?.chat) {
-      loginUser({
-        userId: session.chat.userId,
-        userToken: session.chat.accessToken
-      });
-    }
-  }, [session]);
+  const chatClient = useChatClientContext()
+  console.log("chatClient: ", chatClient);
+
+  const channel = useChatChannelContext();
+
   const onSend = useCallback(
     (values: { input: string }) => {
       if (!values?.input) return

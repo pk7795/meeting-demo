@@ -1,12 +1,17 @@
 import { UserType } from '../constants'
 import { useActions } from '@8xff/atm0s-media-react'
-import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
 import { useAudioSlotsQueueContainer } from '@/hooks'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
 import { MeetingParticipant, RoomMessageWithParticipant, RoomParticipantWithUser, RoomPopulated } from '@/types/types'
+import { Channel, ErmisChat } from 'ermis-chat-js-sdk'
+import { ErmisChatGenerics, LoginConfig } from '@/hooks/common/useChatClient/types'
+import { useChatClient } from '@/hooks/common/useChatClient'
+import { useSession } from 'next-auth/react'
+import { queryChatChannel } from '@/app/actions/chat'
 
 type PinnedPaticipant = { p: MeetingParticipant; force?: boolean }
 
@@ -30,6 +35,11 @@ export const MeetingContext = createContext<{
   clearJoinRequest: () => void
   clearReceiveMessage: () => void
   deletePendingParticipant: (participantId: string) => void
+  // for chat
+  chatClient: ErmisChat<ErmisChatGenerics> | null;
+  channel: Channel<ErmisChatGenerics> | null;
+  logout: () => void;
+  switchUser: (config?: LoginConfig) => void;
 }>({} as any)
 
 export interface MeetingParticipantStatus {
@@ -66,6 +76,9 @@ export const MeetingProvider = ({
   }
   pendingParticipantsList: RoomParticipantWithUser[]
 }) => {
+
+  const { chatClient, loginUser, logout, switchUser, unreadCount, channel } = useChatClient();
+  const { data: session } = useSession();
   const data = useMemo(() => {
     const paticipants = new MapContainer<string, MeetingParticipant>()
     const messages = new MapContainer<string, RoomMessageWithParticipant>()
@@ -330,6 +343,16 @@ export const MeetingProvider = ({
       }
     }
   })
+  useEffect(() => {
+    if (!session) return;
+    let loginConfig = {
+      userId: session.chat.userId,
+      userToken: session.chat.accessToken,
+      meetingRoomId: roomParticipant.roomId,
+    }
+    loginUser(loginConfig);
+    console.log("connect socket ------------------");
+  }, [session]);
 
   return (
     <MeetingContext.Provider
@@ -343,6 +366,10 @@ export const MeetingProvider = ({
         deletePendingParticipant,
         setParticipantState,
         setPinnedParticipant,
+        chatClient,
+        logout,
+        switchUser,
+        channel
       }}
     >
       {children}
@@ -434,4 +461,13 @@ export const useIsConnected = () => {
   const context = useMeeting()
   const isConnected = useReactionData<boolean | null>(context.data.isConnected)
   return isConnected
+}
+
+export const useChatChannelContext = () => {
+  const context = useMeeting()
+  return context.channel
+}
+export const useChatClientContext = () => {
+  const context = useMeeting()
+  return context.chatClient
 }

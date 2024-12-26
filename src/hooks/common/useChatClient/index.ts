@@ -1,11 +1,14 @@
+'use client'
 import { useEffect, useRef, useState } from 'react';
-import { ErmisChat } from 'ermis-chat-js-sdk';
+import { Channel, ErmisChat } from 'ermis-chat-js-sdk';
 import type { LoginConfig, ErmisChatGenerics } from './types';
+import { queryChatChannel } from '@/app/actions/chat/actions';
 export const useChatClient = () => {
     const [chatClient, setChatClient] = useState<ErmisChat<ErmisChatGenerics> | null>(null);
     const [isConnecting, setIsConnecting] = useState(true);
     const [unreadCount, setUnreadCount] = useState<number>();
     const unsubscribePushListenersRef = useRef<() => void>();
+    const [channel, setChannel] = useState<Channel<ErmisChatGenerics> | null>(null);
     // const { disconnect } = useDisconnect();
     /**
      * @param config the user login config
@@ -35,23 +38,19 @@ export const useChatClient = () => {
         });
 
         // connect to SSE, which will keep the connection alive and listen to new messages from user servers.
-        await client.connectToSSE();
+        // await client.connectToSSE();
 
         const initialUnreadCount = connectedUser?.me?.total_unread_count;
         setUnreadCount(initialUnreadCount);
         window.localStorage.setItem('@ermisChat-login-userId', config.userId);
         window.localStorage.setItem('@ermisChat-login-userToken', config.userToken);
 
-        // get profile user
-        let profile = await client.queryUser(config.userId);
-
-        client._setUser(profile);
-        client.state.updateUser(profile);
-
-        // let chains = await client.getChains();
-        // console.log('~~~~~~~~~~~~~~~~~~~~~~~~chains: ', chains);
-
         setChatClient(client);
+        if (client) {
+            console.log("@@@@@@@@@@@@create channel");
+            // await queryChatChannel(client, config.meetingRoomId);
+            // setChannel(newChannel);
+        }
     };
 
     const switchUser = async (config?: LoginConfig) => {
@@ -63,7 +62,7 @@ export const useChatClient = () => {
                 const userId = window.localStorage.getItem('@ermisChat-login-userId');
                 const userToken = window.localStorage.getItem('@ermisChat-login-userToken');
                 if (userId && userToken) {
-                    await loginUser({ userId, userToken });
+                    // await loginUser({ userId, userToken });
                 }
             }
         } catch (e) {
@@ -76,15 +75,15 @@ export const useChatClient = () => {
     const logout = async () => {
         setChatClient(null);
         chatClient?.disconnectUser();
-        chatClient?.disconnectFromSSE();
+        // chatClient?.disconnectFromSSE();
         window.localStorage.clear();
     };
 
     useEffect(() => {
-        const run = async () => {
-            await switchUser();
-        };
-        run();
+        // const run = async () => {
+        //     await switchUser();
+        // };
+        // run();
         return unsubscribePushListenersRef.current;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -119,5 +118,6 @@ export const useChatClient = () => {
         logout,
         switchUser,
         unreadCount,
+        channel,
     };
 };
