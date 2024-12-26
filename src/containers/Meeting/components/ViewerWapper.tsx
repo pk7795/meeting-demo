@@ -1,5 +1,5 @@
 import { Stream } from '../types'
-import { VideoViewer } from '@8xff/atm0s-media-react'
+import { MediaStreamArc, VideoViewer } from '@8xff/atm0s-media-react'
 import { Avatar } from 'antd'
 import { FC } from 'react'
 import { MeetingParticipant } from '@/types/types'
@@ -11,7 +11,7 @@ type Props = {
 }
 
 export const ViewerWapper: FC<Props> = ({ participant, stream, priority }) => {
-  const videoTrack = stream?.stream?.getVideoTracks()?.[0];
+  const videoTrack = (stream as MediaStreamArc)?.stream?.getVideoTracks()?.[0];
   const cameraLabel = videoTrack?.label?.toLowerCase() || '';
 
   const isFrontCamera = Boolean(

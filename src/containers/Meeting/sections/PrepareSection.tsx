@@ -77,7 +77,9 @@ export const PrepareSection: React.FC<Props> = ({
   useEffect(() => {
     if (camera) {
       camStreamChanger({
-        video: true,
+        video: {
+          deviceId: selectedVideoInput?.deviceId
+        },
       })
     } else {
       camStreamChanger(undefined)
