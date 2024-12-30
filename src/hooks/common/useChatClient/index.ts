@@ -2,7 +2,54 @@
 import { useEffect, useRef, useState } from 'react';
 import { Channel, ErmisChat } from 'ermis-chat-js-sdk';
 import type { LoginConfig, ErmisChatGenerics } from './types';
-import { queryChatChannel } from '@/app/actions/chat/actions';
+import { getChatChannelByRoomId, createChatChannel } from '@/app/actions/chat/actions';
+
+async function initializeChannel(client: ErmisChat<ErmisChatGenerics>, config: LoginConfig) {
+    try {
+        // Step 1: Check if channel exists
+        const channelData = await getChatChannelByRoomId(config.meetingRoomId);
+
+        // Step 2: Handle existing channel
+        if (!channelData.isNew) {
+            const chatChannel = client.channel(channelData.channelType!, channelData.channelId!);
+            await chatChannel.query({ messages: { limit: 25 } });
+            return chatChannel;
+        }
+
+        // Step 3: Handle new channel
+        if (!config.isRoomOwner) {
+            console.error('Only room owner can create new channel');
+            throw new Error('Only room owner can create new channel');
+        }
+
+        // Step 4: Create new channel
+        const newChannelData = {
+            name: config.roomName,
+            members: [config.userId, "mockMember"],
+            public: true,
+        };
+
+        const newChannel = client.channel('team', newChannelData);
+        await newChannel.create();
+
+        // Step 5: Save to DB
+        createChatChannel(
+            config.meetingRoomId,
+            newChannel.id!,
+            'team'
+        ).then((res) => {
+            console.log('createChatChannel: ', res);
+        }).catch(e => {
+            console.error('Error: ', e);
+        });
+
+        return newChannel;
+
+    } catch (error) {
+        console.error('Channel initialization failed:', error);
+        throw error;
+    }
+}
 export const useChatClient = () => {
     const [chatClient, setChatClient] = useState<ErmisChat<ErmisChatGenerics> | null>(null);
     const [isConnecting, setIsConnecting] = useState(true);
@@ -16,7 +63,7 @@ export const useChatClient = () => {
      */
     const loginUser = async (config: LoginConfig) => {
         let api_key = process.env.ERMIS_API_KEY || "VskVZNX0ouKF1751699014812";
-        let project_id = "b44937e4-c0d4-4a73-847c-3730a923ce83";
+        let project_id = config.projectId;
         // unsubscribe from previous push listeners
         unsubscribePushListenersRef.current?.();
         const client = ErmisChat.getInstance<ErmisChatGenerics>(api_key, project_id, {
@@ -42,14 +89,17 @@ export const useChatClient = () => {
 
         const initialUnreadCount = connectedUser?.me?.total_unread_count;
         setUnreadCount(initialUnreadCount);
-        window.localStorage.setItem('@ermisChat-login-userId', config.userId);
-        window.localStorage.setItem('@ermisChat-login-userToken', config.userToken);
+        // window.localStorage.setItem('@ermisChat-login-userId', config.userId);
+        // window.localStorage.setItem('@ermisChat-login-userToken', config.userToken);
 
         setChatClient(client);
         if (client) {
-            console.log("@@@@@@@@@@@@create channel");
-            // await queryChatChannel(client, config.meetingRoomId);
-            // setChannel(newChannel);
+            try {
+                const channel = await initializeChannel(client, config);
+                setChannel(channel);
+            } catch (error) {
+                console.error('Error: ', error);
+            }
         }
     };
 

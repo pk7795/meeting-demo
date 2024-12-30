@@ -11,7 +11,6 @@ import { Channel, ErmisChat } from 'ermis-chat-js-sdk'
 import { ErmisChatGenerics, LoginConfig } from '@/hooks/common/useChatClient/types'
 import { useChatClient } from '@/hooks/common/useChatClient'
 import { useSession } from 'next-auth/react'
-import { queryChatChannel } from '@/app/actions/chat'
 
 type PinnedPaticipant = { p: MeetingParticipant; force?: boolean }
 
@@ -37,9 +36,9 @@ export const MeetingContext = createContext<{
   deletePendingParticipant: (participantId: string) => void
   // for chat
   chatClient: ErmisChat<ErmisChatGenerics> | null;
-  channel: Channel<ErmisChatGenerics> | null;
   logout: () => void;
   switchUser: (config?: LoginConfig) => void;
+  channel: Channel<ErmisChatGenerics> | null;
 }>({} as any)
 
 export interface MeetingParticipantStatus {
@@ -77,7 +76,7 @@ export const MeetingProvider = ({
   pendingParticipantsList: RoomParticipantWithUser[]
 }) => {
 
-  const { chatClient, loginUser, logout, switchUser, unreadCount, channel } = useChatClient();
+  const { chatClient, loginUser, logout, switchUser, channel } = useChatClient();
   const { data: session } = useSession();
   const data = useMemo(() => {
     const paticipants = new MapContainer<string, MeetingParticipant>()
@@ -349,6 +348,11 @@ export const MeetingProvider = ({
       userId: session.chat.userId,
       userToken: session.chat.accessToken,
       meetingRoomId: roomParticipant.roomId,
+      projectId: session.chat.projectId,
+      roomName: roomParticipant.name,
+      userName: roomParticipant.user?.name,
+      userImage: roomParticipant.user?.image,
+      isRoomOwner: room!.ownerId === session.user.id,
     }
     loginUser(loginConfig);
     console.log("connect socket ------------------");
@@ -463,11 +467,11 @@ export const useIsConnected = () => {
   return isConnected
 }
 
-export const useChatChannelContext = () => {
-  const context = useMeeting()
-  return context.channel
-}
 export const useChatClientContext = () => {
   const context = useMeeting()
   return context.chatClient
+}
+export const useChatChannelContext = () => {
+  const context = useMeeting()
+  return context.channel
 }

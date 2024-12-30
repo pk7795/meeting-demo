@@ -25,9 +25,11 @@ export type LoginConfig = {
     userId: string;
     userToken: string;
     meetingRoomId: string;
+    roomName: string;
+    projectId: string;
     userImage?: string;
     userName?: string;
-
+    isRoomOwner: boolean;
 };
 export const ActionType = {
     LEAVE: 'leave',

@@ -35,31 +35,30 @@ export async function createMessage({ data }: { data: MessageInput }) {
   return res
 }
 
-export async function queryChatChannel(client: ErmisChat<ErmisChatGenerics>, roomId: string) {
-  const prisma = getPrisma();
-  const chatChannel = await prisma.chatChannel.findFirst({
+export async function getChatChannelByRoomId(roomId: string) {
+  // Check existing channel
+  const prisma = getPrisma()
+  const existingChannel = await prisma.chatChannel.findUnique({
     where: { roomId }
   });
-  console.log("chatChannel: ", chatChannel);
 
-  // if (!chatChannel) {
-  //   console.log("Creating new channel");
+  if (existingChannel) {
+    return {
+      channelId: existingChannel.channelId,
+      channelType: existingChannel.channelType,
+      isNew: false
+    };
+  }
 
-  //   const uuid = uuidv4();
-  //   const projectId = client.projectId;
-  //   const channelId = `${projectId}:${uuid}`
-  //   const channel = client.channel("team", channelId);
-  //   await channel.create();
-  //   await prisma.chatChannel.create({
-  //     data: {
-  //       roomId,
-  //       channelId,
-  //       channelType: "team"
-  //     }
-  //   });
-  //   return channel;
-  // }
-  // const channel = client.channel(chatChannel.channelType, chatChannel.channelId);
-  // await channel.watch();
-  // return channel;
+  return { isNew: true };
+}
+export async function createChatChannel(roomId: string, channelId: string, channelType: string) {
+  const prisma = getPrisma();
+  return await prisma.chatChannel.create({
+    data: {
+      channelId,
+      roomId,
+      channelType
+    }
+  });
 }
