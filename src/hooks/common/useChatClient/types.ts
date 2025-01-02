@@ -40,3 +40,7 @@ export const ActionType = {
     BLOCK: 'block',
     UNBLOCK: 'unblock',
 }
+export type ChatUser = {
+    userId: string | null;
+    gUserId: string;
+}

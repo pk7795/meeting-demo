@@ -10,6 +10,8 @@ import { RoomParticipant } from '@prisma/client'
 import { Atm0sSession } from '@/lib/atm0s'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
+import { ChatUser } from '@/hooks/common/useChatClient/types'
+import { getChatUserList } from '@/app/actions/chat'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -22,7 +24,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
   const [joined, setJoined] = useState(false)
   const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
   console.log('RERENDER HERE')
-
+  const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const senders = useMemo(() => {
     return [Atm0sSenders.audio, Atm0sSenders.video, Atm0sSenders.screen_audio, Atm0sSenders.screen_video]
   }, [])
@@ -58,7 +60,13 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
   // useSharedUserMedia('mic_device')
   // useSharedUserMedia('camera_device')
   // useSharedDisplayMedia('screen_device')
+  useEffect(() => {
+    getChatUserList().then((res) => {
+      console.log('0-------------------------chatUsers: ', res);
 
+      setChatUsers(res);
+    });
+  }, []);
   return (
     <MediaDeviceProvider>
       {atm0sConfig && roomParticipant && joined ? (
@@ -77,7 +85,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
           senders={senders}
           receivers={{ audio: 0, video: 5 }}
         >
-          <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
+          <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants} chatUsers={chatUsers} setChatUsers={setChatUsers}>
             <MainSection room={room} myParticipant={roomParticipant} />
           </MeetingProvider>
         </SessionProvider>

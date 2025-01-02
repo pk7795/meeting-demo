@@ -35,7 +35,7 @@ export async function callLiveApi<T>(api: string, api_path: string, token: strin
         console.error('Error on callLiveApi', error)
         return reject(new Error(error))
       }
-      console.log('-------------------------Response', response.body)
+      console.log('-------------------------callLiveApi Response', response.body)
 
       try {
         const data = JSON.parse(response.body)
@@ -62,14 +62,13 @@ export async function callGatewayApi<T>(gateway: string, api_path: string, body:
     },
     body: JSON.stringify(body),
   }
-  console.log('-------------------------Request on callGatewayApi', options);
-  console.log('-------------------------url on callGatewayApi', url);
 
   return await new Promise((resolve, reject) => {
     request(options, function (error: any, response: any) {
       if (error) {
         return reject(new Error(error))
       }
+      console.log('-------------------------response of callGatewayApi', response);
       try {
         const data = JSON.parse(response.body)
         if (data.status === true) {
@@ -98,6 +97,7 @@ export async function createLiveWebrtcToken(
     peer,
     record,
   })
+  console.log('-------------------------response of createLiveWebrtcToken: ', res);
   return res.token
 }
 
@@ -115,6 +115,7 @@ export async function createLiveRtmpToken(
     transcode: true,
     record,
   })
+  console.log('-------------------------response of createLiveRtmpToken: ', res);
   return res.token
 }
 
@@ -134,6 +135,7 @@ export async function createRtmpUrl(
     video_stream: 'video_main',
     shorten_link: true,
   })
+  console.log('-------------------------response createRtmpUrl: ', res);
   // generate rtmp_uri and stream_key from full link res.rtmp_shorten_uri
   const parts = res.rtmp_shorten_uri.split('/live/')
 
@@ -149,6 +151,7 @@ export async function createComposeToken(room: string, config: Atm0sConfig): Pro
   const res = await callLiveApi<{ token: string }>(config.api, 'compose_session', config.appToken, {
     room,
   })
+  console.log('-------------------------response of createComposeToken: ', res);
   return res.token
 }
 
@@ -159,5 +162,6 @@ export async function submitComposeRecord(source: string, token: string, config:
     token,
     source,
   })
+  console.log('-------------------------response of submitComposeRecord: ', res);
   return res
 }

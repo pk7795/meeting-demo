@@ -7,10 +7,11 @@ import { supabase } from '@/config'
 import { useAudioSlotsQueueContainer } from '@/hooks'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
 import { MeetingParticipant, RoomMessageWithParticipant, RoomParticipantWithUser, RoomPopulated } from '@/types/types'
-import { Channel, ErmisChat } from 'ermis-chat-js-sdk'
-import { ErmisChatGenerics, LoginConfig } from '@/hooks/common/useChatClient/types'
+import { Channel, ErmisChat, FormatMessageResponse } from 'ermis-chat-js-sdk'
+import { ChatUser, ErmisChatGenerics, LoginConfig } from '@/hooks/common/useChatClient/types'
 import { useChatClient } from '@/hooks/common/useChatClient'
 import { useSession } from 'next-auth/react'
+import { getChatUser, getChatUserList } from '@/app/actions/chat'
 
 type PinnedPaticipant = { p: MeetingParticipant; force?: boolean }
 
@@ -39,6 +40,7 @@ export const MeetingContext = createContext<{
   logout: () => void;
   switchUser: (config?: LoginConfig) => void;
   channel: Channel<ErmisChatGenerics> | null;
+  messages: FormatMessageResponse[];
 }>({} as any)
 
 export interface MeetingParticipantStatus {
@@ -55,6 +57,8 @@ export const MeetingProvider = ({
   room,
   roomParticipant,
   pendingParticipantsList,
+  chatUsers,
+  setChatUsers
 }: {
   children: React.ReactNode
   room: RoomPopulated | null
@@ -73,11 +77,15 @@ export const MeetingProvider = ({
     createdAt: Date
     updatedAt: Date
   }
-  pendingParticipantsList: RoomParticipantWithUser[]
+  pendingParticipantsList: RoomParticipantWithUser[],
+  chatUsers: ChatUser[],
+  setChatUsers: React.Dispatch<React.SetStateAction<ChatUser[]>>
 }) => {
 
   const { chatClient, loginUser, logout, switchUser, channel } = useChatClient();
   const { data: session } = useSession();
+  const [messages, setMessages] = useState<FormatMessageResponse[]>([]);
+
   const data = useMemo(() => {
     const paticipants = new MapContainer<string, MeetingParticipant>()
     const messages = new MapContainer<string, RoomMessageWithParticipant>()
@@ -179,6 +187,21 @@ export const MeetingProvider = ({
 
     let presenceChannelSubscription: RealtimeChannel | null = null
     if (roomParticipant.id) {
+      let chatUser: {
+        userId: string | null;
+        gUserId: string;
+      } | null = null;
+      if (roomParticipant.user) {
+        getChatUser(roomParticipant.user.id).then((res) => {
+          chatUser = res;
+          console.log('0-------------------------chatUser: ', chatUser);
+          if (res) {
+            setChatUsers([...chatUsers, res]);
+          }
+        }).catch((error) => {
+          console.error('Error: ', error);
+        });
+      }
       const participantPresenceKey = roomParticipant.id
 
       const presenceChannel = supabase.channel(`room:${room!.id}:presence`, {
@@ -193,6 +216,7 @@ export const MeetingProvider = ({
       presenceChannel
         .on('presence', { event: 'sync' }, () => {
           const newState = presenceChannel.presenceState()
+
           const map = new Map<string, MeetingParticipant>()
           for (const key in newState) {
             if (!(newState[key] as any)) {
@@ -210,8 +234,11 @@ export const MeetingProvider = ({
                   user: value.user,
                   connected_at: value.connected_at,
                   meetingStatus: value.meetingStatus,
+                  chatUserId: chatUsers?.find((user) => user.gUserId === value.user.id)?.userId,
                 }
                 map.set(participantId, payload)
+                console.log("addnew", payload);
+
               }
             }
           }
@@ -355,8 +382,22 @@ export const MeetingProvider = ({
       isRoomOwner: room!.ownerId === session.user.id,
     }
     loginUser(loginConfig);
-    console.log("connect socket ------------------");
+    console.log("-----------------connect socket ------------------");
   }, [session]);
+
+  useEffect(() => {
+    if (!channel) return;
+    setMessages(channel.state.messages || []);
+    const handleNewMessage = (event: any) => {
+      setMessages(prevMessages => [...prevMessages, event.message]);
+    };
+
+    const listener = channel.on('message.new', handleNewMessage);
+
+    return () => {
+      listener.unsubscribe();
+    };
+  }, [channel]);
 
   return (
     <MeetingContext.Provider
@@ -373,7 +414,8 @@ export const MeetingProvider = ({
         chatClient,
         logout,
         switchUser,
-        channel
+        channel,
+        messages
       }}
     >
       {children}
@@ -474,4 +516,8 @@ export const useChatClientContext = () => {
 export const useChatChannelContext = () => {
   const context = useMeeting()
   return context.channel
+}
+export const useChatMessages = () => {
+  const context = useMeeting()
+  return context.messages
 }

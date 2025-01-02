@@ -1,6 +1,6 @@
 'use client'
 
-import { useChatClientContext, useCurrentParticipant, useMeetingMessages, useChatChannelContext, useMeetingParticipantsList } from '../contexts'
+import { useChatClientContext, useCurrentParticipant, useMeetingMessages, useChatChannelContext, useMeetingParticipantsList, useChatMessages, useMeetingParticipants } from '../contexts'
 import { Avatar, Form, Input, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import { map } from 'lodash'
@@ -9,30 +9,12 @@ import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
-import { createMessage } from '@/app/actions/chat'
+import { createMessage, getChatUserList } from '@/app/actions/chat'
 import { ButtonIcon } from '@/components'
 import { formatDateChat } from '@/utils'
-
-
-const mapMessageWithParticipant = (
-  message: FormatMessageResponse,
-  participants: any[]
-) => {
-  const userParticipant = participants.find(participant => {
-    participant.user
-  });
-
-  return {
-    ...message,
-    user: {
-      ...message.user,
-      name: userParticipant?.user?.name,
-      image: userParticipant?.user?.image,
-    }
-  };
-};
-
 import { FormatMessageResponse } from 'ermis-chat-js-sdk'
+
+
 type Props = {
   room: Partial<Room> | null
   onClose: () => void
@@ -43,17 +25,18 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
   const refInput = useRef<any>(null)
   const [form] = Form.useForm()
   const { data: session } = useSession()
-  const [messages, setMessages] = useState<FormatMessageResponse[]>([])
+  const messages = useChatMessages();
   const currentParticipant = useCurrentParticipant()
   useEffect(() => {
     ref.current?.scrollToBottom()
   }, [session, messages])
-  const chatClient = useChatClientContext();
   const chatChannel = useChatChannelContext();
-  const paticipantsList = useMeetingParticipantsList();
-  useEffect(() => {
+  const paticipantList = useMeetingParticipantsList();
+  const participants = useMeetingParticipants();
+  console.log('---------------participants', participants);
+  console.log('---------------paticipantList', paticipantList);
 
-  }, [paticipantsList])
+
 
   const onSend = useCallback(
     (values: { input: string }) => {
@@ -68,27 +51,6 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
     },
     [currentParticipant.id, form, room]
   )
-  useEffect(() => {
-    if (chatChannel) {
-      const channelMessages = chatChannel.state.messages || [];
-      setMessages(channelMessages);
-    }
-  }, [chatChannel]);
-  useEffect(() => {
-    if (!chatChannel) return;
-
-    const handleNewMessage = (event: any) => {
-      setMessages(prevMessages => [...prevMessages, event.message]);
-    };
-
-    // Subscribe to new messages
-    const listener = chatChannel.on('message.new', handleNewMessage);
-
-    return () => {
-      // Cleanup listener
-      listener.unsubscribe();
-    };
-  }, [chatChannel]);
   return (
     <div className="flex flex-col h-full">
       <div className="h-16 border-b dark:border-[#232C3C] flex items-center font-bold px-4 justify-between">

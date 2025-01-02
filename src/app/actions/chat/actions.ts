@@ -62,3 +62,24 @@ export async function createChatChannel(roomId: string, channelId: string, chann
     }
   });
 }
+export async function getChatUserList() {
+  const prisma = getPrisma()
+  return await prisma.chatToken.findMany({
+    select: {
+      userId: true,
+      gUserId: true
+    }
+  })
+}
+export async function getChatUser(userId: string) {
+  const prisma = getPrisma()
+  return await prisma.chatToken.findFirst({
+    where: {
+      gUserId: userId
+    },
+    select: {
+      userId: true,
+      gUserId: true
+    }
+  })
+}

@@ -12,7 +12,10 @@ async function initializeChannel(client: ErmisChat<ErmisChatGenerics>, config: L
         // Step 2: Handle existing channel
         if (!channelData.isNew) {
             const chatChannel = client.channel(channelData.channelType!, channelData.channelId!);
-            await chatChannel.query({ messages: { limit: 25 } });
+            if (!config.isRoomOwner) {
+                await chatChannel.acceptInvite('join');
+            }
+            await chatChannel.watch({ messages: { limit: 25 } });
             return chatChannel;
         }
 
