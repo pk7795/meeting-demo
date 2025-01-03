@@ -186,7 +186,7 @@ model ChatChannel {
   id        String   @id @default(cuid())
   channelId String   @unique
   channelType String 
-  roomId    String   
+  roomId    String   @unique
   room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

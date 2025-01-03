@@ -12,6 +12,7 @@ import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { ChatUser } from '@/hooks/common/useChatClient/types'
 import { getChatUserList } from '@/app/actions/chat'
+import { ChatContextProvider } from '@/contexts/chat'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -60,47 +61,42 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
   // useSharedUserMedia('mic_device')
   // useSharedUserMedia('camera_device')
   // useSharedDisplayMedia('screen_device')
-  useEffect(() => {
-    getChatUserList().then((res) => {
-      console.log('0-------------------------chatUsers: ', res);
-
-      setChatUsers(res);
-    });
-  }, []);
   return (
     <MediaDeviceProvider>
-      {atm0sConfig && roomParticipant && joined ? (
-        <SessionProvider
-          logLevel={atm0sConfig.log_level}
-          gateways={atm0sConfig.gateway}
-          room={atm0sConfig.room}
-          peer={atm0sConfig.peer}
-          token={atm0sConfig.token}
-          autoConnect={false}
-          onConnectError={console.error}
-          mixMinusAudio={{
-            mode: MixMinusMode.AllAudioStreams,
-            elements: createAudio,
-          }}
-          senders={senders}
-          receivers={{ audio: 0, video: 5 }}
-        >
-          <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants} chatUsers={chatUsers} setChatUsers={setChatUsers}>
-            <MainSection room={room} myParticipant={roomParticipant} />
-          </MeetingProvider>
-        </SessionProvider>
-      ) : (
-        <PrepareSection
-          room={room}
-          onJoinMeeting={() => {
-            setJoined(true)
-          }}
-          setRoomParticipant={setRoomParticipant}
-          setAtm0sConfig={setAtm0sConfig}
-          myParticipant={roomParticipant}
-          roomAccess={access}
-        />
-      )}
+      <ChatContextProvider room={room} roomParticipant={roomParticipant}>
+        {atm0sConfig && roomParticipant && joined ? (
+          <SessionProvider
+            logLevel={atm0sConfig.log_level}
+            gateways={atm0sConfig.gateway}
+            room={atm0sConfig.room}
+            peer={atm0sConfig.peer}
+            token={atm0sConfig.token}
+            autoConnect={false}
+            onConnectError={console.error}
+            mixMinusAudio={{
+              mode: MixMinusMode.AllAudioStreams,
+              elements: createAudio,
+            }}
+            senders={senders}
+            receivers={{ audio: 0, video: 5 }}
+          >
+            <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
+              <MainSection room={room} myParticipant={roomParticipant} />
+            </MeetingProvider>
+          </SessionProvider>
+        ) : (
+          <PrepareSection
+            room={room}
+            onJoinMeeting={() => {
+              setJoined(true)
+            }}
+            setRoomParticipant={setRoomParticipant}
+            setAtm0sConfig={setAtm0sConfig}
+            myParticipant={roomParticipant}
+            roomAccess={access}
+          />
+        )}
+      </ChatContextProvider>
     </MediaDeviceProvider>
   )
 }

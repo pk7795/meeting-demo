@@ -1,47 +1,56 @@
 'use client'
 import { useEffect, useRef, useState } from 'react';
 import { Channel, ErmisChat } from 'ermis-chat-js-sdk';
-import type { LoginConfig, ErmisChatGenerics } from './types';
+import type { LoginConfig, ErmisChatGenerics, RoomConfig } from './types';
 import { getChatChannelByRoomId, createChatChannel } from '@/app/actions/chat/actions';
 
-async function initializeChannel(client: ErmisChat<ErmisChatGenerics>, config: LoginConfig) {
+async function initializeChannel(client: ErmisChat<ErmisChatGenerics>, roomConfig: RoomConfig) {
     try {
         // Step 1: Check if channel exists
-        const channelData = await getChatChannelByRoomId(config.meetingRoomId);
+        const channelData = await getChatChannelByRoomId(roomConfig.meetingRoomId);
 
         // Step 2: Handle existing channel
         if (!channelData.isNew) {
             const chatChannel = client.channel(channelData.channelType!, channelData.channelId!);
-            if (!config.isRoomOwner) {
+            if (!roomConfig.isRoomOwner) {
                 await chatChannel.acceptInvite('join');
             }
-            await chatChannel.watch({ messages: { limit: 25 } });
+            await chatChannel.watch();
+            const userIds: string[] = Object.keys(chatChannel.state.members);
+            const existingUserIds = userIds.filter((userId) => {
+                if (userId === 'mockMember') {
+                    return false;
+                }
+                return client.state.users[userId] === undefined;
+            });
+            if (existingUserIds.length > 0) {
+                await client.getBatchUsers(existingUserIds);
+            }
             return chatChannel;
         }
 
         // Step 3: Handle new channel
-        if (!config.isRoomOwner) {
+        if (!roomConfig.isRoomOwner) {
             console.error('Only room owner can create new channel');
             throw new Error('Only room owner can create new channel');
         }
 
         // Step 4: Create new channel
         const newChannelData = {
-            name: config.roomName,
-            members: [config.userId, "mockMember"],
+            name: roomConfig.roomName,
+            members: [roomConfig.userId, "mockMember"],
             public: true,
         };
 
         const newChannel = client.channel('team', newChannelData);
-        await newChannel.create();
+        await newChannel.watch();
 
         // Step 5: Save to DB
         createChatChannel(
-            config.meetingRoomId,
+            roomConfig.meetingRoomId,
             newChannel.id!,
             'team'
         ).then((res) => {
-            console.log('createChatChannel: ', res);
         }).catch(e => {
             console.error('Error: ', e);
         });
@@ -74,7 +83,6 @@ export const useChatClient = () => {
             logger: (type, msg) => console.log(type, msg),
             baseURL: process.env.ERMIS_API || 'https://api-stagging.ermis.network',
         });
-        console.log('api url: ', process.env.ERMIS_API, "   api key: ", process.env.ERMIS_API_KEY)
 
         setChatClient(client);
         const user = {
@@ -88,7 +96,10 @@ export const useChatClient = () => {
         });
 
         // connect to SSE, which will keep the connection alive and listen to new messages from user servers.
-        // await client.connectToSSE();
+        await client.connectToSSE();
+        await client.queryUser(config.userId);
+        console.log('---------------------------profile: ', client.state.users);
+
 
         const initialUnreadCount = connectedUser?.me?.total_unread_count;
         setUnreadCount(initialUnreadCount);
@@ -96,14 +107,6 @@ export const useChatClient = () => {
         // window.localStorage.setItem('@ermisChat-login-userToken', config.userToken);
 
         setChatClient(client);
-        if (client) {
-            try {
-                const channel = await initializeChannel(client, config);
-                setChannel(channel);
-            } catch (error) {
-                console.error('Error: ', error);
-            }
-        }
     };
 
     const switchUser = async (config?: LoginConfig) => {
@@ -132,6 +135,16 @@ export const useChatClient = () => {
         window.localStorage.clear();
     };
 
+    const joinChatChannel = async (roomConfig: RoomConfig) => {
+        if (chatClient) {
+            try {
+                const channel = await initializeChannel(chatClient, roomConfig);
+                setChannel(channel);
+            } catch (error) {
+                console.error('Error: ', error);
+            }
+        }
+    }
     useEffect(() => {
         // const run = async () => {
         //     await switchUser();
@@ -172,5 +185,6 @@ export const useChatClient = () => {
         switchUser,
         unreadCount,
         channel,
+        joinChatChannel
     };
 };

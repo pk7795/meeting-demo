@@ -17,7 +17,7 @@ import { MainLayout } from '@/layouts'
 import { RoomAccessStatus } from '@/lib/constants'
 import { randomUUID } from '@/lib/random'
 import { RoomPopulated } from '@/types/types'
-
+import { useChatPendingMeetingRoomStatusContext } from '@/contexts/chat'
 type Props = {
   onJoinMeeting: () => void
   room: RoomPopulated
@@ -57,6 +57,7 @@ export const PrepareSection: React.FC<Props> = ({
   const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
 
   const [acceptSubscription, setAcceptSubscription] = useState<RealtimeChannel>()
+  const setRoomAccessStatus = useChatPendingMeetingRoomStatusContext();
 
   const guestUUID = useMemo(() => {
     return randomUUID() + ':' + room.id
@@ -115,7 +116,10 @@ export const PrepareSection: React.FC<Props> = ({
       acceptSubscription && supabase.removeChannel(acceptSubscription)
     }
   }, [acceptSubscription])
+  useEffect(() => {
+    setRoomAccessStatus(access)
 
+  }, [access])
   const sendJoinRequest = useCallback(
     (id: string, name: string, type: string) => {
       // TODO: Refactor

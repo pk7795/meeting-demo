@@ -24,12 +24,9 @@ export type ErmisChatGenerics = {
 export type LoginConfig = {
     userId: string;
     userToken: string;
-    meetingRoomId: string;
-    roomName: string;
     projectId: string;
     userImage?: string;
     userName?: string;
-    isRoomOwner: boolean;
 };
 export const ActionType = {
     LEAVE: 'leave',
@@ -44,3 +41,10 @@ export type ChatUser = {
     userId: string | null;
     gUserId: string;
 }
+
+export type RoomConfig = {
+    userId: string;
+    meetingRoomId: string;
+    roomName: string;
+    isRoomOwner: boolean;
+};

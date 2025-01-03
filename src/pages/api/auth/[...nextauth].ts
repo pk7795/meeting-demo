@@ -26,7 +26,6 @@ const authOptions: NextAuthOptions = {
             token: account.id_token,
             apikey: env.ERMIS_API_KEY,
           });
-          console.log('response: ', response.data);
 
           const existingChatToken = await getPrisma().chatToken.findFirst({
             where: {
@@ -74,7 +73,13 @@ const authOptions: NextAuthOptions = {
         session.user.status = user.status
         session.user.id = user.id
       }
-      session.chat = session.chat || {};
+      if (!session.chat) {
+        session.chat = {
+          userId: '',
+          accessToken: '',
+          projectId: ''
+        }
+      }
 
       const existingChatToken = await getPrisma().chatToken.findFirst({
         where: {
@@ -111,7 +116,6 @@ const authOptions: NextAuthOptions = {
           session.chat.gUserId = existingChatToken.gUserId;
         }
       }
-      console.log('session: ', session);
 
       return session
     },
