@@ -245,11 +245,11 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
         footer={false}
         closable={false}
         open={
-          isConnected === false ||
-          sessionState === 'reconnecting' ||
-          sessionState === 'disconnected' ||
-          sessionState === 'error'
-          // false
+          // isConnected === false ||
+          // sessionState === 'reconnecting' ||
+          // sessionState === 'disconnected' ||
+          // sessionState === 'error'
+          false
         }
       >
         <div className="flex flex-col items-center justify-center">

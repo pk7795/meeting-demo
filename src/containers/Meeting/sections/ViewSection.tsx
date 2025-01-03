@@ -64,6 +64,8 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
       },
     },
   })
+
+  const participantCount = participants.length;
   const isAnyoneSharing = useMemo(() => {
     return participants.some(p => p.meetingStatus?.screenShare)
   }, [participants])
@@ -86,101 +88,154 @@ export const ViewSection: React.FC<Props> = ({ layout, setLayout }) => {
       )}
       style={{ height: 'calc(100% - 8rem)' }}
     >
-      {layout !== 'GRID' && (
-        <div className={classNames('h-full hidden relative lg:flex items-center bg-black rounded-lg w-full mr-2 content')}>
-          {renderBigViewer()}
-          <ButtonIcon
-            onClick={() => setShowUser(!showUser)}
-            icon={
-              showUser ? (
-                <ChevronRightIcon size={16} className="text-white" />
-              ) : (
-                <ChevronLeftIcon size={16} className="text-white" />
-              )
-            }
-            className="absolute right-2 bg-black bg-opacity-50"
-            shape="circle"
-          />
-        </div>
-      )}
+      {
+        layout !== 'GRID' && (
+          <div className={classNames('h-full hidden relative lg:flex items-center bg-black rounded-lg w-full mr-2 content')}>
+            {renderBigViewer()}
+            <ButtonIcon
+              onClick={() => setShowUser(!showUser)}
+              icon={
+                showUser ? (
+                  <ChevronRightIcon size={16} className="text-white" />
+                ) : (
+                  <ChevronLeftIcon size={16} className="text-white" />
+                )
+              }
+              className="absolute right-2 bg-black bg-opacity-50"
+              shape="circle"
+            />
+          </div>
+        )
+      }
       {showUser && (
         <div className={
           classNames('h-full relative',
             layout !== 'GRID' ? 'w-56' : 'w-full',
           )}
-        >
-          <Row className={classNames(layout !== 'GRID' ? 'overflow-y-auto' : 'h-full')}
-          >
-            {map(
-              filter(participants, (_: any, index) => index >= page * 12 && index < (page || 1) * 12),
-              (p, index) => {
-                const isPinned = layout !== 'GRID' && p.id === pinnedParticipant?.p?.id
+        >{
+            participantCount === 1
+              ? (
+                <div className="w-full h-full relative">
+                  <div className="w-full h-full">
+                    <LocalUser
+                      key={participants[0]?.id}
+                      participant={participants[0]}
+                      isPinned={layout !== 'GRID' && participants[0]?.id === pinnedParticipant?.p?.id}
+                      layout={layout}
+                      participantCount={participantCount}
+                    />
+                  </div>
+                </div>
+              )
+              : participantCount === 2 && layout === 'GRID'
+                ? <>
+                  {(() => {
+                    const remoteParticipant = participants.find(participant => !participant.is_me)
+                    const localParticipant = participants.find(participant => participant.is_me)
+                    const isPinned = layout !== 'GRID' && (remoteParticipant?.id === pinnedParticipant?.p?.id || localParticipant?.id === pinnedParticipant?.p?.id)
 
-                return (
-                  <Col span={getColSpan(participants.length)} key={p.id}
-                    style={{ height: getColHeight(participants.length), padding: '0.5rem' }}>
-                    <div
-                      key={index}
-                      className={classNames(
-                        'rounded-lg relative flex items-start justify-center h-full',
-                        classNameViewer
-                      )}
-                    >
-                      <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black bg-opacity-50 cursor-pointer w-8 h-8 rounded-full items-center justify-center __btn-hover"
-                        onClick={() => {
-                          if (isPinned) {
-                            setPinnedParticipant(null)
-                            return
-                          }
-                          setPinnedParticipant({
-                            p,
-                            force: true,
-                          })
-                          if (layout === 'GRID') {
-                            setLayout('LEFT')
-                          }
-                        }}
-                      >
-                        {isPinned ? (
-                          <PinOffIcon size={16} className="text-white" />
-                        ) : (
-                          <PinIcon size={16} className="text-white" />
-                        )}
+                    return (
+                      <div className="w-full h-full relative">
+                        {/* Remote User as main view */}
+                        <div className="w-full h-full">
+                          <RemoteUser
+                            raiseRingTone={raiseRingTone}
+                            key={remoteParticipant?.id}
+                            participant={remoteParticipant}
+                            isPinned={isPinned}
+                            layout={layout}
+                            participantCount={participantCount}
+                          />
+                        </div>
+                        {/* Local User as overlay */}
+                        <div className="absolute bottom-4 right-4 w-56 z-10 shadow-lg rounded-lg overflow-hidden">
+                          <LocalUser
+                            key={localParticipant?.id}
+                            participant={localParticipant}
+                            isPinned={isPinned}
+                            layout={layout}
+                          />
+                        </div>
                       </div>
-                      {p.is_me ? (
-                        <LocalUser key={p.id} participant={p} isPinned={isPinned} layout={layout} />
-                      ) : (
-                        <RemoteUser raiseRingTone={raiseRingTone} key={p.id} participant={p} isPinned={isPinned} layout={layout} />
+                    )
+                  })()}
+                </>
+                : (
+                  <>
+                    <Row className={classNames(layout !== 'GRID' ? 'overflow-y-auto' : 'h-full')}
+                    >
+                      {map(
+                        filter(participants, (_: any, index) => index >= page * 12 && index < (page || 1) * 12),
+                        (p, index) => {
+                          const isPinned = layout !== 'GRID' && p.id === pinnedParticipant?.p?.id
+                          return (
+                            <Col span={getColSpan(participants.length)} key={p.id}
+                              style={{ height: getColHeight(participants.length), padding: '0.5rem' }}>
+                              <div
+                                key={index}
+                                className={classNames(
+                                  'rounded-lg relative flex items-start justify-center h-full',
+                                  classNameViewer
+                                )}
+                              >
+                                <div
+                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black bg-opacity-50 cursor-pointer w-8 h-8 rounded-full items-center justify-center __btn-hover"
+                                  onClick={() => {
+                                    if (isPinned) {
+                                      setPinnedParticipant(null)
+                                      return
+                                    }
+                                    setPinnedParticipant({
+                                      p,
+                                      force: true,
+                                    })
+                                    if (layout === 'GRID') {
+                                      setLayout('LEFT')
+                                    }
+                                  }}
+                                >
+                                  {isPinned ? (
+                                    <PinOffIcon size={16} className="text-white" />
+                                  ) : (
+                                    <PinIcon size={16} className="text-white" />
+                                  )}
+                                </div>
+                                {p.is_me ? (
+                                  <LocalUser key={p.id} participant={p} isPinned={isPinned} layout={layout} />
+                                ) : (
+                                  <RemoteUser raiseRingTone={raiseRingTone} key={p.id} participant={p} isPinned={isPinned} layout={layout} participantCount={participantCount} />
+                                )}
+                              </div>
+                            </Col>
+                          )
+                        }
                       )}
+                    </Row>
+                    <div
+                      className={classNames('flex items-center justify-center mt-6 absolute bottom-0 left-1/2 -translate-x-1/2')}
+                    >
+                      {map(times(Math.floor(participants?.length / 12) + 1), (_, index) => (
+                        <div
+                          className={classNames(
+                            'w-4 h-4 flex items-center justify-center cursor-pointer',
+                            participants?.length <= 12 && 'hidden'
+                          )}
+                          onClick={() => setPage(index)}
+                        >
+                          <div
+                            className={classNames(
+                              'rounded-full w-2 h-2',
+                              index === page ? 'bg-gray-200' : 'bg-gray-200 bg-opacity-30'
+                            )}
+                          />
+                        </div>
+                      ))}
                     </div>
-                  </Col>
+                  </>
                 )
-              }
-            )}
-          </Row>
-          <div
-            className={classNames('flex items-center justify-center mt-6 absolute bottom-0 left-1/2 -translate-x-1/2')}
-          >
-            {map(times(Math.floor(participants?.length / 12) + 1), (_, index) => (
-              <div
-                className={classNames(
-                  'w-4 h-4 flex items-center justify-center cursor-pointer',
-                  participants?.length <= 12 && 'hidden'
-                )}
-                onClick={() => setPage(index)}
-              >
-                <div
-                  className={classNames(
-                    'rounded-full w-2 h-2',
-                    index === page ? 'bg-gray-200' : 'bg-gray-200 bg-opacity-30'
-                  )}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+          }
+        </div>)
+      }
+    </div >
   )
 }

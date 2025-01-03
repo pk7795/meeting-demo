@@ -12,9 +12,10 @@ type Props = {
   participant: MeetingParticipant
   isPinned: boolean
   layout: 'GRID' | 'LEFT'
+  participantCount?: number
 }
 
-export const LocalUser = ({ participant, isPinned, layout }: Props) => {
+export const LocalUser = ({ participant, isPinned, layout, participantCount }: Props) => {
   const camPublisher = usePublisher(Atm0sSenders.video)
   const micPublisher = usePublisher(Atm0sSenders.audio)
   const screenPublisher = usePublisher(Atm0sSenders.screen_video)
@@ -31,19 +32,19 @@ export const LocalUser = ({ participant, isPinned, layout }: Props) => {
     if (screenStream && !isPinned) {
       return (
         <div>
-          <ViewerWapper participant={participant} stream={screenStream as Stream} priority={1000} />
+          <ViewerWapper participant={participant} stream={screenStream as Stream} priority={1000} participantCount={participantCount} />
           <div
             className={classNames(
               'w-1/3 absolute top-0 right-0 rounded-bl-lg overflow-hidden aspect-video',
               camStream ? 'block' : 'hidden'
             )}
           >
-            <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} />
+            <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} participantCount={participantCount} />
           </div>
         </div>
       )
     }
-    return <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} />
+    return <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} participantCount={participantCount} />
   }, [camStream, isPinned, participant, screenStream])
 
   // useEffect(() => {
@@ -60,8 +61,9 @@ export const LocalUser = ({ participant, isPinned, layout }: Props) => {
   return (
     <div
       className={classNames(
-        'w-full relative bg-black rounded-lg overflow-hidden aspect-video ', layout !== 'GRID' ? '' : 'h-full',
-        isHandRaised ? 'ring-4 ring-yellow-400' : ''
+        'w-full relativerounded-lg overflow-hidden aspect-video ', layout !== 'GRID' ? '' : 'h-full',
+        isHandRaised ? 'ring-4 ring-yellow-400' : '',
+        participantCount === 1 && layout == "GRID" ? "" : "bg-black"
       )}
     >
       <div className="rounded-lg overflow-hidden w-full h-full">{_renderView}</div>

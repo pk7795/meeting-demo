@@ -15,9 +15,10 @@ type Props = {
   isPinned: boolean
   raiseRingTone: HTMLAudioElement
   layout: 'GRID' | 'LEFT'
+  participantCount: number
 }
 
-export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone, layout }) => {
+export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone, layout, participantCount }) => {
   const camStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.video.name)
   const micStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.audio.name)
   const screenStream = usePeerRemoteStreamActive(participant.id!, Atm0sSenders.screen_video.name)
@@ -45,26 +46,27 @@ export const RemoteUser: FC<Props> = ({ participant, isPinned, raiseRingTone, la
     if (screenStream && !isPinned) {
       return (
         <div>
-          <ViewerWapper participant={participant} stream={screenStream as Stream} priority={1000} />
+          <ViewerWapper participant={participant} stream={screenStream as Stream} priority={1000} participantCount={participantCount} />
           <div
             className={classNames(
               'w-1/3 absolute top-0 right-0 rounded-bl-lg overflow-hidden aspect-video',
               camStream ? 'block' : 'hidden'
             )}
           >
-            <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} />
+            <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} participantCount={participantCount} />
           </div>
         </div>
       )
     }
-    return <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} />
+    return <ViewerWapper participant={participant} stream={camStream as Stream} priority={100} participantCount={participantCount} />
   }, [camStream, isPinned, participant, screenStream])
 
   return (
     <div
       className={classNames(
-        'w-full relative bg-black rounded-lg overflow-hidden aspect-video', layout !== 'GRID' ? '' : 'h-full',
-        isHandRaised ? 'ring-4 ring-yellow-400' : ''
+        'w-full relative rounded-lg overflow-hidden aspect-video', layout !== 'GRID' ? '' : 'h-full',
+        isHandRaised ? 'ring-4 ring-yellow-400' : '',
+        participantCount === 2 && layout == "GRID" ? "" : "bg-black"
       )}
     >
       <div className="rounded-lg overflow-hidden w-full h-full">{_renderView}</div>
