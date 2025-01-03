@@ -16,11 +16,12 @@ export const ViewerWapper: FC<Props> = ({ participant, stream, priority, partici
   const videoTrack = (stream as MediaStreamArc)?.stream?.getVideoTracks()?.[0];
   const cameraLabel = videoTrack?.label?.toLowerCase() || '';
 
-  const isFrontCamera = Boolean(
-    cameraLabel.includes('facetime') ||
-    cameraLabel.includes('front') ||
-    cameraLabel.includes('user')
-  );
+  // const isFrontCamera = Boolean(
+  //   cameraLabel.includes('facetime') ||
+  //   cameraLabel.includes('front') ||
+  //   cameraLabel.includes('user')
+  // );
+  const isFrontCamera = true;
 
   console.log('Camera Label:', cameraLabel, 'Is Front:', isFrontCamera);
 
