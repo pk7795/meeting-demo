@@ -10,8 +10,6 @@ import { RoomParticipant } from '@prisma/client'
 import { Atm0sSession } from '@/lib/atm0s'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
-import { ChatUser } from '@/hooks/common/useChatClient/types'
-import { getChatUserList } from '@/app/actions/chat'
 import { ChatContextProvider } from '@/contexts/chat'
 type Props = {
   room: RoomPopulated
@@ -25,7 +23,6 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
   const [joined, setJoined] = useState(false)
   const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
   console.log('RERENDER HERE')
-  const [chatUsers, setChatUsers] = useState<ChatUser[]>([]);
   const senders = useMemo(() => {
     return [Atm0sSenders.audio, Atm0sSenders.video, Atm0sSenders.screen_audio, Atm0sSenders.screen_video]
   }, [])
