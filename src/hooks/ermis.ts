@@ -1,6 +1,6 @@
 import { MapContainer } from './common'
-import { StreamRemote, usePeerRemoteStream, useSession } from '@8xff/atm0s-media-react'
-import { AudioMixSlotInfo } from '@8xff/atm0s-media-react/types/hooks/audio_level'
+import { StreamRemote, usePeerRemoteStream, useSession } from 'ermis-media-react-sdk'
+import { AudioMixSlotInfo } from 'ermis-media-react-sdk/types/hooks/audio_level'
 import { range } from 'lodash'
 import { useEffect, useState } from 'react'
 

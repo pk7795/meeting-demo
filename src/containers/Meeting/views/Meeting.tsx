@@ -1,13 +1,13 @@
 'use client'
 
-import { Atm0sSenders } from '../constants'
+import { ErmisSenders } from '../constants'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
 import { PrepareSection } from '../sections'
 import { MainSection } from '../sections/MainSection'
-import { MixMinusMode, SessionProvider, useSharedDisplayMedia, useSharedUserMedia } from '@8xff/atm0s-media-react'
+import { MixMinusMode, SessionProvider, useSharedDisplayMedia, useSharedUserMedia } from 'ermis-media-react-sdk'
 import { useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
-import { Atm0sSession } from '@/lib/atm0s'
+import { ErmisSession } from '@/lib/ermis'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { ChatContextProvider } from '@/contexts/chat'
@@ -19,12 +19,12 @@ type Props = {
 }
 
 export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingParticipants }) => {
-  const [atm0sConfig, setAtm0sConfig] = useState<Atm0sSession>()
+  const [ermisConfig, setErmisConfig] = useState<ErmisSession>()
   const [joined, setJoined] = useState(false)
   const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
   console.log('RERENDER HERE')
   const senders = useMemo(() => {
-    return [Atm0sSenders.audio, Atm0sSenders.video, Atm0sSenders.screen_audio, Atm0sSenders.screen_video]
+    return [ErmisSenders.audio, ErmisSenders.video, ErmisSenders.screen_audio, ErmisSenders.screen_video]
   }, [])
 
   const createAudio: [HTMLAudioElement, HTMLAudioElement, HTMLAudioElement] = useMemo(() => {
@@ -61,13 +61,13 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
   return (
     <MediaDeviceProvider>
       <ChatContextProvider room={room} roomParticipant={roomParticipant}>
-        {atm0sConfig && roomParticipant && joined ? (
+        {ermisConfig && roomParticipant && joined ? (
           <SessionProvider
-            logLevel={atm0sConfig.log_level}
-            gateways={atm0sConfig.gateway}
-            room={atm0sConfig.room}
-            peer={atm0sConfig.peer}
-            token={atm0sConfig.token}
+            logLevel={ermisConfig.log_level}
+            gateways={ermisConfig.gateway}
+            room={ermisConfig.room}
+            peer={ermisConfig.peer}
+            token={ermisConfig.token}
             autoConnect={false}
             onConnectError={console.error}
             mixMinusAudio={{
@@ -88,7 +88,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
               setJoined(true)
             }}
             setRoomParticipant={setRoomParticipant}
-            setAtm0sConfig={setAtm0sConfig}
+            setErmisConfig={setErmisConfig}
             myParticipant={roomParticipant}
             roomAccess={access}
           />

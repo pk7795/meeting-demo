@@ -1,4 +1,4 @@
-import { MediaStreamArc, StreamConsumer, StreamConsumerPair, StreamRemote } from '@8xff/atm0s-media-react'
+import { MediaStreamArc, StreamConsumer, StreamConsumerPair, StreamRemote } from 'ermis-media-react-sdk'
 
 export type Stream = MediaStream | MediaStreamArc | StreamRemote | StreamConsumerPair | StreamConsumer
 

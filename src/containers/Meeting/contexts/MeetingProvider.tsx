@@ -1,5 +1,5 @@
 import { UserType } from '../constants'
-import { useActions } from '@8xff/atm0s-media-react'
+import { useActions } from 'ermis-media-react-sdk'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'

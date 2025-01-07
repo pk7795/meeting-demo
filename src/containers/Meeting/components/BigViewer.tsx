@@ -1,6 +1,6 @@
 import { usePinnedParticipant } from '../contexts'
 import { MicStream, Stream } from '../types'
-import { VideoViewer } from '@8xff/atm0s-media-react'
+import { VideoViewer } from 'ermis-media-react-sdk'
 import { Avatar } from 'antd'
 import classNames from 'classnames'
 import { MicIcon, MicOffIcon, PinIcon, PinOffIcon } from 'lucide-react'

@@ -1,5 +1,5 @@
 import { Stream } from '../types'
-import { MediaStreamArc, VideoViewer } from '@8xff/atm0s-media-react'
+import { MediaStreamArc, VideoViewer } from 'ermis-media-react-sdk'
 import { Avatar } from 'antd'
 import { FC } from 'react'
 import { MeetingParticipant } from '@/types/types'

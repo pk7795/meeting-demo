@@ -1,6 +1,6 @@
 'use client'
 
-import { Atm0sSenders } from '../constants'
+import { ErmisSenders } from '../constants'
 import {
   useAudioInput,
   useMeetingParticipantsList,
@@ -18,7 +18,7 @@ import {
   useSessionState,
   useSharedDisplayMedia,
   useSharedUserMedia,
-} from '@8xff/atm0s-media-react'
+} from 'ermis-media-react-sdk'
 import { Badge, Modal, Popover, Select, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import { find, isEmpty, map } from 'lodash'
@@ -76,11 +76,11 @@ export const ToolbarSection: React.FC<Props> = ({
   const { isMobile } = useDevice()
 
   const sessionState = useSessionState()
-  const camPublisher = usePublisher(Atm0sSenders.video)
+  const camPublisher = usePublisher(ErmisSenders.video)
 
-  const micPublisher = usePublisher(Atm0sSenders.audio)
-  const screenVideoPublisher = usePublisher(Atm0sSenders.screen_video)
-  const screenAudioPublisher = usePublisher(Atm0sSenders.screen_audio)
+  const micPublisher = usePublisher(ErmisSenders.audio)
+  const screenVideoPublisher = usePublisher(ErmisSenders.screen_video)
+  const screenAudioPublisher = usePublisher(ErmisSenders.screen_audio)
   const [, micPublisherStream] = usePublisherState(micPublisher)
   const [, camPublisherStream] = usePublisherState(camPublisher)
   console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>camPublisherStream", camPublisherStream);

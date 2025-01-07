@@ -1,13 +1,13 @@
-import { LogLevel } from '@8xff/atm0s-media-react'
+import { LogLevel } from 'ermis-media-react-sdk'
 import request from 'request'
 
-export interface Atm0sConfig {
+export interface ErmisConfig {
   api: string
   appToken: string
   gateway: string
 }
 
-export interface Atm0sSession {
+export interface ErmisSession {
   gateway: string
   room: string
   peer: string
@@ -23,7 +23,7 @@ export async function callLiveApi<T>(api: string, api_path: string, token: strin
     rejectUnauthorized: false,
     headers: {
       'Content-Type': 'application/json',
-      'User-Agent': 'Atm0s-SDK/1.0.0',
+      'User-Agent': 'Ermis-SDK/1.0.0',
     },
     body: JSON.stringify(body),
   }
@@ -58,7 +58,7 @@ export async function callGatewayApi<T>(gateway: string, api_path: string, body:
     url: url,
     headers: {
       'Content-Type': 'application/json',
-      'User-Agent': 'Atm0s-SDK/1.0.0',
+      'User-Agent': 'Ermis-SDK/1.0.0',
     },
     body: JSON.stringify(body),
   }
@@ -87,7 +87,7 @@ export async function callGatewayApi<T>(gateway: string, api_path: string, body:
 export async function createLiveWebrtcToken(
   room: string,
   peer: string,
-  config: Atm0sConfig,
+  config: ErmisConfig,
   record: boolean
 ): Promise<string> {
   console.log('-------------------------webrtc_session');
@@ -104,7 +104,7 @@ export async function createLiveWebrtcToken(
 export async function createLiveRtmpToken(
   room: string,
   peer: string,
-  config: Atm0sConfig,
+  config: ErmisConfig,
   record: boolean
 ): Promise<string> {
   console.log('-------------------------rtmp_session');
@@ -123,7 +123,7 @@ export async function createRtmpUrl(
   room: string,
   peer: string,
   token: string,
-  config: Atm0sConfig
+  config: ErmisConfig
 ): Promise<{ rtmp_uri: string; stream_key: string }> {
   console.log('-------------------------rtmp/connect');
 
@@ -145,7 +145,7 @@ export async function createRtmpUrl(
   }
 }
 
-export async function createComposeToken(room: string, config: Atm0sConfig): Promise<string> {
+export async function createComposeToken(room: string, config: ErmisConfig): Promise<string> {
   console.log('-------------------------compose_session');
 
   const res = await callLiveApi<{ token: string }>(config.api, 'compose_session', config.appToken, {
@@ -155,7 +155,7 @@ export async function createComposeToken(room: string, config: Atm0sConfig): Pro
   return res.token
 }
 
-export async function submitComposeRecord(source: string, token: string, config: Atm0sConfig): Promise<string> {
+export async function submitComposeRecord(source: string, token: string, config: ErmisConfig): Promise<string> {
   console.log('-------------------------compose/submit');
 
   const res = await callGatewayApi<string>(config.gateway, 'compose/submit', {

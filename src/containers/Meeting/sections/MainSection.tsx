@@ -9,7 +9,7 @@ import {
   useRoomSupabaseChannel,
 } from '../contexts'
 import { ChatSection, PaticipantSection, ToolbarSection, ViewSection } from '../sections'
-import { useActions, useSessionState } from '@8xff/atm0s-media-react'
+import { useActions, useSessionState } from 'ermis-media-react-sdk'
 import { Button, Modal, notification, Space } from 'antd'
 import { throttle } from 'lodash'
 import {

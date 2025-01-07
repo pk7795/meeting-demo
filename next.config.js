@@ -19,8 +19,8 @@ const nextConfig = {
   },
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    ERMIS_API: process.env.ERMIS_API,
-    ERMIS_API_KEY: process.env.ERMIS_API_KEY,
+    ERMIS_CHAT_API: process.env.ERMIS_CHAT_API,
+    ERMIS_CHAT_API_KEY: process.env.ERMIS_CHAT_API_KEY,
   },
 }
 

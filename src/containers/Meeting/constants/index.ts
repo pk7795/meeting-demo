@@ -1,6 +1,6 @@
-import { ContentHint, StreamKinds } from '@8xff/atm0s-media-react'
+import { ContentHint, StreamKinds } from 'ermis-media-react-sdk'
 
-export const Atm0sSenders = {
+export const ErmisSenders = {
   video: {
     kind: StreamKinds.VIDEO,
     name: 'video_main',
@@ -23,7 +23,7 @@ export const Atm0sSenders = {
   },
 }
 
-export const Atm0sStreamPriority = {
+export const ErmisStreamPriority = {
   SmallVideo: 100,
   BigVideo: 500,
   ScreenShare: 1000,

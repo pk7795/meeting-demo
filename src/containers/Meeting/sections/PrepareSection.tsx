@@ -1,6 +1,6 @@
 import { UserType } from '../constants'
 import { useAudioInput, useSelectedCam, useSelectedMic, useVideoInput } from '../contexts'
-import { useSharedUserMedia, VideoViewer } from '@8xff/atm0s-media-react'
+import { useSharedUserMedia, VideoViewer } from 'ermis-media-react-sdk'
 import { Col, Divider, Input, Row, Select, Space, Spin, Typography } from 'antd'
 import classNames from 'classnames'
 import { filter, find, map } from 'lodash'
@@ -23,7 +23,7 @@ type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
   setRoomParticipant: (participant: RoomParticipant) => void
-  setAtm0sConfig: (config: any) => void
+  setErmisConfig: (config: any) => void
   roomAccess: RoomAccessStatus
 }
 
@@ -31,7 +31,7 @@ export const PrepareSection: React.FC<Props> = ({
   room,
   onJoinMeeting,
   setRoomParticipant,
-  setAtm0sConfig: setAtm0sConfig,
+  setErmisConfig: setErmisConfig,
   roomAccess,
 }) => {
   const { data: user, status } = useSession()
@@ -154,13 +154,13 @@ export const PrepareSection: React.FC<Props> = ({
         data: {
           passcode: room.passcode as string,
         },
-      }).then(({ atm0sConfig, roomParticipant }) => {
+      }).then(({ ermisConfig, roomParticipant }) => {
         setRoomParticipant(roomParticipant)
-        setAtm0sConfig(atm0sConfig)
+        setErmisConfig(ermisConfig)
         onJoinMeeting()
       })
     })
-  }, [onJoinMeeting, room.passcode, setAtm0sConfig, setRoomParticipant])
+  }, [onJoinMeeting, room.passcode, setErmisConfig, setRoomParticipant])
 
   const onGuestJoin = useCallback(() => {
     startTransitionCreateRoomParticipant(() => {
@@ -169,13 +169,13 @@ export const PrepareSection: React.FC<Props> = ({
           name,
           passcode: room.passcode as string,
         },
-      }).then(({ atm0sConfig, roomParticipant }) => {
+      }).then(({ ermisConfig, roomParticipant }) => {
         setRoomParticipant(roomParticipant)
-        setAtm0sConfig(atm0sConfig)
+        setErmisConfig(ermisConfig)
         onJoinMeeting()
       })
     })
-  }, [name, onJoinMeeting, room.passcode, setAtm0sConfig, setRoomParticipant])
+  }, [name, onJoinMeeting, room.passcode, setErmisConfig, setRoomParticipant])
 
   const onJoin = useCallback(() => {
     if (user) {
@@ -192,9 +192,9 @@ export const PrepareSection: React.FC<Props> = ({
           data: {
             passcode: room.passcode as string,
           },
-        }).then(({ atm0sConfig, roomParticipant }) => {
+        }).then(({ ermisConfig, roomParticipant }) => {
           setRoomParticipant(roomParticipant)
-          setAtm0sConfig(atm0sConfig)
+          setErmisConfig(ermisConfig)
           sendJoinRequest(roomParticipant.id, user.user.name as string, UserType.User)
           setAcceptSubscription(
             supabase
@@ -219,7 +219,7 @@ export const PrepareSection: React.FC<Props> = ({
         )
       }
     })
-  }, [guestUUID, name, onJoin, room.id, room.passcode, sendJoinRequest, setAtm0sConfig, setRoomParticipant, user])
+  }, [guestUUID, name, onJoin, room.id, room.passcode, sendJoinRequest, setErmisConfig, setRoomParticipant, user])
 
   const renderJoinButton = () => {
     switch (access) {
