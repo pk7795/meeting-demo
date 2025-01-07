@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@8xff/atm0s-media-js@0.1.3-alpha.10":
-  version "0.1.3-alpha.10"
-  resolved "https://registry.yarnpkg.com/@8xff/atm0s-media-js/-/atm0s-media-js-0.1.3-alpha.10.tgz#edd9969e6a97eb7fc71936b0298bc1d62525f4fc"
-  integrity sha512-yVN4c5+o6P5WI7MEJFmOB5RUq5faBRj10znVp08Y2FN3SzMUGKcTI8QHi2mKh/yhQkiZsmfSOCBJYrJkh/M3uQ==
+"@8xff/atm0s-media-js@0.1.3-alpha.11":
+  version "0.1.3-alpha.11"
+  resolved "https://registry.yarnpkg.com/@8xff/atm0s-media-js/-/atm0s-media-js-0.1.3-alpha.11.tgz#094b0a506820771323c59532050387269d994de3"
+  integrity sha512-1LWB0NTOgGQQrbzP+xDjrY/iBH+ezL9h/LnJDVXxpjm3RhmMtxsREmxzcBbs1e8Oa8cg+Aoa9r1ihu27YjS4KA==
   dependencies:
     pako "^2.1.0"
     ts-debounce "^4.0.0"

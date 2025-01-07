@@ -23,6 +23,7 @@ export const LocalUser = ({ participant, isPinned, layout, participantCount }: P
   const [, micStream] = usePublisherState(micPublisher)
   const [, screenStream] = usePublisherState(screenPublisher)
   console.log("micStream", micStream);
+  console.log("---------_---------------camStream", camStream);
 
   const audioLevel = useAudioLevelProducer(micPublisher)
   const isTalking = useMemo(() => typeof audioLevel === 'number' && audioLevel > MIN_AUDIO_LEVEL, [audioLevel])

@@ -131,7 +131,7 @@ export const useChatClient = () => {
     const logout = async () => {
         setChatClient(null);
         chatClient?.disconnectUser();
-        // chatClient?.disconnectFromSSE();
+        chatClient?.disconnectFromSSE();
         window.localStorage.clear();
     };
 

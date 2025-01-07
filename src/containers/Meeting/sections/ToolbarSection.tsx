@@ -3,6 +3,7 @@
 import { Atm0sSenders } from '../constants'
 import {
   useAudioInput,
+  useMeetingParticipantsList,
   useMeetingParticipantState,
   usePendingParticipants,
   useReceiveMessage,
@@ -44,6 +45,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ButtonIcon, Copy, Drawer, Icon, useApp } from '@/components'
 import { useDevice } from '@/hooks'
+import { useChatChannelContext } from '@/contexts/chat'
 
 type Props = {
   openChat: boolean
@@ -81,6 +83,8 @@ export const ToolbarSection: React.FC<Props> = ({
   const screenAudioPublisher = usePublisher(Atm0sSenders.screen_audio)
   const [, micPublisherStream] = usePublisherState(micPublisher)
   const [, camPublisherStream] = usePublisherState(camPublisher)
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>camPublisherStream", camPublisherStream);
+
   const [, screenPublisherStream] = usePublisherState(screenVideoPublisher)
 
   const [micStream, , micStreamChanger] = useSharedUserMedia('mic_device')
@@ -95,7 +99,8 @@ export const ToolbarSection: React.FC<Props> = ({
   const [selectedAudioInput, setSelectedAudioInput] = useSelectedMic()
   const [pendingParticipants] = usePendingParticipants()
   const [receiveMessage] = useReceiveMessage()
-
+  const participants = useMeetingParticipantsList();
+  const chatChannel = useChatChannelContext();
   const audioLevel = useAudioLevelProducer(micPublisher)
 
   const whiteboardUri = useMemo(
@@ -205,11 +210,15 @@ export const ToolbarSection: React.FC<Props> = ({
         danger: true,
       },
       onOk: () => {
+        // ????? Think about delete chat channel if user is not owner
+        // if (participants.length <= 1) {
+        //   chatChannel?.delete();
+        // }
         router.push('/')
       },
       getContainer: () => document.getElementById('id--fullScreen') as HTMLElement,
     })
-  }, [modal, router])
+  }, [modal, router, participants.length])
 
   // get meeting url
   const meetingUrl = useMemo(() => {
