@@ -3,7 +3,6 @@ import { ClerkProvider } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
-
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -18,6 +17,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: 'Ermis - Meet',
   description: 'Meet new people, make new friends, and have fun!',
+  icons: 'icon.ico',
 }
 
 export default function RootLayout({
