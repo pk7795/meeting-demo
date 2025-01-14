@@ -16,7 +16,7 @@ const geistMono = localFont({
 })
 
 export const metadata: Metadata = {
-  title: '8xFF - Meet',
+  title: 'Ermis - Meet',
   description: 'Meet new people, make new friends, and have fun!',
 }
 

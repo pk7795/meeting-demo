@@ -21,11 +21,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <img src="/logo.svg" alt="" />
+                <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg text-sidebar-primary-foreground">
+                  <img src="/ermislogo.svg" alt="" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">8xFF</span>
+                  <span className="truncate font-semibold">Ermis</span>
                   <span className="truncate text-xs">Decentralize. Innovate. Open.</span>
                 </div>
               </Link>

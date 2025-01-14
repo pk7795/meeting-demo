@@ -1,2 +1,2 @@
 export const ImgSignInBg = './sign-in-bg.webp'
-export const Logo = './logo.svg'
+export const Logo = './ermislogo.svg'

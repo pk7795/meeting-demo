@@ -2,7 +2,7 @@ import { TRoom } from '@/types'
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
-const roomAtom = atomWithStorage<TRoom[]>('8xff.room', [])
+const roomAtom = atomWithStorage<TRoom[]>('Ermis.room', [])
 
 const createRoomUseLater = atom(null, (get, set, update: TRoom) => {
   const rooms = get(roomAtom)
