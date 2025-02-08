@@ -10,9 +10,10 @@ import { Pin, PinOff } from 'lucide-react'
 
 type Props = {
   peer: RemotePeer
+  userName: string | undefined
 }
 
-export const PeerRemote: React.FC<Props> = ({ peer }) => {
+export const PeerRemote: React.FC<Props> = ({ peer, userName }) => {
   const remote_videos = useRemoteVideoTracks(peer.peer)
   const { speaking } = useAudioMixerSpeaking(peer.peer)
   const video_main = find(remote_videos, (t) => t.track === 'video_main')
@@ -39,7 +40,9 @@ export const PeerRemote: React.FC<Props> = ({ peer }) => {
       </Button>
 
       <div className="absolute bottom-3 left-2 z-[1] flex items-center gap-1">
-        <div className="truncate rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">{peer.peer}</div>
+        <div className="truncate rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">
+          {peer.peer} {video_screen && <div>, presenting</div>}
+        </div>
       </div>
       {!isEmpty(remote_videos) ? (
         <>
@@ -51,7 +54,7 @@ export const PeerRemote: React.FC<Props> = ({ peer }) => {
         </>
       ) : (
         <div className="flex aspect-square max-h-40 w-1/3 max-w-40 items-center justify-center rounded-full bg-zinc-500 text-[calc(200%)] uppercase text-white">
-          {peer.peer?.[0]}
+          {userName?.[0]}
         </div>
       )}
     </div>

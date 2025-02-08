@@ -4,6 +4,7 @@ export const generateRandomString = (length: number) => {
   let charset = ''
   charset += '1234567890'
   charset += 'abcdefghijklmnopqrstuvwxyz'
+  charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   charset += date
 
   let password = ''

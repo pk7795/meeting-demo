@@ -12,6 +12,8 @@ export class Context extends EventEmitter {
   streams_history: Map<string, string> = new Map()
 
   async requestDevice(source_name: string, kind: 'audio' | 'video' | 'screen', deviceId?: string): Promise<MediaStream> {
+    console.log('request device', source_name, kind, deviceId)
+
     const old_stream = this.streams.get(source_name)
     if (old_stream) {
       old_stream.getTracks().map((t) => t.stop())

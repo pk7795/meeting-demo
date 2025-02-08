@@ -90,7 +90,7 @@ export const MicrophoneSelection: React.FC<MicrophoneSelectionProps> = ({ source
 }
 
 export const MicrophoneToggle: React.FC<MicrophoneSelectionProps> = ({ sourceName, isFirstPage }) => {
-  const publisher = usePublisher(sourceName, Kind.AUDIO)
+  // const publisher = usePublisher(sourceName, Kind.AUDIO)
   const ctx = useContext(MediaContext)
   const stream = useDeviceStream(sourceName)
 
@@ -104,14 +104,14 @@ export const MicrophoneToggle: React.FC<MicrophoneSelectionProps> = ({ sourceNam
     init()
   }, [ctx, sourceName, isFirstPage])
 
-  useEffect(() => {
-    const track = stream?.getAudioTracks()[0]
-    if (track && !publisher.attached) {
-      publisher.attach(track)
-    } else if (!track && publisher.attached) {
-      publisher.detach()
-    }
-  }, [publisher, stream])
+  // useEffect(() => {
+  //   const track = stream?.getAudioTracks()[0]
+  //   if (track && !publisher.attached) {
+  //     publisher.attach(track)
+  //   } else if (!track && publisher.attached) {
+  //     publisher.detach()
+  //   }
+  // }, [publisher, stream])
 
   const onToggle = useCallback(() => {
     if (stream) {

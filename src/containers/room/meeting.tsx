@@ -3,13 +3,16 @@
 import { AudioMixerPlayer, PeerLocal, PeerRemote } from '@/components'
 import { Button } from '@/components/ui/button'
 import { peerPinnedAtom } from '@/jotai/peer'
+import { ADMIT_RINGTONE, MESSAGE_RINGTONE } from '@/public'
 import { RoomStore } from '@/stores/room'
+import { RoomPopulated } from '@/types/types'
 import { useRemotePeers, useRoom } from '@atm0s-media-sdk/react-hooks'
-import { useUser } from '@clerk/nextjs'
+import { RoomParticipant } from '@prisma/client'
 import { useMouse } from '@uidotdev/usehooks'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { filter, find, map } from 'lodash'
 import { CopyIcon, XIcon } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,23 +21,32 @@ import { BottomBarV2, GridViewLayout, Header, SidebarViewLayout } from './compon
 
 type Props = {
   host: string | null
+  roomParticipant: RoomPopulated
+  myParticipant: RoomParticipant | null
 }
 
-export const Meeting: React.FC<Props> = ({ host }) => {
+export const Meeting: React.FC<Props> = ({ host, myParticipant, roomParticipant }) => {
   const params = useParams()
   const room = useRoom()
   const remotePeers = useRemotePeers()
-  const meetingLink = `https://${host}/invite/${params?.room}`
+  const meetingLink = `https://${host}/${params?.room}`
   const [, onCopy] = useCopyToClipboard()
   const [isCreateNewRoom, setIsCreateNewRoom] = useState(true)
   const [mouse, containerRef] = useMouse<any>()
-  const { user } = useUser()
+  const { data: session } = useSession()
+  const user = session?.user
   const addListUserToRoom = useSetAtom(RoomStore.addListUserToRoom)
-
   const widthContent = containerRef?.current?.clientWidth
   const heightContent = containerRef?.current?.clientHeight
   const peerPinned = useAtomValue(peerPinnedAtom)
 
+  // const [joinRequest, clearJoinRequest] = useJoinRequest()
+
+  // const [pendingParticipants, delPendingParticipant] = usePendingParticipants()
+
+  // const roomSupabaseChannel = useRoomSupabaseChannel()
+  const admitRingTone = useMemo(() => new Audio(ADMIT_RINGTONE), [])
+  const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
   const checkPeerPinned = useMemo(() => {
     if (peerPinned?.peer === room?.peer) return { check: true, peer: 'local', peerItem: room }
     const findRemotePeer = find(remotePeers, (peer) => peer.peer === peerPinned?.peer)
@@ -51,13 +63,65 @@ export const Meeting: React.FC<Props> = ({ host }) => {
       toast.success('Copied invite link', { duration: 2000 })
     })
   }
+  // const sendAcceptJoinRequest = useCallback(
+  //   (id: string, type: UserType) => {
+  //     console.log(`${id}:room:${roomParticipant.id}`)
 
-  const peerLocal = useMemo(() => <PeerLocal />, [])
+  //     if (type === UserType.User) {
+  //       acceptParticipant(id)
+  //     }
+
+  //     const channel = supabase.channel(`${id}:room:${roomParticipant.id}`)
+  //     channel.subscribe((status) => {
+  //       if (status === 'SUBSCRIBED') {
+  //         channel.send({
+  //           type: 'broadcast',
+  //           event: 'accepted',
+  //           payload: { token: 'aaaaaa' },
+  //         })
+  //         delPendingParticipant(id)
+  //       }
+  //     })
+  //   },
+  //   [delPendingParticipant, roomParticipant.id]
+  // )
+
+  // useEffect(() => {
+  //   console.log('joinRequest', joinRequest);
+
+  //   if (!joinRequest) return
+  //   const { id, name, type } = joinRequest
+
+  //   toast.success("hahahahaha", { duration: 2000 })
+  //   admitRingTone.play()
+  //   // openNotification({
+  //   //   message: `A ${type} named '${name}' is requesting to join the room`,
+  //   //   description: 'Do you want to accept this request?',
+  //   //   buttons: {
+  //   //     confirm: 'Accept',
+  //   //     onConfirm: () => {
+  //   //       sendAcceptJoinRequest(id, type)
+  //   //     },
+  //   //     cancel: 'Reject',
+  //   //     onCancel: () => {
+  //   //       delPendingParticipant(id)
+  //   //     },
+  //   //   },
+  //   //   onClose: () => {
+  //   //     clearJoinRequest()
+  //   //   },
+  //   // })
+  // }, [admitRingTone, clearJoinRequest, delPendingParticipant, joinRequest, toast, sendAcceptJoinRequest])
+
+  //end  accept join request
+
+  //? move participant to meetingProvider
+  const peerLocal = useMemo(() => <PeerLocal userName={myParticipant?.name} />, [])
 
   const mainPeerScreen = useMemo(() => {
     if (checkPeerPinned.check && checkPeerPinned.peer === 'remote') {
       const peer: any = checkPeerPinned.peerItem
-      return <PeerRemote peer={peer} />
+      return <PeerRemote peer={peer} userName={myParticipant?.name} />
     }
     return peerLocal
   }, [checkPeerPinned, peerLocal])
@@ -68,10 +132,10 @@ export const Meeting: React.FC<Props> = ({ host }) => {
     let mapRemotePeers = []
     if (checkPeerPinned.check && checkPeerPinned.peer === 'remote') {
       const peerRemote: any = filter(filterRemotePeers, (p) => p.peer != checkPeerPinned?.peerItem?.peer)
-      const peerRemoteScreen = map(peerRemote, (p) => <PeerRemote key={p.peer} peer={p} />)
+      const peerRemoteScreen = map(peerRemote, (p) => <PeerRemote key={p.peer} peer={p} userName={myParticipant?.name} />)
       mapRemotePeers = [peerLocal, ...peerRemoteScreen]
     } else {
-      mapRemotePeers = map(filterRemotePeers, (p) => <PeerRemote key={p.peer} peer={p} />)
+      mapRemotePeers = map(filterRemotePeers, (p) => <PeerRemote key={p.peer} peer={p} userName={myParticipant?.name} />)
     }
     return mapRemotePeers
   }, [checkPeerPinned.check, checkPeerPinned.peer, checkPeerPinned?.peerItem?.peer, filterRemotePeers, peerLocal])
@@ -80,9 +144,9 @@ export const Meeting: React.FC<Props> = ({ host }) => {
     addListUserToRoom({
       users: [
         {
-          gmail: user?.emailAddresses?.[0]?.emailAddress as string,
-          name: user?.fullName ?? '',
-          avatar: user?.imageUrl as string,
+          gmail: user?.email ?? '',
+          name: user?.name ?? '',
+          avatar: user?.image ?? '',
         },
         ...map(remotePeers, (item) => ({ gmail: item.peer, name: item.peer, avatar: '' })),
       ],
@@ -96,7 +160,10 @@ export const Meeting: React.FC<Props> = ({ host }) => {
       })
     }
   }, [addListUserToRoom, params?.room, remotePeers, user])
-
+  // useEffect(() => {
+  //   console.log("Giá trị joinRequest thay đổi:", joinRequest, pendingParticipants);
+  //   // Bạn có thể thực hiện xử lý khác ở đây mỗi khi joinRequest cập nhật
+  // }, [joinRequest, pendingParticipants]);
   return (
     <div
       ref={containerRef}

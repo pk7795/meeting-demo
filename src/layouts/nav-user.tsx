@@ -17,10 +17,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
-import { useClerk, useUser } from '@clerk/nextjs'
 import { BadgeCheck, Bell, ChevronsUpDown, LogOut, SunMoonIcon } from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
 import { useTheme } from 'next-themes'
-
 export const NavUser = () => {
   return (
     <SidebarMenu>
@@ -36,8 +35,7 @@ type UserInfoProps = {}
 export const UserInfo: React.FC<UserInfoProps> = () => {
   const { isMobile } = useSidebar()
   const { theme, setTheme } = useTheme()
-  const { signOut } = useClerk()
-
+  const { data: session } = useSession()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -45,7 +43,7 @@ export const UserInfo: React.FC<UserInfoProps> = () => {
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
-          <UserAvatar hasArrow />
+          {session ? <UserAvatar hasArrow /> : <SignIn />}
         </SidebarMenuButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -86,10 +84,12 @@ export const UserInfo: React.FC<UserInfoProps> = () => {
           </DropdownMenuPortal>
         </DropdownMenuSub>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => signOut()}>
-          <LogOut />
-          Log out
-        </DropdownMenuItem>
+        {session && (
+          <DropdownMenuItem onClick={() => signOut()}>
+            <LogOut />
+            Log out
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -100,12 +100,13 @@ type UserAvatarProps = {
 }
 
 const UserAvatar: React.FC<UserAvatarProps> = ({ hasArrow }) => {
-  const { user } = useUser()
+  const { data: session } = useSession()
+  const user = session?.user
 
-  const avatar = user?.imageUrl as string
-  const name = user?.fullName as string
+  const avatar = user?.image as string
+  const name = user?.name as string
   const firstLetter = name?.split('')?.[0]
-  const email = user?.emailAddresses?.[0]?.emailAddress as string
+  const email = user?.email as string
   return (
     <>
       <Avatar className="h-8 w-8 rounded-lg">
@@ -118,5 +119,13 @@ const UserAvatar: React.FC<UserAvatarProps> = ({ hasArrow }) => {
       </div>
       {hasArrow && <ChevronsUpDown className="ml-auto size-4" />}
     </>
+  )
+}
+
+const SignIn: React.FC = () => {
+  return (
+    <div className="grid flex-1 justify-center text-left text-sm leading-tight">
+      <span className="truncate font-semibold">Guest User</span>
+    </div>
   )
 }

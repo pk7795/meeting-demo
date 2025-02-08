@@ -1,17 +1,15 @@
 'use client'
 
-import { useClerk, useUser } from '@clerk/nextjs'
+import { signOut, useSession } from 'next-auth/react'
 
 type Props = {}
 
 export const Username: React.FC<Props> = ({}) => {
-  const { signOut } = useClerk()
-  const { user } = useUser()
-  const fullName = user?.fullName
-
+  const { data: session } = useSession()
+  const user = session?.user
   return (
     <>
-      Logged in as {fullName} |{' '}
+      Logged in as {user?.name} |{' '}
       <span className="cursor-pointer underline" onClick={() => signOut()}>
         Logout
       </span>

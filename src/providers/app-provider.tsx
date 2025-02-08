@@ -1,11 +1,11 @@
 'use client'
 
-import { Toaster } from 'sonner'
-
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { JotaiProvider } from '@/providers/jotai-provider'
 import { ReactQueryProvider } from '@/providers/react-query-provider'
+import { SessionProvider } from 'next-auth/react'
 import dynamic from 'next/dynamic'
+import { Toaster } from 'sonner'
 type Props = {
   children: React.ReactNode
 }
@@ -15,14 +15,16 @@ const ThemeProvider = dynamic(() => import('./theme-provider').then((mod) => mod
 export const AppProvider: React.FC<Props> = ({ children }) => {
   return (
     <>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        <ReactQueryProvider>
-          <JotaiProvider>
-            <TooltipProvider>{children}</TooltipProvider>
-          </JotaiProvider>
-        </ReactQueryProvider>
-      </ThemeProvider>
-      <Toaster />
+      <SessionProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <ReactQueryProvider>
+            <JotaiProvider>
+              <TooltipProvider>{children}</TooltipProvider>
+            </JotaiProvider>
+          </ReactQueryProvider>
+        </ThemeProvider>
+        <Toaster />
+      </SessionProvider>
     </>
   )
 }

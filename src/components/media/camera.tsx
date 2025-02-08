@@ -112,8 +112,8 @@ export const CameraSelection: React.FC<CameraSelectionProps> = ({ sourceName }) 
 }
 
 export const CameraToggle: React.FC<CameraSelectionProps> = ({ sourceName, isFirstPage }) => {
-  const publisher = usePublisher(sourceName, Kind.VIDEO, PUBLISHER_CONFIG)
   const ctx = useContext(MediaContext)
+  // const publisher = usePublisher(sourceName, Kind.VIDEO, PUBLISHER_CONFIG)
   const stream = useDeviceStream(sourceName)
 
   useEffect(() => {
@@ -126,14 +126,14 @@ export const CameraToggle: React.FC<CameraSelectionProps> = ({ sourceName, isFir
     init()
   }, [ctx, sourceName, isFirstPage])
 
-  useEffect(() => {
-    const track = stream?.getVideoTracks()[0]
-    if (track && !publisher.attached) {
-      publisher.attach(track)
-    } else if (!track && publisher.attached) {
-      publisher.detach()
-    }
-  }, [publisher, stream])
+  // useEffect(() => {
+  //   const track = stream?.getVideoTracks()[0]
+  //   if (track && !publisher.attached) {
+  //     publisher.attach(track)
+  //   } else if (!track && publisher.attached) {
+  //     publisher.detach()
+  //   }
+  // }, [publisher, stream])
 
   const onToggle = useCallback(() => {
     if (stream) {
