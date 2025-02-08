@@ -223,7 +223,7 @@ export const ToolbarSection: React.FC<Props> = ({
   // get meeting url
   const meetingUrl = useMemo(() => {
     const baseUrl = window.location.origin
-    return `${baseUrl}/meeting/${params?.passcode}`
+    return `${baseUrl}/${params?.passcode}`
   }, [params?.passcode])
 
   return (

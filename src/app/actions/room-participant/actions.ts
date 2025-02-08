@@ -1,7 +1,8 @@
 'use server'
 
 import { env, getPrisma, getSessionUser } from '@/lib'
-import { createLiveWebrtcToken } from '@/lib/atm0s'
+import { generateToken } from '@/lib/atm0s'
+
 
 export async function createRoomParticipantLoginUser({ data }: { data: { passcode: string } }) {
   const prisma = getPrisma()
@@ -48,16 +49,15 @@ export async function createRoomParticipantLoginUser({ data }: { data: { passcod
   }
 
   const peer = roomParticipant.id
-  const token = await createLiveWebrtcToken(room.id, peer, env.ATM0S_CONFIG, false)
-  const atm0sConfig = {
+  const token = await generateToken(room.id, peer, env.GATEWAYS, env.APP_SECRET)
+  const peerSession = {
     room: room.id,
     peer,
-    gateway: env.ATM0S_CONFIG.gateway,
+    gateway: env.GATEWAYS,
     token: token,
-    log_level: env.ATM0S_CONFIG.logLevel,
   }
   return {
-    atm0sConfig,
+    peerSession,
     roomParticipant,
   }
 }
@@ -84,16 +84,15 @@ export async function createRoomParticipantGuestUser({ data }: { data: { name: s
   })
 
   const peer = roomParticipant.id
-  const token = await createLiveWebrtcToken(room.id, peer, env.ATM0S_CONFIG, false)
-  const atm0sConfig = {
+  const token = await generateToken(room.id, peer, env.GATEWAYS, env.APP_SECRET)
+  const peerSession = {
     room: room.id,
     peer,
-    gateway: env.ATM0S_CONFIG.gateway,
+    gateway: env.GATEWAYS,
     token: token,
-    log_level: env.ATM0S_CONFIG.logLevel,
   }
   return {
-    atm0sConfig,
+    peerSession,
     roomParticipant,
   }
 }

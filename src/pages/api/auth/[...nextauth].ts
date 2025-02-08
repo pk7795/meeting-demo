@@ -4,7 +4,7 @@ import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { env, getPrisma } from '@/lib'
 import axios from 'axios'
-const CHAT_API_URL = `${env.ERMIS_API}/uss/v1/wallets/google_login`;
+const CHAT_API_URL = `${env.ERMIS_CHAT_API}/uss/v1/wallets/google_login`;
 const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(getPrisma()),
   secret: env.NEXTAUTH_SECRET,
@@ -24,7 +24,7 @@ const authOptions: NextAuthOptions = {
         try {
           const response = await axios.post(CHAT_API_URL, {
             token: account.id_token,
-            apikey: env.ERMIS_API_KEY,
+            apikey: env.ERMIS_CHAT_API_KEY,
           });
 
           const existingChatToken = await getPrisma().chatToken.findFirst({
@@ -140,7 +140,7 @@ function hasTokenExpired(accessToken: string): boolean {
 }
 async function refreshChatTokens(refreshToken: string) {
   try {
-    const response = await axios.post(`${env.ERMIS_API}/uss/v1/wallets/google_login`, {
+    const response = await axios.post(`${env.ERMIS_CHAT_API}/uss/v1/wallets/google_login`, {
       refreshToken,
     });
 

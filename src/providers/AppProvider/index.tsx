@@ -5,11 +5,9 @@ import dynamic from 'next/dynamic'
 import { ReactNode, useState } from 'react'
 import { RecoilRoot } from 'recoil'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
-const AntdProvider = dynamic(() => import('@/providers/AntdProvider'), {
-  ssr: false,
-})
-
+const ThemeProvider = dynamic(() => import('@/providers/ThemeProvider').then((mod) => mod.ThemeProvider), { ssr: false })
 type Props = {
   children?: ReactNode
 }
@@ -21,7 +19,11 @@ export const AppProvider: React.FC<Props> = ({ children }) => {
     <SessionProvider>
       <RecoilRoot>
         <QueryClientProvider client={queryClient}>
-          <AntdProvider>{children}</AntdProvider>
+          <ThemeProvider>
+            <TooltipProvider>
+              {children}
+            </TooltipProvider>
+          </ThemeProvider>
         </QueryClientProvider>
       </RecoilRoot>
     </SessionProvider>

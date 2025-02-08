@@ -1,6 +1,7 @@
-import { LogLevel } from '@8xff/atm0s-media-react'
+
 
 export const env = {
+  GATEWAYS: (process.env.NEXT_PUBLIC_GATEWAYS as string) || 'http://localhost:3000',
   SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
   NEXTAUTH_URL: process.env.NEXTAUTH_URL as string,
   PUBLIC_URL: (process.env.PUBLIC_URL || process.env.NEXTAUTH_URL) as string,
@@ -10,12 +11,7 @@ export const env = {
   GITHUB_SECRET: process.env.GITHUB_SECRET as string,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
-  ATM0S_CONFIG: {
-    api: process.env.ATM0S_API as string,
-    gateway: process.env.ATM0S_GATEWAY as string,
-    appToken: process.env.ATM0S_APP_TOKEN as string,
-    logLevel: parseInt(process.env.ATM0S_LOG_LEVEL || '2') as LogLevel,
-  },
-  ERMIS_API: process.env.ERMIS_API,
-  ERMIS_API_KEY: process.env.ERMIS_API_KEY
+  APP_SECRET: process.env.APP_SECRET as string,
+  ERMIS_CHAT_API: process.env.ERMIS_CHAT_API,
+  ERMIS_CHAT_API_KEY: process.env.ERMIS_CHAT_API_KEY,
 } as const

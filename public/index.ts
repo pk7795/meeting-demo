@@ -8,3 +8,4 @@ export const MESSAGE_RINGTONE = '/audio/message-ringtone.mp3'
 export const RAISE_HAND_RINGTONE = '/audio/raise-hand-ringtone.mp3'
 
 export const ERMIS_LOGO = '/ermislogo.svg'
+export const ImgSignInBg = '/sign-in-bg.webp'

@@ -8,8 +8,10 @@ import { useAudioSlotsQueueContainer } from '@/hooks'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
 import { MeetingParticipant, RoomMessageWithParticipant, RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { ChatUser } from '@/hooks/common/useChatClient/types'
+import { JoinInfo } from '@atm0s-media-sdk/core'
+import { RemotePeer, useSession } from '@atm0s-media-sdk/react-hooks'
 
-type PinnedPaticipant = { p: MeetingParticipant; force?: boolean }
+type PinnedPaticipant = { p: JoinInfo | RemotePeer; force?: boolean, name?: string }
 
 export const MeetingContext = createContext<{
   data: {
@@ -276,7 +278,7 @@ export const MeetingProvider = ({
     }
   }, [])
 
-  const actions = useActions()
+  const session = useSession()
 
   useEffect(() => {
     return data.destroy
@@ -285,8 +287,8 @@ export const MeetingProvider = ({
   console.log(' RENDER --------------------------------------------------------')
 
   useEffect(() => {
-    actions.connect()
-  }, [actions])
+    session.connect()
+  }, [session])
 
   const setParticipantState = useCallback(
     (state: MeetingParticipantStatus) => {
@@ -322,15 +324,15 @@ export const MeetingProvider = ({
     if (list.length > 0 && list[0].peerId) {
       const sorted = list.sort((a, b) => a.ts - b.ts)
       let selected = sorted[0].peerId
-      const pinned = sorted.find((p) => p.peerId === data.pinnedPaticipant?.data?.p?.id)
+      const pinned = sorted.find((p) => p.peerId === data.pinnedPaticipant?.data?.p?.peer)
       if (pinned) {
         selected = sorted.find((p) => p.audioLevel - pinned.audioLevel > 20)?.peerId || pinned.peerId
       }
       if (!data.pinnedPaticipant?.data?.force) {
-        setPinnedParticipant({
-          p: data.paticipants.get(selected),
-          force: false,
-        })
+        // setPinnedParticipant({
+        //   p: data.paticipants.get(selected),
+        //   force: false,
+        // })
       }
     }
   })

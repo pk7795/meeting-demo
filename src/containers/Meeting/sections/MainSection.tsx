@@ -4,15 +4,16 @@ import { UserType } from '../constants'
 import {
   useIsConnected,
   useJoinRequest,
+  useOnlineMeetingParticipantsList,
   usePendingParticipants,
+  usePinnedParticipant,
   useReceiveMessage,
   useRoomSupabaseChannel,
 } from '../contexts'
-import { ChatSection, PaticipantSection, ToolbarSection, ViewSection } from '../sections'
-import { useActions, useSessionState } from '@8xff/atm0s-media-react'
-import { Button, Modal, notification, Space } from 'antd'
-import { throttle } from 'lodash'
+import { Button as AntdButton, Modal, notification, Space } from 'antd'
+import { find, throttle, filter, map } from 'lodash'
 import {
+  CopyIcon,
   LayoutGridIcon,
   LayoutPanelLeftIcon,
   Loader2Icon,
@@ -21,13 +22,14 @@ import {
   MoonIcon,
   RefreshCwIcon,
   SunIcon,
+  XIcon,
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import useWindowFocus from 'use-window-focus'
-import { useTimeout } from 'usehooks-ts'
+import { useCopyToClipboard, useTimeout } from 'usehooks-ts'
 import { RoomParticipant } from '@prisma/client'
 import { ADMIT_RINGTONE, MESSAGE_RINGTONE, ERMIS_LOGO } from '@public'
 import { acceptParticipant } from '@/app/actions'
@@ -36,7 +38,18 @@ import { supabase } from '@/config/supabase'
 import { useDevice, useFullScreen } from '@/hooks'
 import { themeState } from '@/recoil'
 import { RoomPopulated } from '@/types/types'
-
+import { useMouse } from '@uidotdev/usehooks'
+import { toast } from 'sonner'
+import { useParams } from 'next/navigation'
+import { Header } from '../components/header'
+import { GridViewLayout } from '../components/grid-view-layout'
+import { AudioMixerPlayer } from '@/components/media/audio-mixer'
+import { BottomBarV2 } from '../components/bottom-bar-v2'
+import { Button } from '@/components/ui/button'
+import { SidebarViewLayout } from '../components/sidebar-view-layout'
+import { useRemotePeers, useRoom, useSessionStatus } from '@atm0s-media-sdk/react-hooks'
+import { PeerLocal, PeerRemote } from '@/components/media'
+import { MainLayout } from '@/layouts'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -57,9 +70,74 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const admitRingTone = useMemo(() => new Audio(ADMIT_RINGTONE), [])
   const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
   const windowFocused = useWindowFocus()
-  const sessionState = useSessionState()
+  const sessionStatus = useSessionStatus()
   const [visibleRefresh, setVisibleRefresh] = useState(false)
+  const participants = useOnlineMeetingParticipantsList()
 
+  //From new meeting
+  const params = useParams()
+  const [, onCopy] = useCopyToClipboard()
+  const [isCreateNewRoom, setIsCreateNewRoom] = useState(true)
+  // const [mouse, containerRef] = useMouse<any>()
+  // const widthContent = containerRef?.current?.clientWidth
+  // const heightContent = containerRef?.current?.clientHeight
+  const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
+  const roomInfo = useRoom()
+  const remotePeers = useRemotePeers()
+
+  // const isHoverContent =
+  //   mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
+  const isHoverContent = true
+  const baseUrl = window.location.origin
+  const meetingLink = `${baseUrl}/${params?.passcode}`
+
+  const onCopyInviteLink = () => {
+    onCopy(meetingLink as string).then(() => {
+      toast.success('Copied invite link', { duration: 2000 })
+    })
+  }
+
+  const checkPeerPinned = useMemo(() => {
+    if (pinnedParticipant?.p.peer === roomInfo?.peer) return { check: true, peer: 'local', peerItem: roomInfo }
+    const findRemotePeer = find(remotePeers, (peer) => peer.peer === pinnedParticipant?.p.peer)
+    return findRemotePeer
+      ? { check: true, peer: 'remote', peerItem: findRemotePeer }
+      : { check: false, peer: null, peerItem: null }
+  }, [pinnedParticipant?.p.peer, room, remotePeers])
+
+  const peerLocal = useMemo(() => <PeerLocal userName={myParticipant?.name} />, [])
+
+  const mainPeerScreen = useMemo(() => {
+    if (checkPeerPinned.check && checkPeerPinned.peer === 'remote') {
+      const peer: any = checkPeerPinned.peerItem
+
+      const remoteParticipant = find(participants, (p) => p.id === peer.peer)
+      return <PeerRemote peer={peer} userName={remoteParticipant?.name} />
+    }
+    return peerLocal
+  }, [checkPeerPinned, peerLocal])
+
+  const filterRemotePeers = useMemo(() => filter(remotePeers, (p) => p.peer != roomInfo?.peer), [remotePeers, roomInfo?.peer])
+
+  const peerRemoteMixerAudio = useMemo(() => {
+    let mapRemotePeers = []
+    if (checkPeerPinned.check && checkPeerPinned.peer === 'remote') {
+      const peerRemote: any = filter(filterRemotePeers, (p) => p.peer != checkPeerPinned?.peerItem?.peer)
+
+      const peerRemoteScreen = map(peerRemote, (p) => {
+        const participant = find(participants, (participant) => participant.id === p.peer)
+        return <PeerRemote key={p.peer} peer={p} userName={participant?.name} />
+      })
+      mapRemotePeers = [peerLocal, ...peerRemoteScreen]
+    } else {
+      mapRemotePeers = map(filterRemotePeers, (p) => {
+        const participant = find(participants, (participant) => participant.id === p.peer)
+
+        return <PeerRemote key={p.peer} peer={p} userName={participant?.name} />
+      })
+    }
+    return mapRemotePeers
+  }, [checkPeerPinned.check, checkPeerPinned.peer, checkPeerPinned?.peerItem?.peer, filterRemotePeers, peerLocal])
   useTimeout(() => setVisibleRefresh(true), 30000)
 
   useEffect(() => {
@@ -70,9 +148,9 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     }
     if (
       isConnected === false ||
-      sessionState === 'reconnecting' ||
-      sessionState === 'disconnected' ||
-      sessionState === 'error'
+      sessionStatus === 'reconnecting' ||
+      sessionStatus === 'disconnected' ||
+      sessionStatus === 'error'
     ) {
       timeout = setTimeout(() => {
         setVisibleRefresh(true)
@@ -81,10 +159,10 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     return () => {
       clearTimeout(timeout)
     }
-  }, [isConnected, sessionState, visibleRefresh])
+  }, [isConnected, sessionStatus, visibleRefresh])
 
   console.log('--------------------------------------------------------')
-  console.log('sessionState', sessionState)
+  console.log('sessionStatus', sessionStatus)
   console.log('--------------------------------------------------------')
 
   const { data: session } = useSession()
@@ -144,7 +222,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       const key = 'open' + Date.now()
       const btn = (
         <Space>
-          <Button
+          <AntdButton
             type="link"
             size="small"
             onClick={() => {
@@ -153,8 +231,8 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
             }}
           >
             {opts.buttons.cancel}
-          </Button>
-          <Button
+          </AntdButton>
+          <AntdButton
             type="primary"
             size="small"
             onClick={() => {
@@ -163,7 +241,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
             }}
           >
             {opts.buttons.confirm}
-          </Button>
+          </AntdButton>
         </Space>
       )
       api.open({
@@ -245,11 +323,10 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
         footer={false}
         closable={false}
         open={
-          // isConnected === false ||
-          // sessionState === 'reconnecting' ||
-          // sessionState === 'disconnected' ||
-          // sessionState === 'error'
-          false
+          isConnected === false ||
+          sessionStatus === 'reconnecting' ||
+          sessionStatus === 'disconnected' ||
+          sessionStatus === 'error'
         }
       >
         <div className="flex flex-col items-center justify-center">
@@ -268,85 +345,44 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
         </div>
       </Modal>
       {contextHolder}
-      <div className="bg-[#F9FAFB] dark:bg-dark_ebony h-screen flex items-center" id="id--fullScreen">
-        <div className="flex-1 h-full flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between h-16 px-4 ">
-            <Space>
-              <Link href="/">
-                <img src={theme === 'dark' ? ERMIS_LOGO : ERMIS_LOGO} alt="" className="h-8" />
-              </Link>
-              <div className="pl-2">
-                <div className="dark:text-gray-100 text-xl font-semibold">{room.name}</div>
-              </div>
-            </Space>
-            <Space>
-              <ButtonIcon
-                className="hidden lg:flex"
-                onClick={() => setLayout('GRID')}
-                icon={<LayoutGridIcon size={16} color={layout === 'GRID' ? '#2D8CFF' : '#9ca3af'} />}
-              />
-              <ButtonIcon
-                className="hidden lg:flex"
-                onClick={() => setLayout('LEFT')}
-                icon={<LayoutPanelLeftIcon size={16} color={layout === 'LEFT' ? '#2D8CFF' : '#9ca3af'} />}
-              />
-              <ButtonIcon
-                onClick={() => onOpenFullScreen()}
-                icon={
-                  !isMaximize ? (
-                    <MaximizeIcon size={16} color="#9ca3af" />
-                  ) : (
-                    <MinimizeIcon size={16} color="#9ca3af" />
-                  )
-                }
-                className="hidden lg:flex"
-              />
-              <ButtonIcon
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                shape="circle"
-                icon={theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} color="#000" />}
-              />
-            </Space>
-          </div>
-          <ViewSection layout={layout} setLayout={setLayout} />
-          <ToolbarSection
-            sendEvent={sendRoomEvent}
-            openChat={openChat}
-            setOpenChat={setOpenChat}
-            openPaticipant={openPaticipant}
-            setOpenPaticipant={setOpenPaticipant}
-          />
+      <div
+        // ref={containerRef}
+        className="  h-screen relative flex w-full items-start justify-center overflow-hidden bg-foreground px-4 pt-[60px] " id="id--fullScreen"
+      >
+        {isHoverContent && <Header meetingLink={meetingLink} />}
+
+        <div className="flex h-full max-h-[calc(100vh-168px)] w-full flex-col">
+          {!checkPeerPinned?.check ? (
+            <GridViewLayout items={[mainPeerScreen, ...(peerRemoteMixerAudio || [])]} />
+          ) : (
+            <SidebarViewLayout
+              showButtonExpand={isHoverContent}
+              mainPeerScreen={mainPeerScreen}
+              remotePeerScreens={[...(peerRemoteMixerAudio || [])]}
+            />
+          )}
+          <AudioMixerPlayer />
         </div>
-        {!isMobile ? (
-          <>
-            {openChat && (
-              <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
-                <ChatSection room={room} onClose={() => setOpenChat(false)} />
+        {isHoverContent && <BottomBarV2 />}
+
+        {isCreateNewRoom && (
+          <div className="absolute bottom-24 left-8 z-[2] w-[360px] rounded-xl bg-muted">
+            <div className="flex items-center justify-between py-2 pl-4 pr-3">
+              <div>Your meeting&apos;s ready</div>
+              <Button className={'h-7 w-7'} variant={'ghost'} onClick={() => setIsCreateNewRoom(false)}>
+                <XIcon size={16} />
+              </Button>
+            </div>
+            <div className="grid gap-4 px-4 pb-4">
+              <div className="text-xs text-muted-foreground">Share this meeting link with others you want in the meeting</div>
+              <div className="flex h-10 items-center gap-2 rounded bg-zinc-200 pl-3">
+                <div className="flex-1 text-sm">{meetingLink}</div>
+                <Button variant="link" size="icon" onClick={onCopyInviteLink}>
+                  <CopyIcon size={16} />
+                </Button>
               </div>
-            )}
-            {openPaticipant && (
-              <div className="w-80 h-full dark:bg-[#17202E] bg-[#F9FAFB] border-l dark:border-l-[#232C3C]">
-                <PaticipantSection
-                  room={room}
-                  onClose={() => setOpenPaticipant(false)}
-                  sendAcceptJoinRequest={sendAcceptJoinRequest}
-                />
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <Drawer open={openChat} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
-              <ChatSection room={room} onClose={() => setOpenChat(false)} />
-            </Drawer>
-            <Drawer open={openPaticipant} headerStyle={{ display: 'none' }} bodyStyle={{ padding: 0 }}>
-              <PaticipantSection
-                room={room}
-                onClose={() => setOpenPaticipant(false)}
-                sendAcceptJoinRequest={sendAcceptJoinRequest}
-              />
-            </Drawer>
-          </>
+            </div>
+          </div>
         )}
       </div>
     </>

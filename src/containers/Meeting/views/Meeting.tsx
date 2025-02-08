@@ -7,10 +7,12 @@ import { MainSection } from '../sections/MainSection'
 import { MixMinusMode, SessionProvider, useSharedDisplayMedia, useSharedUserMedia } from '@8xff/atm0s-media-react'
 import { useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
-import { Atm0sSession } from '@/lib/atm0s'
+import { peerSession } from '@/lib/atm0s'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { ChatContextProvider } from '@/contexts/chat'
+import { SettingSection } from '../sections/SettingSection'
+import { Atm0sMediaProvider, AudioMixerMode } from '@atm0s-media-sdk/react-hooks'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -19,7 +21,7 @@ type Props = {
 }
 
 export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingParticipants }) => {
-  const [atm0sConfig, setAtm0sConfig] = useState<Atm0sSession>()
+  const [peerSession, setPeerSession] = useState<peerSession>()
   const [joined, setJoined] = useState(false)
   const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
   console.log('RERENDER HERE')
@@ -60,40 +62,43 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
   // useSharedDisplayMedia('screen_device')
   return (
     <MediaDeviceProvider>
-      <ChatContextProvider room={room} roomParticipant={roomParticipant}>
-        {atm0sConfig && roomParticipant && joined ? (
-          <SessionProvider
-            logLevel={atm0sConfig.log_level}
-            gateways={atm0sConfig.gateway}
-            room={atm0sConfig.room}
-            peer={atm0sConfig.peer}
-            token={atm0sConfig.token}
-            autoConnect={false}
-            onConnectError={console.error}
-            mixMinusAudio={{
-              mode: MixMinusMode.AllAudioStreams,
-              elements: createAudio,
-            }}
-            senders={senders}
-            receivers={{ audio: 0, video: 5 }}
-          >
-            <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
-              <MainSection room={room} myParticipant={roomParticipant} />
-            </MeetingProvider>
-          </SessionProvider>
-        ) : (
-          <PrepareSection
-            room={room}
-            onJoinMeeting={() => {
-              setJoined(true)
-            }}
-            setRoomParticipant={setRoomParticipant}
-            setAtm0sConfig={setAtm0sConfig}
-            myParticipant={roomParticipant}
-            roomAccess={access}
-          />
-        )}
-      </ChatContextProvider>
+      {/* <ChatContextProvider room={room} roomParticipant={roomParticipant}> */}
+      {peerSession && roomParticipant && joined ? (
+        <Atm0sMediaProvider
+          gateway={peerSession.gateway}
+          cfg={{
+            token: peerSession.token,
+            join: {
+              room: room.id,
+              peer: peerSession.peer,
+              publish: { peer: true, tracks: true },
+              subscribe: { peers: true, tracks: true },
+              features: {
+                mixer: {
+                  mode: AudioMixerMode.AUTO,
+                  outputs: 3,
+                },
+              },
+            },
+          }}
+          prepareAudioReceivers={3}
+          prepareVideoReceivers={3}
+        >
+          <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
+            <MainSection room={room} myParticipant={roomParticipant} />
+          </MeetingProvider>
+        </Atm0sMediaProvider>
+      ) : (
+        <SettingSection
+          onConnected={() => setJoined(true)}
+          myParticipant={roomParticipant}
+          room={room}
+          setRoomParticipant={setRoomParticipant}
+          setPeerSession={setPeerSession}
+          roomAccess={access}
+        />
+      )}
+      {/* </ChatContextProvider> */}
     </MediaDeviceProvider>
   )
 }

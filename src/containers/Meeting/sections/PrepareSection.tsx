@@ -154,9 +154,9 @@ export const PrepareSection: React.FC<Props> = ({
         data: {
           passcode: room.passcode as string,
         },
-      }).then(({ atm0sConfig, roomParticipant }) => {
+      }).then(({ peerSession, roomParticipant }) => {
         setRoomParticipant(roomParticipant)
-        setAtm0sConfig(atm0sConfig)
+        setAtm0sConfig(peerSession)
         onJoinMeeting()
       })
     })
@@ -169,9 +169,9 @@ export const PrepareSection: React.FC<Props> = ({
           name,
           passcode: room.passcode as string,
         },
-      }).then(({ atm0sConfig, roomParticipant }) => {
+      }).then(({ peerSession, roomParticipant }) => {
         setRoomParticipant(roomParticipant)
-        setAtm0sConfig(atm0sConfig)
+        setAtm0sConfig(peerSession)
         onJoinMeeting()
       })
     })
@@ -192,9 +192,9 @@ export const PrepareSection: React.FC<Props> = ({
           data: {
             passcode: room.passcode as string,
           },
-        }).then(({ atm0sConfig, roomParticipant }) => {
+        }).then(({ peerSession, roomParticipant }) => {
           setRoomParticipant(roomParticipant)
-          setAtm0sConfig(atm0sConfig)
+          setAtm0sConfig(peerSession)
           sendJoinRequest(roomParticipant.id, user.user.name as string, UserType.User)
           setAcceptSubscription(
             supabase

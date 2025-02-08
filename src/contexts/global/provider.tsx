@@ -56,7 +56,7 @@ export const GlobalContextProvider = ({ children }: { children: React.ReactNode 
         buttons: {
           confirm: 'Join',
           onConfirm: () => {
-            router.push('/meeting/' + room?.data?.passcode)
+            router.push('/' + room?.data?.passcode)
           },
           cancel: 'Cancel',
           onCancel: () => api.destroy(),
