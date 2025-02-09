@@ -36,10 +36,10 @@ export const Header: React.FC<Props> = ({ meetingLink }) => {
           </div>
           <Button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            variant={'secondary'}
-            className='rounded-full bg-transparent'
+            variant={'ghost'}
+            className='h-7 w-7 text-background'
           >
-            {theme === 'light' ? <SunIcon size={16} color='#ffffff' /> : <MoonIcon size={16} color="#000" />}
+            {theme === 'light' ? <SunIcon size={16} /> : <MoonIcon size={16} />}
           </Button>
         </div>
         <Button

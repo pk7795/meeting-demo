@@ -268,8 +268,6 @@ export const SidebarTriggerWithType = React.forwardRef<React.ElementRef<typeof B
         className={cn('h-10 w-10', className)}
         onClick={(event) => {
           onClick?.(event)
-          // Gọi toggleSidebar truyền vào kiểu sidebar mong muốn.
-          // Lưu ý: Bạn cần cập nhật hàm toggleSidebar ở context (hoặc tạo hàm mới) để xử lý tham số này.
           toggleSidebar(sidebarType)
         }}
         {...props}
