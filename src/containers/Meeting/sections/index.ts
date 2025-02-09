@@ -1,5 +1,3 @@
-export * from './ViewSection'
 export * from './ChatSection'
-export * from './PaticipantSection'
-export * from './ToolbarSection'
-export * from './PrepareSection'
+export * from './ParticipantSection'
+

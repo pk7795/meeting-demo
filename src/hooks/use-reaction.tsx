@@ -20,17 +20,14 @@ export class DataContainer<T> extends EventEmitter {
   change = (new_value: T) => {
     this.data = new_value
     this.emit('changed', new_value)
-    console.log('DataContainer changed to:', new_value)
   }
 
   addChangeListener = (callback: (data: T) => void) => {
     this.on('changed', callback)
-    console.log('DataContainer change listener added')
   }
 
   removeChangeListener = (callback: (data: T) => void) => {
     this.off('changed', callback)
-    console.log('DataContainer change listener removed')
   }
 }
 export class MapContainer<K, T> extends EventEmitter {
@@ -49,7 +46,6 @@ export class MapContainer<K, T> extends EventEmitter {
       this.emit('list', this.list)
       this.emit('map', this.map)
       this.emit('slot_' + key, value)
-      console.log('MapContainer set:', key, value)
     }
   }
 

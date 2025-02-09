@@ -8,39 +8,25 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
 // import { NavChanel } from './nav-chanel'
 import { NavUser } from './nav-user'
+import { ChatSection, ParticipantSection } from '@/containers/Meeting/sections'
+import { UserType } from '@/containers/Meeting/constants'
+import { RoomPopulated } from '@/types/types'
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  sendAcceptJoinRequest: (id: string, type: UserType) => void
+  room: RoomPopulated // hoặc thay any thành type Room nếu đã có định nghĩa
+}
+export function AppSidebar({ sendAcceptJoinRequest, room, ...props }: AppSidebarProps) {
+  const { triggerType } = useSidebar()
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="floating" {...props} side='right'>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg text-sidebar-primary-foreground">
-                  <img src="/ermislogo.svg" alt="" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Ermis</span>
-                  <span className="truncate text-xs">Decentralize. Innovate. Open.</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        {/* <NavChanel /> */}
-        {/* <NavMain items={menu.navMain} /> */}
-        {/* <NavSecondary items={menu.navSecondary} className="mt-auto" /> */}
-      </SidebarContent>
-      <SidebarFooter>
-        <NavUser />
-      </SidebarFooter>
+      {triggerType == "participant" && <ParticipantSection sendAcceptJoinRequest={sendAcceptJoinRequest} room={room} />}
+      {triggerType == "chat" && <ChatSection room={room} />}
     </Sidebar>
   )
 }

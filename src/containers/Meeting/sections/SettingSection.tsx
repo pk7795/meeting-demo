@@ -50,7 +50,7 @@ export const SettingSection: React.FC<Props> = ({
     const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
     const [acceptSubscription, setAcceptSubscription] = useState<RealtimeChannel>()
     const [access, setAccess] = useState<RoomAccessStatus | null>(roomAccess)
-    // const setRoomAccessStatus = useChatPendingMeetingRoomStatusContext();
+    const setRoomAccessStatus = useChatPendingMeetingRoomStatusContext();
     const {
         register,
         handleSubmit,
@@ -128,7 +128,7 @@ export const SettingSection: React.FC<Props> = ({
                             console.log('sendJoinRequest')
                         })
                         .catch((e) => {
-                            console.log('sendJoinRequest error: ', e)
+                            console.error('sendJoinRequest error: ', e)
                         })
 
                     setAccess(RoomAccessStatus.PENDING)
@@ -147,7 +147,7 @@ export const SettingSection: React.FC<Props> = ({
     }, [onGuestJoin, onUserJoin, user])
 
     useEffect(() => {
-        // setRoomAccessStatus(access)
+        setRoomAccessStatus(access)
 
     }, [access])
     useEffect(() => {

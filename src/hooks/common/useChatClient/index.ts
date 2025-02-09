@@ -98,7 +98,6 @@ export const useChatClient = () => {
         // connect to SSE, which will keep the connection alive and listen to new messages from user servers.
         await client.connectToSSE();
         await client.queryUser(config.userId);
-        console.log('---------------------------profile: ', client.state.users);
 
 
         const initialUnreadCount = connectedUser?.me?.total_unread_count;
@@ -139,6 +138,7 @@ export const useChatClient = () => {
         if (chatClient) {
             try {
                 const channel = await initializeChannel(chatClient, roomConfig);
+
                 setChannel(channel);
             } catch (error) {
                 console.error('Error: ', error);

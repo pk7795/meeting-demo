@@ -20,6 +20,8 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/c
 import { BadgeCheck, Bell, ChevronsUpDown, LogOut, SunMoonIcon } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import { useTheme } from 'next-themes'
+import { useRecoilState } from 'recoil'
+import { themeState } from '@/recoil'
 export const NavUser = () => {
   return (
     <SidebarMenu>
@@ -34,7 +36,8 @@ type UserInfoProps = {}
 
 export const UserInfo: React.FC<UserInfoProps> = () => {
   const { isMobile } = useSidebar()
-  const { theme, setTheme } = useTheme()
+  // const { theme, setTheme } = useTheme()
+  const [theme, setTheme] = useRecoilState(themeState)
   const { data: session } = useSession()
   return (
     <DropdownMenu>
@@ -75,7 +78,7 @@ export const UserInfo: React.FC<UserInfoProps> = () => {
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
+              <DropdownMenuRadioGroup value={theme} onValueChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
                 <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>

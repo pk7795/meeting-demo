@@ -50,6 +50,7 @@ export const ChatContextProvider = ({
                 roomName: room.name,
                 isRoomOwner: room!.ownerId === session.user.id,
             }
+
             joinChatChannel(roomConfig);
         }
     }, [session, chatClient, roomParticipant, room, roomAccessStatus]);

@@ -22,8 +22,8 @@ export const PeerLocal: React.FC<Props> = ({ userName }) => {
   const name = user?.name || userName
 
   const room = useRoom()
-  const [pinnedPaticipant, setPinnedParticipant] = usePinnedParticipant()
-  const isPinned = pinnedPaticipant?.p.peer === room?.peer
+  const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
+  const isPinned = pinnedParticipant?.p.peer === room?.peer
   const onPin = () => {
     setPinnedParticipant(isPinned ? null : { p: room as any, force: true, name })
   }

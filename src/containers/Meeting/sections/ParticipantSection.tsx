@@ -2,9 +2,9 @@
 
 import { UserType } from '../constants'
 import { useMeetingParticipantsList, usePendingParticipants } from '../contexts'
-import { Avatar, Modal, Select, Space, Typography } from 'antd'
+import { Modal, Select, Space, Typography } from 'antd'
 import { isEmpty, map } from 'lodash'
-import { MailPlusIcon, PlusIcon, XIcon } from 'lucide-react'
+import { MailPlusIcon, MicIcon, MicOff, MicOffIcon, PlusIcon, XIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
@@ -14,18 +14,21 @@ import { inviteToRoom, rejectParticipant } from '@/app/actions'
 import { ButtonIcon, useApp } from '@/components'
 import { supabase } from '@/config'
 import { MeetingParticipant } from '@/types/types'
+import { useAudioMixerSpeaking } from '@/hooks/use-audio-mixer-speaking'
+import { useRemoteAudioTracks, useRemoteTracks } from '@atm0s-media-sdk/react-hooks'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 type Props = {
   room: Partial<Room> | null
-  onClose: () => void
   sendAcceptJoinRequest: (participantId: string, type: UserType) => void
 }
 
-export const PaticipantSection: React.FC<Props> = ({ room, onClose, sendAcceptJoinRequest }) => {
+export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinRequest }) => {
   const { data: session } = useSession()
   const params = useParams()
   const { message } = useApp()
-  const paticipantsList = useMeetingParticipantsList()
+  const participantsList = useMeetingParticipantsList()
   const [pendingParticipants, delPendingParticipant] = usePendingParticipants()
   const [, startTransitionAccept] = useTransition()
   const [, startTransitionReject] = useTransition()
@@ -51,18 +54,6 @@ export const PaticipantSection: React.FC<Props> = ({ room, onClose, sendAcceptJo
     return room?.ownerId === session?.user.id
   }, [session?.user.id, room?.ownerId])
 
-  const renderUserStatus = useCallback((participant: MeetingParticipant) => {
-    if (participant.meetingStatus?.online) {
-      if (participant.meetingStatus?.joining === 'prepare-meeting') {
-        return '#FBBF24'
-      }
-      if (participant.meetingStatus?.joining === 'meeting') {
-        return '#10B981'
-      }
-    } else {
-      return '#F87171'
-    }
-  }, [])
 
   const onAccept = useCallback(
     (participant: MeetingParticipant) => {
@@ -130,18 +121,19 @@ export const PaticipantSection: React.FC<Props> = ({ room, onClose, sendAcceptJo
   return (
     <div className="flex flex-col h-full">
       <div className="h-16 border-b dark:border-[#232C3C] flex items-center font-bold px-4 justify-between">
-        <span className="dark:text-gray-200 text-gray-900">Paticipants ({paticipantsList?.length})</span>
-        <ButtonIcon icon={<XIcon size={16} />} onClick={onClose} />
+        <span className="dark:text-gray-200 text-gray-900">Participants ({participantsList?.length})</span>
+        {/* <ButtonIcon icon={<XIcon size={16} />} onClick={onClose} /> */}
       </div>
       <div className="border-b dark:border-[#232C3C] flex flex-col items-start font-bold p-4">
-        <ButtonIcon
-          size="middle"
-          type="primary"
-          icon={<PlusIcon size={16} />}
+        <Button
+          variant={"secondary"}
+          size="full"
+          className={'rounded-lg [&_svg]:!size-full'}
           onClick={() => setOpenModalInvites(true)}
         >
+          <PlusIcon size={16} />
           Invite user
-        </ButtonIcon>
+        </Button>
         {isRoomOwner && !isEmpty(pendingParticipants) && (
           <>
             <div className="text-sm dark:text-gray-200 text-gray-900 mt-4 mb-2">
@@ -169,17 +161,8 @@ export const PaticipantSection: React.FC<Props> = ({ room, onClose, sendAcceptJo
       <div className="flex flex-col flex-1">
         <Scrollbars className="h-full dark:bg-[#1D2431] bg-white">
           <div className="h-full p-2">
-            {map(paticipantsList, (p) => (
-              <div className="flex items-center mb-2 last:mb-0" key={p.id}>
-                <div className="relative">
-                  <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
-                  <div
-                    className="absolute bottom-0 right-0 w-2 h-2 rounded-full"
-                    style={{ backgroundColor: renderUserStatus(p) }}
-                  />
-                </div>
-                <div className="ml-2 text-gray-400">{p.name}</div>
-              </div>
+            {map(participantsList, (p) => (
+              <ParticipantList key={p.id} participant={p} />
             ))}
           </div>
         </Scrollbars>
@@ -220,6 +203,50 @@ export const PaticipantSection: React.FC<Props> = ({ room, onClose, sendAcceptJo
           onChange={(value) => setInviteEmail(value)}
         />
       </Modal>
+    </div>
+  )
+}
+const ParticipantList = ({ participant }: { participant: MeetingParticipant }) => {
+  const name = participant.user?.name || participant.name
+  const avatar = participant.user?.image
+  const firstLetter = name.charAt(0)
+  const { speaking } = useAudioMixerSpeaking(participant.id)
+  const audioTracks = useRemoteAudioTracks(participant.id)
+  const renderUserStatus = useCallback((participant: MeetingParticipant) => {
+    if (participant.meetingStatus?.online) {
+      if (participant.meetingStatus?.joining === 'prepare-meeting') {
+        return '#FBBF24'
+      }
+      if (participant.meetingStatus?.joining === 'meeting') {
+        return '#10B981'
+      }
+    } else {
+      return '#F87171'
+    }
+  }, [])
+  return (
+    <div className="flex items-center justify-between mb-2 last:mb-0 w-full">
+      <div className="flex items-center mb-2 last:mb-0">
+        <div className="relative items-center flex gap-2">
+          <Avatar className="h-10 w-10 rounded-full">
+            <AvatarImage src={avatar} alt={name} />
+            <AvatarFallback className="rounded-full">{firstLetter}</AvatarFallback>
+          </Avatar>
+          <div
+            className="absolute bottom-0 right-0 w-2 h-2 rounded-full"
+            style={{ backgroundColor: renderUserStatus(participant) }}
+          />
+        </div>
+        <div className="ml-2 text-gray-400">{participant.name}</div>
+      </div>
+      {!participant.is_me && audioTracks.length !== 0 && <MicIcon
+        size={16}
+        className={speaking ? "text-green-500" : "text-gray-400"}
+      />}
+      {!participant.is_me && audioTracks.length === 0 && <MicOffIcon
+        size={16}
+        className={"text-red-400"}
+      />}
     </div>
   )
 }

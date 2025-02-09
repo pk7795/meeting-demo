@@ -15,15 +15,12 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, remotePeerScree
   const [isExpand, setIsExpand] = useState(true)
 
   if (isEmpty(remotePeerScreens)) {
-    console.log('remotePeerScreens empty', mainPeerScreen);
-
     return (
       <div className={'grid h-full max-h-[calc(100vh-168px)] w-full duration-300'}>
         {renderItem?.(mainPeerScreen || <></>) || mainPeerScreen}
       </div>
     )
   }
-  console.log('remotePeerScreens', remotePeerScreens);
   return (
     <div className={'relative flex h-full w-full flex-row gap-4 duration-300'}>
       <div className={'flex-1'}>{renderItem?.(mainPeerScreen || <></>) || mainPeerScreen}</div>
@@ -42,7 +39,7 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, remotePeerScree
               onClick={() => setIsExpand((prev) => !prev)}
               className={cn('absolute flex flex-col bottom-1/2 z-[2] translate-y-1/2 rounded-2yl p-2', isExpand ? 'right-40' : 'right-0')}
             >
-              <UsersRound />
+              {/* <UsersRound /> */}
               {isExpand ? <ChevronRight /> : <ChevronLeft />}
             </Button>
           )}

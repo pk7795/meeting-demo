@@ -1,7 +1,6 @@
 'use client'
 
 import { useCurrentParticipant, useMeetingParticipantsList, useMeetingParticipants } from '../contexts'
-import { Avatar, Form, Input, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import { map } from 'lodash'
 import { SendIcon, XIcon } from 'lucide-react'
@@ -9,20 +8,34 @@ import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
-import { ButtonIcon } from '@/components'
 import { formatDateChat } from '@/utils'
 import { useChatChannelContext, useChatClientContext, useChatMessages } from '@/contexts/chat'
 import { MessageAvatar } from '../components/chat/MessageAvatar'
+import { Button } from '@/components/ui/button'
+import { useSidebar } from '@/components/ui/sidebar'
+import { useForm } from 'react-hook-form'
+import { Input } from '@/components/ui/input'
 
 type Props = {
   room: Partial<Room> | null
-  onClose: () => void
+}
+type TextInput = {
+  message: string
 }
 
-export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
+export const ChatSection: React.FC<Props> = ({ room }) => {
   const ref = useRef<Scrollbars>(null)
-  const refInput = useRef<any>(null)
-  const [form] = Form.useForm()
+  const refInput = useRef<HTMLInputElement>(null)
+  const [isSending, setIsSending] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+    watch,
+    reset
+  } = useForm<TextInput>()
+
   const { data: session } = useSession()
   const messages = useChatMessages();
   const currentParticipant = useCurrentParticipant()
@@ -31,25 +44,37 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
   }, [session, messages])
   const chatChannel = useChatChannelContext();
 
-  const onSend = useCallback(
-    (values: { input: string }) => {
-      if (!values?.input) return
-      const payload = { text: values?.input.trim() };
-      chatChannel?.sendMessage(payload).then(() => {
-        form.setFieldValue('input', '')
-        refInput.current?.focus()
-      }).catch((error) => {
-        console.error('Error: ', error);
-      });
-    },
-    [currentParticipant.id, form, room]
+  const { toggleSidebar } = useSidebar()
+
+  const onSend = useCallback(async () => {
+    setIsSending(true)
+    try {
+      if (!getValues('message')) return
+      const payload = { text: getValues('message') };
+      const message = await chatChannel?.sendMessage(payload)
+
+      reset({ message: '' });
+      setIsSending(false)
+
+    } catch (error) {
+      setIsSending(false)
+      console.error('Error: ', error);
+
+    } finally {
+      setIsSending(false)
+    }
+
+  },
+    [chatChannel, getValues, reset]
   )
-  if (!chatChannel) return null;
+  if (!chatChannel && !room) return null;
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full ">
       <div className="h-16 border-b dark:border-[#232C3C] flex items-center font-bold px-4 justify-between">
         <span className="dark:text-gray-200 text-gray-900">Chat</span>
-        <ButtonIcon icon={<XIcon size={16} />} onClick={onClose} />
+        <Button className={'h-7 w-7'} variant={'ghost'} onClick={() => toggleSidebar()} >
+          <XIcon size={16} />
+        </Button>
       </div>
       <div className="flex flex-col flex-1">
         <Scrollbars ref={ref} className="h-full flex-1 dark:bg-[#1D2431] bg-white">
@@ -57,22 +82,40 @@ export const ChatSection: React.FC<Props> = ({ room, onClose }) => {
             <MessageAvatar key={message.id} message={message} />
           ))}
         </Scrollbars>
-        <Form form={form} onFinish={onSend}>
-          <div className="flex items-center justify-center h-16 border-t dark:border-t-[#232C3C]">
-            <div className="flex items-center justify-between w-full px-4">
-              <Form.Item className="mb-0 flex-1 mr-2" name="input">
-                <Input
-                  ref={refInput}
-                  size="large"
-                  className="bg-transparent border-transparent flex-1 text-gray-400 placeholder"
-                  placeholder="Type something..."
-                />
-              </Form.Item>
-              <ButtonIcon htmlType="submit" size="large" type="primary" icon={<SendIcon size={16} />} />
+        <div className="flex items-center justify-center h-24 border-t dark:border-t-[#232C3C]">
+          <div className=" items-center justify-between w-full p-4">
+            <div className="flex gap-2 ">
+              <Input
+                ref={refInput}
+                id="message"
+                placeholder="Type something..."
+                type='text'
+                className="w-full border-primary/20 bg-background/50 transition-shadow duration-200 focus:border-primary focus:shadow-md line-clamp-2"
+                {...register('message', {
+                  required: true,
+                  validate: {
+                    maxLines: (value) => {
+                      const lines = value?.split('\n') || [];
+                      return lines.length <= 2;
+                    }
+                  }
+                })}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(onSend)();
+                  }
+                }}
+              />
+              <Button loading={isSending} type="submit" onClick={handleSubmit(onSend)} variant={'outline'} >
+                <SendIcon size={16} />
+              </Button>
             </div>
+            {errors.message && <span className="text-xs text-red-500">This field is required</span>}
+
           </div>
-        </Form>
+        </div>
       </div>
-    </div>
+    </div >
   )
 }

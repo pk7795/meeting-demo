@@ -2,7 +2,7 @@
 
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import { PanelLeft } from 'lucide-react'
+import { MessagesSquareIcon, PanelLeft, PanelRight, UsersIcon } from 'lucide-react'
 import * as React from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -21,6 +21,8 @@ const SIDEBAR_WIDTH_MOBILE = '18rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
 
+export type TriggerType = 'chat' | 'participant' | 'setting'
+
 type SidebarContext = {
   state: 'expanded' | 'collapsed'
   open: boolean
@@ -28,9 +30,9 @@ type SidebarContext = {
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
-  toggleSidebar: () => void
+  toggleSidebar: (type?: TriggerType) => void
+  triggerType: TriggerType
 }
-
 const SidebarContext = React.createContext<SidebarContext | null>(null)
 
 function useSidebar() {
@@ -52,7 +54,7 @@ const SidebarProvider = React.forwardRef<
 >(({ defaultOpen = true, open: openProp, onOpenChange: setOpenProp, className, style, children, ...props }, ref) => {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
-
+  const [triggerType, setTriggerType] = React.useState<TriggerType>('chat')
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen)
@@ -73,9 +75,14 @@ const SidebarProvider = React.forwardRef<
   )
 
   // Helper to toggle the sidebar.
-  const toggleSidebar = React.useCallback(() => {
+  const toggleSidebar = React.useCallback((type: TriggerType = 'setting') => {
+    if (triggerType !== type) {
+      setTriggerType(type)
+      isMobile ? setOpenMobile(true) : setOpen(true)
+      return
+    }
     return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
-  }, [isMobile, setOpen, setOpenMobile])
+  }, [isMobile, setOpen, setOpenMobile, triggerType])
 
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
@@ -103,6 +110,7 @@ const SidebarProvider = React.forwardRef<
       openMobile,
       setOpenMobile,
       toggleSidebar,
+      triggerType,
     }),
     [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
   )
@@ -235,7 +243,7 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
         }}
         {...props}
       >
-        <PanelLeft />
+        <PanelRight />
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
     )
@@ -243,16 +251,53 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
 )
 SidebarTrigger.displayName = 'SidebarTrigger'
 
+type SidebarTriggerWithTypeProps = React.ComponentProps<typeof Button> & {
+  sidebarType: TriggerType
+}
+
+export const SidebarTriggerWithType = React.forwardRef<React.ElementRef<typeof Button>, SidebarTriggerWithTypeProps>(
+  ({ sidebarType, className, onClick, ...props }, ref) => {
+    const { toggleSidebar } = useSidebar()
+
+    return (
+      <Button
+        ref={ref}
+        data-sidebar="trigger-with-type"
+        variant="ghost"
+        size="icon"
+        className={cn('h-10 w-10', className)}
+        onClick={(event) => {
+          onClick?.(event)
+          // Gọi toggleSidebar truyền vào kiểu sidebar mong muốn.
+          // Lưu ý: Bạn cần cập nhật hàm toggleSidebar ở context (hoặc tạo hàm mới) để xử lý tham số này.
+          toggleSidebar(sidebarType)
+        }}
+        {...props}
+      >
+        {sidebarType === 'chat' && <MessagesSquareIcon />}
+        {sidebarType === 'participant' && <UsersIcon />}
+        {sidebarType === 'setting' && <PanelRight />}
+        <span className="sr-only">Toggle Sidebar {sidebarType}</span>
+      </Button>
+    )
+  }
+)
+SidebarTriggerWithType.displayName = 'SidebarTriggerWithType'
 const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<'button'>>(({ className, ...props }, ref) => {
   const { toggleSidebar } = useSidebar()
-
+  const handleToggleClick = React.useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      toggleSidebar('setting');
+    },
+    [toggleSidebar]
+  );
   return (
     <Button
       ref={ref}
       data-sidebar="rail"
       aria-label="Toggle Sidebar"
       tabIndex={-1}
-      onClick={toggleSidebar}
+      onClick={handleToggleClick}
       title="Toggle Sidebar"
       className={cn(
         'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',

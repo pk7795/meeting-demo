@@ -11,17 +11,17 @@ import { ChatUser } from '@/hooks/common/useChatClient/types'
 import { JoinInfo } from '@atm0s-media-sdk/core'
 import { RemotePeer, useSession } from '@atm0s-media-sdk/react-hooks'
 
-type PinnedPaticipant = { p: JoinInfo | RemotePeer; force?: boolean, name?: string }
+type PinnedParticipant = { p: JoinInfo | RemotePeer; force?: boolean, name?: string }
 
 export const MeetingContext = createContext<{
   data: {
-    paticipants: MapContainer<string, MeetingParticipant>
+    participants: MapContainer<string, MeetingParticipant>
     messages: MapContainer<string, RoomMessageWithParticipant>
     participantState: DataContainer<MeetingParticipantStatus>
     joinRequest: DataContainer<{ id: string; name: string; type: UserType } | null>
     receiveMessage: DataContainer<RoomMessageWithParticipant | null>
-    pinnedPaticipant: DataContainer<PinnedPaticipant | null>
-    currentPaticipant: RoomParticipant
+    pinnedParticipant: DataContainer<PinnedParticipant | null>
+    currentParticipant: RoomParticipant
     pendingParticipants: MapContainer<string, Partial<RoomParticipantWithUser>>
     roomSupabaseChannel: DataContainer<RealtimeChannel>
     talkingParticipants: MapContainer<string, { peerId: string; ts: number }>
@@ -29,7 +29,7 @@ export const MeetingContext = createContext<{
     destroy: () => void
   }
   setParticipantState: (state: MeetingParticipantStatus) => void
-  setPinnedParticipant: (participant: PinnedPaticipant | null) => void
+  setPinnedParticipant: (participant: PinnedParticipant | null) => void
   clearJoinRequest: () => void
   clearReceiveMessage: () => void
   deletePendingParticipant: (participantId: string) => void
@@ -71,7 +71,7 @@ export const MeetingProvider = ({
 }) => {
 
   const data = useMemo(() => {
-    const paticipants = new MapContainer<string, MeetingParticipant>()
+    const participants = new MapContainer<string, MeetingParticipant>()
     const messages = new MapContainer<string, RoomMessageWithParticipant>()
     const participantState = new DataContainer<MeetingParticipantStatus>({
       online: true,
@@ -79,7 +79,7 @@ export const MeetingProvider = ({
       handRaised: false,
       screenShare: false,
     })
-    const pinnedPaticipant = new DataContainer<PinnedPaticipant | null>(null)
+    const pinnedParticipant = new DataContainer<PinnedParticipant | null>(null)
     const joinRequest = new DataContainer<{ id: string; name: string; type: UserType } | null>(null)
     const receiveMessage = new DataContainer<RoomMessageWithParticipant | null>(null)
     const pendingParticipants = new MapContainer<string, Partial<RoomParticipantWithUser>>()
@@ -115,7 +115,7 @@ export const MeetingProvider = ({
       console.log('--------------------------------------------------------')
       console.log('onMessageRoomChanged', new Date().getTime())
       console.log('--------------------------------------------------------')
-      const participant = paticipants.get(payload.new.participantId) as any
+      const participant = participants.get(payload.new.participantId) as any
       const message = {
         ...payload.new,
         participant,
@@ -209,16 +209,16 @@ export const MeetingProvider = ({
               }
             }
           }
-          paticipants.setBatch(map)
+          participants.setBatch(map)
         })
         .on('presence', { event: 'join' }, ({ key, newPresences }) => {
           console.log('join', key, newPresences)
         })
         .on('presence', { event: 'leave' }, ({ key }) => {
           console.log('leave', key)
-          const paticipant = paticipants.get(key)
-          if (paticipant) {
-            paticipants.del(key)
+          const participant = participants.get(key)
+          if (participant) {
+            participants.del(key)
           }
         })
 
@@ -264,8 +264,8 @@ export const MeetingProvider = ({
     }
 
     return {
-      paticipants,
-      pinnedPaticipant,
+      participants,
+      pinnedParticipant,
       pendingParticipants,
       messages,
       participantState,
@@ -273,7 +273,7 @@ export const MeetingProvider = ({
       receiveMessage,
       roomSupabaseChannel,
       isConnected,
-      currentPaticipant: roomParticipant,
+      currentParticipant: roomParticipant,
       destroy,
     }
   }, [])
@@ -306,10 +306,10 @@ export const MeetingProvider = ({
   }, [data])
 
   const setPinnedParticipant = useCallback(
-    (participant: PinnedPaticipant | null) => {
-      data.pinnedPaticipant.change(participant)
+    (participant: PinnedParticipant | null) => {
+      data.pinnedParticipant.change(participant)
     },
-    [data.pinnedPaticipant]
+    [data.pinnedParticipant]
   )
 
   const deletePendingParticipant = useCallback(
@@ -324,13 +324,13 @@ export const MeetingProvider = ({
     if (list.length > 0 && list[0].peerId) {
       const sorted = list.sort((a, b) => a.ts - b.ts)
       let selected = sorted[0].peerId
-      const pinned = sorted.find((p) => p.peerId === data.pinnedPaticipant?.data?.p?.peer)
+      const pinned = sorted.find((p) => p.peerId === data.pinnedParticipant?.data?.p?.peer)
       if (pinned) {
         selected = sorted.find((p) => p.audioLevel - pinned.audioLevel > 20)?.peerId || pinned.peerId
       }
-      if (!data.pinnedPaticipant?.data?.force) {
+      if (!data.pinnedParticipant?.data?.force) {
         // setPinnedParticipant({
-        //   p: data.paticipants.get(selected),
+        //   p: data.participants.get(selected),
         //   force: false,
         // })
       }
@@ -373,24 +373,24 @@ export const useRoomSupabaseChannel = () => {
 
 export const useMeetingParticipantsList = (): MeetingParticipant[] => {
   const context = useMeeting()
-  const list = useReactionList(context.data.paticipants)
+  const list = useReactionList(context.data.participants)
   return list
 }
 
 export const useOnlineMeetingParticipantsList = (): MeetingParticipant[] => {
   const participants = useMeetingParticipantsList()
   return participants
-    .filter((paticipant) => (paticipant as MeetingParticipant).meetingStatus?.online)
-    .map((paticipant) => ({
-      ...paticipant,
-      connected_at: paticipant.connected_at || 0,
+    .filter((participant) => (participant as MeetingParticipant).meetingStatus?.online)
+    .map((participant) => ({
+      ...participant,
+      connected_at: participant.connected_at || 0,
     }))
     .sort((a, b) => a.connected_at - b.connected_at)
 }
 
 export const useMeetingParticipants = () => {
   const context = useMeeting()
-  return context.data.paticipants
+  return context.data.participants
 }
 
 export const useMeetingParticipantState = () => {
@@ -401,13 +401,13 @@ export const useMeetingParticipantState = () => {
 
 export const usePinnedParticipant = () => {
   const context = useMeeting()
-  const pinnedPaticipant = useReactionData<PinnedPaticipant | null>(context.data.pinnedPaticipant)
-  return [pinnedPaticipant, context.setPinnedParticipant] as const
+  const pinnedParticipant = useReactionData<PinnedParticipant | null>(context.data.pinnedParticipant)
+  return [pinnedParticipant, context.setPinnedParticipant] as const
 }
 
 export const useCurrentParticipant = () => {
   const context = useMeeting()
-  return context.data.currentPaticipant
+  return context.data.currentParticipant
 }
 
 export const useJoinRequest = () => {
