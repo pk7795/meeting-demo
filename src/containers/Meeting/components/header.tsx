@@ -1,6 +1,6 @@
 import BlurFade from '@/components/ui/blur-fade'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { SidebarRight } from '@/layouts/MainLayout/sidebar-right'
+import { InviteButton } from '@/layouts/MainLayout/invite-button'
 import { useParams } from 'next/navigation'
 
 type Props = {
@@ -21,12 +21,12 @@ export const Header: React.FC<Props> = ({ meetingLink }) => {
     >
       <header className="flex justify-between">
         <div className={'flex items-center'}>
-          {/* <SidebarTrigger className={'text-background'} /> */}
+          <InviteButton meetingLink={meetingLink} />
           <div className="flex items-center gap-2">
             <div className="hidden text-background lg:block"> | Room ID: {params?.passcode}</div>
           </div>
         </div>
-        <SidebarRight meetingLink={meetingLink} />
+        <SidebarTrigger className={'text-background'} />
       </header>
     </BlurFade>
   )

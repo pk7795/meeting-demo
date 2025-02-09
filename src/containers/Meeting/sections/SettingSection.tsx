@@ -24,6 +24,7 @@ import { useChatPendingMeetingRoomStatusContext } from '@/contexts/chat'
 type NameInputs = {
     userName: string
 }
+
 type Props = {
     onConnected: () => void
     room: RoomPopulated

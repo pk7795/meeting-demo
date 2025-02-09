@@ -2,9 +2,7 @@
 
 import { Atm0sSenders } from '../constants'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
-import { PrepareSection } from '../sections'
 import { MainSection } from '../sections/MainSection'
-import { MixMinusMode, SessionProvider, useSharedDisplayMedia, useSharedUserMedia } from '@8xff/atm0s-media-react'
 import { useEffect, useMemo, useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { peerSession } from '@/lib/atm0s'
@@ -57,48 +55,45 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
     }
   }, [createAudio])
 
-  // useSharedUserMedia('mic_device')
-  // useSharedUserMedia('camera_device')
-  // useSharedDisplayMedia('screen_device')
   return (
     <MediaDeviceProvider>
-      {/* <ChatContextProvider room={room} roomParticipant={roomParticipant}> */}
-      {peerSession && roomParticipant && joined ? (
-        <Atm0sMediaProvider
-          gateway={peerSession.gateway}
-          cfg={{
-            token: peerSession.token,
-            join: {
-              room: room.id,
-              peer: peerSession.peer,
-              publish: { peer: true, tracks: true },
-              subscribe: { peers: true, tracks: true },
-              features: {
-                mixer: {
-                  mode: AudioMixerMode.AUTO,
-                  outputs: 3,
+      <ChatContextProvider room={room} roomParticipant={roomParticipant}>
+        {peerSession && roomParticipant && joined ? (
+          <Atm0sMediaProvider
+            gateway={peerSession.gateway}
+            cfg={{
+              token: peerSession.token,
+              join: {
+                room: room.id,
+                peer: peerSession.peer,
+                publish: { peer: true, tracks: true },
+                subscribe: { peers: true, tracks: true },
+                features: {
+                  mixer: {
+                    mode: AudioMixerMode.AUTO,
+                    outputs: 3,
+                  },
                 },
               },
-            },
-          }}
-          prepareAudioReceivers={3}
-          prepareVideoReceivers={3}
-        >
-          <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
-            <MainSection room={room} myParticipant={roomParticipant} />
-          </MeetingProvider>
-        </Atm0sMediaProvider>
-      ) : (
-        <SettingSection
-          onConnected={() => setJoined(true)}
-          myParticipant={roomParticipant}
-          room={room}
-          setRoomParticipant={setRoomParticipant}
-          setPeerSession={setPeerSession}
-          roomAccess={access}
-        />
-      )}
-      {/* </ChatContextProvider> */}
+            }}
+            prepareAudioReceivers={3}
+            prepareVideoReceivers={3}
+          >
+            <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
+              <MainSection room={room} myParticipant={roomParticipant} />
+            </MeetingProvider>
+          </Atm0sMediaProvider>
+        ) : (
+          <SettingSection
+            onConnected={() => setJoined(true)}
+            myParticipant={roomParticipant}
+            room={room}
+            setRoomParticipant={setRoomParticipant}
+            setPeerSession={setPeerSession}
+            roomAccess={access}
+          />
+        )}
+      </ChatContextProvider>
     </MediaDeviceProvider>
   )
 }

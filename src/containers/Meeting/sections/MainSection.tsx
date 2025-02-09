@@ -49,7 +49,7 @@ import { Button } from '@/components/ui/button'
 import { SidebarViewLayout } from '../components/sidebar-view-layout'
 import { useRemotePeers, useRoom, useSessionStatus } from '@atm0s-media-sdk/react-hooks'
 import { PeerLocal, PeerRemote } from '@/components/media'
-import { MainLayout } from '@/layouts'
+import { SidebarLayout } from '@/layouts'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -78,16 +78,15 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const params = useParams()
   const [, onCopy] = useCopyToClipboard()
   const [isCreateNewRoom, setIsCreateNewRoom] = useState(true)
-  // const [mouse, containerRef] = useMouse<any>()
-  // const widthContent = containerRef?.current?.clientWidth
-  // const heightContent = containerRef?.current?.clientHeight
+  const [mouse, containerRef] = useMouse<any>()
+  const widthContent = containerRef?.current?.clientWidth
+  const heightContent = containerRef?.current?.clientHeight
   const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
   const roomInfo = useRoom()
   const remotePeers = useRemotePeers()
 
-  // const isHoverContent =
-  //   mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
-  const isHoverContent = true
+  const isHoverContent =
+    mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
   const baseUrl = window.location.origin
   const meetingLink = `${baseUrl}/${params?.passcode}`
 
@@ -317,7 +316,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     [roomSupabaseChannel, myParticipant?.id]
   )
   return (
-    <>
+    <SidebarLayout>
       <Modal
         getContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
         footer={false}
@@ -346,8 +345,8 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       </Modal>
       {contextHolder}
       <div
-        // ref={containerRef}
-        className="  h-screen relative flex w-full items-start justify-center overflow-hidden bg-foreground px-4 pt-[60px] " id="id--fullScreen"
+        ref={containerRef}
+        className=" h-full relative flex w-full items-start justify-center overflow-hidden bg-foreground px-4 pt-[60px] rounded-xl" id="id--fullScreen"
       >
         {isHoverContent && <Header meetingLink={meetingLink} />}
 
@@ -385,6 +384,6 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
           </div>
         )}
       </div>
-    </>
+    </SidebarLayout>
   )
 }

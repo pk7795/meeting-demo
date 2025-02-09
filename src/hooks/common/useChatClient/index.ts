@@ -74,14 +74,14 @@ export const useChatClient = () => {
      * @returns function to unsubscribe from listeners
      */
     const loginUser = async (config: LoginConfig) => {
-        let api_key = process.env.ERMIS_API_KEY || "VskVZNX0ouKF1751699014812";
+        let api_key = process.env.ERMIS_CHAT_API_KEY || "VskVZNX0ouKF1751699014812";
         let project_id = config.projectId;
         // unsubscribe from previous push listeners
         unsubscribePushListenersRef.current?.();
         const client = ErmisChat.getInstance<ErmisChatGenerics>(api_key, project_id, {
             timeout: 6000,
             logger: (type, msg) => console.log(type, msg),
-            baseURL: process.env.ERMIS_API || 'https://api-stagging.ermis.network',
+            baseURL: process.env.ERMIS_CHAT_API || 'https://api-stagging.ermis.network',
         });
 
         setChatClient(client);

@@ -31,6 +31,8 @@ export async function createRoom({ data }: { data: RoomInput }) {
         ownerId: session?.id as string,
       },
     })
+    console.log(' prisma.room.create', res);
+
     return res
   }
 }

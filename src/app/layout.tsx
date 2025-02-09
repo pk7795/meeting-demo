@@ -1,7 +1,7 @@
 import './global.scss'
-// import 'antd/dist/reset.css'
 import { AppProvider } from '@/providers'
 import localFont from 'next/font/local'
+import type { Metadata } from 'next'
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -12,13 +12,13 @@ const geistMono = localFont({
   variable: '--font-geist-mono',
   weight: '100 900',
 })
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Ermis Meet',
   description: 'Ermis Meet',
   icons: 'icon.ico',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} id="id--full-screen">

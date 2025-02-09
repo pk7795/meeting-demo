@@ -144,7 +144,7 @@ export const Header: React.FC<Props> = () => {
             <ButtonIcon
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               shape="circle"
-              icon={theme === 'dark' ? <SunIcon size={16} /> : <MoonIcon size={16} color="#000" />}
+              icon={theme === 'dark' ? <SunIcon size={16} color='#ffffff' /> : <MoonIcon size={16} color="#000" />}
             />
           </Space>
         </Col>
