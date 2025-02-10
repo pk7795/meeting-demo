@@ -10,7 +10,7 @@ type Props = {
 const SLIDE_PER_VIEW = 25
 
 export const GridViewLayout: React.FC<Props> = ({ items, renderItem }) => {
-  const { isMobile } = useDevice()
+  const { isMobile, isTablet } = useDevice()
   const totalUser = items.length
   if (totalUser === 2) {
     const [firstItem, secondItem] = items
@@ -26,11 +26,15 @@ export const GridViewLayout: React.FC<Props> = ({ items, renderItem }) => {
       </div>
     )
   }
+  const columns = Math.ceil(Math.sqrt(totalUser)) > 5 ? 5 : Math.ceil(Math.sqrt(totalUser)) // The column is based on the square root of n
+  const rows = Math.ceil(totalUser / columns) // Rows are based on dividing numbers evenly in rows
+  const leftoverItems = isTablet ? totalUser % rows : totalUser % columns // Calculate the number of extra elements
+  const checkFullRow = columns * rows === totalUser
   if (isMobile) {
     return (
-      <div className="flex h-full w-full flex-col gap-4 overflow-auto">
+      <div className={cn(`no-scrollbar grid h-full w-full grid-cols-${rows} gap-4 overflow-auto xl:grid-cols-${columns} xl:grid-rows-${rows} md:grid-rows-2 xl:md:grid-cols-2 `)}>
         {map(items, (item, index) => (
-          <div key={index} className="w-full flex-shrink-0 aspect-video">
+          <div key={index} className={cn("aspect-video h-full w-full duration-300")}>
             {renderItem?.(item) || item}
           </div>
         ))}
@@ -38,11 +42,6 @@ export const GridViewLayout: React.FC<Props> = ({ items, renderItem }) => {
     )
   }
 
-
-  const columns = Math.ceil(Math.sqrt(totalUser)) > 5 ? 5 : Math.ceil(Math.sqrt(totalUser)) // The column is based on the square root of n
-  const rows = Math.ceil(totalUser / columns) // Rows are based on dividing numbers evenly in rows
-  const leftoverItems = totalUser % columns // Calculate the number of extra elements
-  const checkFullRow = columns * rows === totalUser
 
   return (
     <div
