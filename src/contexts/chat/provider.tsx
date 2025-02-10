@@ -57,30 +57,17 @@ export const ChatContextProvider = ({
 
     useEffect(() => {
         if (!channel) return;
-        setMessages(channel.state.messages);
+        const messages = channel.state.messages.filter((message) => message.type !== 'system');
+        setMessages(messages);
 
         // because something wrong with member.added event and don't have event for member added, so we need to check members by message.new event for all members of channel except new member.
         // for new member, we check by get members list from channel state.
         // const channelSubscriptions: Array<ReturnType<Channel['on']>> = [];
         const handleNewMessage = (event: any) => {
 
-            if (event.message.type === 'system') {
-                const systemCode = event.message.text.trim().split(' ')[0];
-                switch (systemCode) {
-                    case "17":
-                        const user = chatClient?.state.users[event.user.id];
-
-                        if (!user) {
-                            chatClient?.queryUser(event.user.id);
-                        }
-                        event.message.text = `${user?.name || event.user.id} joined the meeting`;
-                        break;
-
-                    default:
-                        break;
-                }
+            if (event.message.type !== 'system') {
+                setMessages((prev) => [...prev, event.message]);
             }
-            setMessages((prev) => [...prev, event.message]);
 
         };
         // const handleMemberAdded = (event: any) => {
