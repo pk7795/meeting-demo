@@ -18,6 +18,7 @@ import { useAudioMixerSpeaking } from '@/hooks/use-audio-mixer-speaking'
 import { useRemoteAudioTracks, useRemoteTracks } from '@atm0s-media-sdk/react-hooks'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useSidebar } from '@/components/ui/sidebar'
 
 type Props = {
   room: Partial<Room> | null
@@ -54,6 +55,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
     return room?.ownerId === session?.user.id
   }, [session?.user.id, room?.ownerId])
 
+  const { toggleSidebar } = useSidebar()
 
   const onAccept = useCallback(
     (participant: MeetingParticipant) => {
@@ -120,15 +122,15 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
 
   return (
     <div className="flex flex-col h-full">
-      <div className="h-16 border-b dark:border-[#232C3C] flex items-center font-bold px-4 justify-between">
+      <div className="h-16 border-b dark:border-[#293042] flex items-center font-bold px-4 justify-between">
         <span className="dark:text-gray-200 text-gray-900">Participants ({participantsList?.length})</span>
-        {/* <ButtonIcon icon={<XIcon size={16} />} onClick={onClose} /> */}
+        <ButtonIcon icon={<XIcon size={16} />} onClick={() => toggleSidebar("participant")} />
       </div>
       <div className="border-b dark:border-[#232C3C] flex flex-col items-start font-bold p-4">
         <Button
           variant={"secondary"}
           size="full"
-          className={'rounded-lg [&_svg]:!size-full'}
+          className={'rounded-lg [&_svg]:!size-full bg-[#D3D9F0] dark:bg-[#1D2431] dark:text-gray-200 text-gray-900'}
           onClick={() => setOpenModalInvites(true)}
         >
           <PlusIcon size={16} />

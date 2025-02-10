@@ -1,6 +1,6 @@
 'use client'
 
-import { useCurrentParticipant, useMeetingParticipantsList, useMeetingParticipants } from '../contexts'
+import { useCurrentParticipant, useMeetingParticipantsList, useMeetingParticipants, useOnlineMeetingParticipantsList } from '../contexts'
 import dayjs from 'dayjs'
 import { map } from 'lodash'
 import { SendIcon, XIcon } from 'lucide-react'
@@ -43,7 +43,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
     ref.current?.scrollToBottom()
   }, [session, messages])
   const chatChannel = useChatChannelContext();
-
+  const participants = useOnlineMeetingParticipantsList()
   const { toggleSidebar } = useSidebar()
 
   const onSend = useCallback(async () => {
@@ -72,12 +72,12 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
     <div className="flex flex-col h-full ">
       <div className="h-16 border-b dark:border-[#232C3C] flex items-center font-bold px-4 justify-between">
         <span className="dark:text-gray-200 text-gray-900">Chat</span>
-        <Button className={'h-7 w-7'} variant={'ghost'} onClick={() => toggleSidebar()} >
+        <Button className={'h-7 w-7'} variant={'ghost'} onClick={() => toggleSidebar("chat")} >
           <XIcon size={16} />
         </Button>
       </div>
       <div className="flex flex-col flex-1">
-        <Scrollbars ref={ref} className="h-full flex-1 dark:bg-[#1D2431] bg-white">
+        <Scrollbars ref={ref} className="h-full flex-1 dark:bg-[#11131A] bg-white">
           {map(messages, (message) => (
             <MessageAvatar key={message.id} message={message} />
           ))}

@@ -1,7 +1,8 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useChatClientContext } from "@/contexts/chat";
 import { ErmisChatGenerics } from "@/hooks/common/useChatClient/types";
 import { formatDateChat } from "@/utils";
-import { Avatar, Tooltip } from "antd";
 import dayjs from "dayjs";
 import { ErmisChat } from "ermis-chat-js-sdk/dist/types/client";
 import { FormatMessageResponse } from "ermis-chat-js-sdk/dist/types/types";
@@ -23,10 +24,11 @@ export const MessageAvatar = React.memo(({ message }: MessageAvatarProps) => {
   }, [client?.state.users, message.user]);
 
   if (!user) return null;
+  const userName = typeof user.name === 'string' ? user.name : '';
   const systemCode = message.text?.trim().split(' ')[0];
   switch (systemCode) {
     case "17":
-      message.text = `${user?.name || user.id} joined the meeting`;
+      message.text = `${userName || user.id} joined the meeting`;
       break;
 
     default:
@@ -36,22 +38,24 @@ export const MessageAvatar = React.memo(({ message }: MessageAvatarProps) => {
 
     <div key={message.id} className="p-2">
       <div className="flex items-end">
-        <Avatar
-          className="mr-2"
-          src={user.avatar}
-          alt={user.name || user.id}
-        >
-          {user.name?.[0] || user.id?.[0]}
+        <Avatar className="h-10 w-10 rounded-full">
+          <AvatarImage src={user?.image || user?.avatar} alt={userName} />
+          <AvatarFallback className="rounded-full">{user?.name?.charAt(0)}</AvatarFallback>
         </Avatar>
-        <div className="flex-1">
+        <div className="flex-1 ml-1">
           <div className="flex items-center justify-between">
-            <div className="text-xs font-bold text-[#F87171]">{user.name || formatUserName(user.id)}</div>
-            <Tooltip title={dayjs(message.created_at).format('DD/MM/YYYY hh:mm a')}>
-              <div className="ml-2 text-[9px] text-gray-400">{formatDateChat(message.created_at)}</div>
+            <Tooltip>
+              <div className="text-xs font-bold text-[#F87171]">{userName || formatUserName(user.id)}</div>
+              <TooltipTrigger asChild>
+                <div className="ml-2 text-[9px] text-gray-400">{formatDateChat(message.created_at)}</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{dayjs(message.created_at).format('DD/MM/YYYY hh:mm a')}</p>
+              </TooltipContent>
             </Tooltip>
           </div>
           <div
-            className="text-sm text-gray-400 p-2 rounded-lg bg-gray-200 dark:bg-dark_ebony whitespace-pre-wrap w-fit"
+            className="text-sm text-gray-500 dark:text-gray-700 p-2 rounded-lg bg-gray-200  w-fit"
             dangerouslySetInnerHTML={{ __html: message.html || message.text || "" }}
           />
         </div>
