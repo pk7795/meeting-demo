@@ -61,12 +61,8 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [layout, setLayout] = useState<'GRID' | 'LEFT'>('GRID')
   const [openChat, setOpenChat] = useState(false)
   const [openParticipant, setOpenParticipant] = useState(false)
-  const { isMaximize, onOpenFullScreen } = useFullScreen()
   const { isMobile } = useDevice()
   const [theme, setTheme] = useRecoilState(themeState)
-
-
-  const chatClient = useChatClientContext()
 
   const [joinRequest, clearJoinRequest] = useJoinRequest()
   const [, delPendingParticipant] = usePendingParticipants()
@@ -85,15 +81,15 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [, onCopy] = useCopyToClipboard()
   const [isCreateNewRoom, setIsCreateNewRoom] = useState(true)
   const [mouse, containerRef] = useMouse<any>()
-  // const widthContent = containerRef?.current?.clientWidth
-  // const heightContent = containerRef?.current?.clientHeight
+  const widthContent = containerRef?.current?.clientWidth
+  const heightContent = containerRef?.current?.clientHeight
   const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
   const roomInfo = useRoom()
   const remotePeers = useRemotePeers()
 
-  const isHoverContent = true
-  // const isHoverContent =
-  //   mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
+  // const isHoverContent = true
+  const isHoverContent =
+    mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
   const baseUrl = window.location.origin
   const meetingLink = `${baseUrl}/${params?.passcode}`
 

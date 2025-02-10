@@ -1,3 +1,4 @@
+import { useDevice } from '@/hooks'
 import { cn } from '@/lib/utils'
 import { map } from 'lodash'
 
@@ -9,6 +10,7 @@ type Props = {
 const SLIDE_PER_VIEW = 25
 
 export const GridViewLayout: React.FC<Props> = ({ items, renderItem }) => {
+  const { isMobile } = useDevice()
   const totalUser = items.length
   if (totalUser === 2) {
     const [firstItem, secondItem] = items
@@ -18,12 +20,25 @@ export const GridViewLayout: React.FC<Props> = ({ items, renderItem }) => {
         <div className="flex-1">
           {renderItem?.(secondItem) || secondItem}
         </div>
-        <div className="absolute bottom-3 right-2 flex aspect-video h-[140px] flex-shrink-0 items-center justify-center p-1">
+        <div className={cn("bottom-3 right-2 flex aspect-video h-[140px] flex-shrink-0 items-center justify-center p-1", !isMobile && "absolute")}>
           {renderItem?.(firstItem) || firstItem}
         </div>
       </div>
     )
   }
+  if (isMobile) {
+    return (
+      <div className="flex h-full w-full flex-col gap-4 overflow-auto">
+        {map(items, (item, index) => (
+          <div key={index} className="w-full flex-shrink-0 aspect-video">
+            {renderItem?.(item) || item}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+
   const columns = Math.ceil(Math.sqrt(totalUser)) > 5 ? 5 : Math.ceil(Math.sqrt(totalUser)) // The column is based on the square root of n
   const rows = Math.ceil(totalUser / columns) // Rows are based on dividing numbers evenly in rows
   const leftoverItems = totalUser % columns // Calculate the number of extra elements
