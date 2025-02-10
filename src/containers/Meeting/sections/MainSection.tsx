@@ -119,7 +119,13 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     return peerLocal
   }, [checkPeerPinned, peerLocal])
 
-  const filterRemotePeers = useMemo(() => filter(remotePeers, (p) => p.peer != roomInfo?.peer), [remotePeers, roomInfo?.peer])
+  const filterRemotePeers = useMemo(() => {
+    const nonLocalPeers = filter(remotePeers, (p) => p.peer != roomInfo?.peer)
+
+    return filter(nonLocalPeers, (peer) =>
+      find(participants, participant => participant.id === peer.peer)
+    )
+  }, [remotePeers, roomInfo?.peer, participants])
 
   const peerRemoteMixerAudio = useMemo(() => {
     let mapRemotePeers = []
