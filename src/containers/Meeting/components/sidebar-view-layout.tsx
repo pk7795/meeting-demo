@@ -26,7 +26,8 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, remotePeerScree
   const sidebarClasses = cn(
     'overflow-hidden duration-300',
     !isMobile ? 'w-[200px] flex-col flex items-end' : 'h-[140px]',
-    !isExpand && 'w-0'
+    !isExpand && !isMobile && 'w-0',
+    !isExpand && isMobile && 'h-0'
   )
 
   const peerListClasses = cn(
@@ -63,7 +64,7 @@ export const SidebarViewLayout: React.FC<Props> = ({ renderItem, remotePeerScree
               className={expandButtonClasses}
             >
               {/* <UsersRound /> */}
-              {isExpand ? <ChevronRight /> : <ChevronLeft />}
+              {isExpand ? isMobile ? <ChevronDown /> : <ChevronRight /> : isMobile ? <ChevronUp /> : <ChevronLeft />}
             </Button>
           )}
         </div>
