@@ -112,7 +112,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
                   }
                 }}
               />
-              <Button loading={isSending} type="submit" onClick={handleSubmit(onSend)} variant={'outline'} >
+              <Button loading={isSending} type="submit" onClick={handleSubmit(onSend)} variant={'default'} >
                 <SendIcon size={16} />
               </Button>
             </div>
