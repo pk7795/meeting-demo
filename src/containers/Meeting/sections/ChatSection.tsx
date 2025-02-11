@@ -21,8 +21,7 @@ type TextInput = {
 }
 
 export const ChatSection: React.FC<Props> = ({ room }) => {
-  const ref = useRef<Scrollbars>(null)
-  const refInput = useRef<HTMLInputElement>(null)
+  const scrollRef = useRef<Scrollbars>(null)
   const [isSending, setIsSending] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const {
@@ -39,7 +38,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
 
 
   useEffect(() => {
-    ref.current?.scrollToBottom()
+    scrollRef.current?.scrollToBottom()
   }, [session, messages])
   const chatChannel = useChatChannelContext();
   const { toggleSidebar } = useSidebar()
@@ -72,6 +71,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
   },
     [chatChannel, getValues, reset]
   )
+
   if (!chatChannel && !room) return null;
   return (
     <div className="flex flex-col h-full ">
@@ -82,7 +82,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
         </Button>
       </div>
       <div className="flex flex-col flex-1">
-        <Scrollbars ref={ref} className="h-full flex-1 dark:bg-[#11131A] bg-white">
+        <Scrollbars ref={scrollRef} className="h-full flex-1 dark:bg-[#11131A] bg-white">
           {map(messages, (message) => (
             <MessageAvatar key={message.id} message={message} />
           ))}
@@ -91,7 +91,6 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
           <div className=" items-center justify-between w-full p-4">
             <div className="flex gap-2 ">
               <Input
-                ref={refInput}
                 id="message"
                 placeholder="Type something..."
                 type='text'
