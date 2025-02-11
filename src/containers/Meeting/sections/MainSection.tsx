@@ -51,6 +51,7 @@ import { useRemotePeers, useRoom, useSessionStatus } from '@atm0s-media-sdk/reac
 import { PeerLocal, PeerRemote } from '@/components/media'
 import { SidebarLayout } from '@/layouts'
 import { useChatClientContext } from '@/contexts/chat'
+import { useSidebar } from '@/components/ui/sidebar'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -75,6 +76,8 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const sessionStatus = useSessionStatus()
   const [visibleRefresh, setVisibleRefresh] = useState(false)
   const participants = useOnlineMeetingParticipantsList()
+
+  const { toggleSidebar } = useSidebar()
 
   //From new meeting
   const params = useParams()
@@ -291,23 +294,44 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     if (!joinRequest) return
     const { id, name, type } = joinRequest
     admitRingTone.play()
-    openNotification({
-      message: `A ${type} named '${name}' is requesting to join the room`,
-      description: 'Do you want to accept this request?',
-      buttons: {
-        confirm: 'Accept',
-        onConfirm: () => {
-          sendAcceptJoinRequest(id, type)
-        },
-        cancel: 'Reject',
-        onCancel: () => {
-          delPendingParticipant(id)
-        },
-      },
-      onClose: () => {
-        clearJoinRequest()
-      },
+    toast.custom((t) => (
+      <div className="flex flex-col gap-4 rounded-lg bg-background p-4 shadow-lg">
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-muted-foreground">
+            A {type} named <span className="font-semibold">{name}</span> wants to join this meeting
+          </p>
+
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button
+            variant={'blue'}
+            size={"sm"}
+            onClick={() => {
+              sendAcceptJoinRequest(id, type)
+              toast.dismiss(t)
+            }}
+          >
+            Admit
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => {
+              toggleSidebar('participant')
+            }}
+          >
+            View
+          </Button>
+        </div>
+      </div>
+    ), {
+      duration: Infinity,
+      onAutoClose: () => clearJoinRequest(),
+      onDismiss: () => clearJoinRequest(),
+      position: 'top-right',
+      className: 'join-request-toast'
     })
+
   }, [admitRingTone, clearJoinRequest, delPendingParticipant, joinRequest, openNotification, sendAcceptJoinRequest])
 
   // TODO: Move every send and receive event to hooks

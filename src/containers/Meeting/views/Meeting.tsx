@@ -11,6 +11,7 @@ import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { ChatContextProvider } from '@/contexts/chat'
 import { SettingSection } from '../sections/SettingSection'
 import { Atm0sMediaProvider, AudioMixerMode } from '@atm0s-media-sdk/react-hooks'
+import { SidebarProvider } from '@/components/ui/sidebar'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -80,7 +81,9 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
             prepareVideoReceivers={3}
           >
             <MeetingProvider room={room} roomParticipant={roomParticipant} pendingParticipantsList={pendingParticipants}>
-              <MainSection room={room} myParticipant={roomParticipant} />
+              <SidebarProvider defaultOpen={false}>
+                <MainSection room={room} myParticipant={roomParticipant} />
+              </SidebarProvider>
             </MeetingProvider>
           </Atm0sMediaProvider>
         ) : (

@@ -16,6 +16,8 @@ export const ChatContext = createContext<{
     channel: Channel<ErmisChatGenerics> | null;
     messages: FormatMessageResponse[];
     setRoomAccessStatus: React.Dispatch<React.SetStateAction<RoomAccessStatus | null>>;
+    isNewMessage: boolean;
+    setIsNewMessage: React.Dispatch<React.SetStateAction<boolean>>;
 }>({} as any);
 
 export const ChatContextProvider = ({
@@ -31,6 +33,7 @@ export const ChatContextProvider = ({
     const { data: session } = useSession();
     const [messages, setMessages] = useState<FormatMessageResponse[]>([]);
     const [roomAccessStatus, setRoomAccessStatus] = useState<RoomAccessStatus | null>(RoomAccessStatus.PENDING);
+    const [isNewMessage, setIsNewMessage] = useState(false);
     useEffect(() => {
         if (!session) return;
         if (!chatClient) {
@@ -64,8 +67,9 @@ export const ChatContextProvider = ({
         // for new member, we check by get members list from channel state.
         // const channelSubscriptions: Array<ReturnType<Channel['on']>> = [];
         const handleNewMessage = (event: any) => {
-
             if (event.message.type !== 'system') {
+                setIsNewMessage(true);
+
                 setMessages((prev) => [...prev, event.message]);
             }
 
@@ -88,6 +92,10 @@ export const ChatContextProvider = ({
             listener.unsubscribe();
         };
     }, [channel]);
+    useEffect(() => {
+        console.log('----------------isNewMessage', isNewMessage);
+
+    }, [isNewMessage])
     return <ChatContext.Provider
         value={{
             chatClient,
@@ -95,7 +103,9 @@ export const ChatContextProvider = ({
             switchUser,
             channel,
             messages,
-            setRoomAccessStatus
+            setRoomAccessStatus,
+            isNewMessage,
+            setIsNewMessage
         }}>
         {children}
     </ChatContext.Provider>;
@@ -120,4 +130,11 @@ export const useChatMessages = () => {
 export const useChatPendingMeetingRoomStatusContext = () => {
     const context = useChatContext()
     return context.setRoomAccessStatus
+}
+export const useChatNewMessageContext = (): [boolean, React.Dispatch<React.SetStateAction<boolean>>] => {
+    const context = useChatContext();
+    if (context.isNewMessage === undefined || context.setIsNewMessage === undefined) {
+        throw new Error('useChatNewMessageContext must be usesd within ChatContextProvider');
+    }
+    return [context.isNewMessage, context.setIsNewMessage];
 }

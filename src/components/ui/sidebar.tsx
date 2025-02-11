@@ -13,6 +13,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
+import { useChatNewMessageContext } from '@/contexts/chat'
+import { useJoinRequest } from '@/containers/Meeting/contexts'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -256,24 +258,58 @@ type SidebarTriggerWithTypeProps = React.ComponentProps<typeof Button> & {
 }
 
 export const SidebarTriggerWithType = React.forwardRef<React.ElementRef<typeof Button>, SidebarTriggerWithTypeProps>(
-  ({ sidebarType, className, onClick, ...props }, ref) => {
-    const { toggleSidebar } = useSidebar()
+  ({ variant, size, sidebarType, className, onClick, ...props }, ref) => {
+    const { toggleSidebar, open } = useSidebar()
+    const [isNewMessage, setIsNewMessage] = useChatNewMessageContext();
+    const [joinRequest, clearJoinRequest] = useJoinRequest()
+    const [isNewJoinRequest, setIsNewJoinRequest] = React.useState(false)
+
+    const onChangeStatus = () => {
+      if (open) return;
+      if (sidebarType === 'chat') {
+        setIsNewMessage(false)
+      } else if (sidebarType === 'participant') {
+        setIsNewJoinRequest(false)
+        clearJoinRequest()
+      }
+    }
+
+    React.useEffect(() => {
+      if (joinRequest) {
+        setIsNewJoinRequest(true)
+      }
+    }, [joinRequest])
 
     return (
       <Button
         ref={ref}
         data-sidebar="trigger-with-type"
-        variant="ghost"
-        size="icon"
-        className={cn('h-10 w-10', className)}
+        variant={variant}
+        size={size}
+        className={className}
         onClick={(event) => {
           onClick?.(event)
           toggleSidebar(sidebarType)
+          onChangeStatus()
         }}
         {...props}
       >
-        {sidebarType === 'chat' && <MessagesSquareIcon />}
-        {sidebarType === 'participant' && <UsersIcon />}
+        {sidebarType === 'chat' && <div className='flex items-center justify-between'>
+          <MessagesSquareIcon />
+          {isNewMessage && <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: "#F87171 " }}
+          />}
+        </div>
+        }
+        {sidebarType === 'participant' && <div className='flex items-center justify-between'>
+          <UsersIcon />
+          {isNewJoinRequest && <div
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: "#F87171 " }}
+          />}
+        </div>
+        }
         {sidebarType === 'setting' && <PanelRight />}
         <span className="sr-only">Toggle Sidebar {sidebarType}</span>
       </Button>

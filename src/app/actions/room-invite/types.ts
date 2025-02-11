@@ -8,4 +8,17 @@ export class InviteToRoomInput {
   @IsString()
   @IsNotEmpty()
   email!: string
+
+  @IsString()
+  @IsNotEmpty()
+  senderName!: string
+
+  @IsString()
+  @IsNotEmpty()
+  meetingLink!: string
+
+  @IsString()
+  @IsNotEmpty()
+  accessToken!: string
+
 }

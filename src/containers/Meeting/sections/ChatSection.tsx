@@ -1,20 +1,17 @@
 'use client'
-
-import { useCurrentParticipant, useMeetingParticipantsList, useMeetingParticipants, useOnlineMeetingParticipantsList } from '../contexts'
-import dayjs from 'dayjs'
 import { map } from 'lodash'
 import { SendIcon, XIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
-import { formatDateChat } from '@/utils'
-import { useChatChannelContext, useChatClientContext, useChatMessages } from '@/contexts/chat'
+import { useChatChannelContext, useChatMessages, } from '@/contexts/chat'
 import { MessageAvatar } from '../components/chat/MessageAvatar'
 import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/components/ui/sidebar'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
+import { toast } from 'sonner'
 
 type Props = {
   room: Partial<Room> | null
@@ -27,6 +24,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
   const ref = useRef<Scrollbars>(null)
   const refInput = useRef<HTMLInputElement>(null)
   const [isSending, setIsSending] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
   const {
     register,
     handleSubmit,
@@ -38,16 +36,22 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
 
   const { data: session } = useSession()
   const messages = useChatMessages();
-  const currentParticipant = useCurrentParticipant()
+
+
   useEffect(() => {
     ref.current?.scrollToBottom()
   }, [session, messages])
   const chatChannel = useChatChannelContext();
-  const participants = useOnlineMeetingParticipantsList()
   const { toggleSidebar } = useSidebar()
 
   const onSend = useCallback(async () => {
+    if (!chatChannel) {
+      toast.error('Guest users cannot participate in group chat. Please log in to use this feature.')
+      reset({ message: '' });
+      return;
+    }
     setIsSending(true)
+    setIsSubmitted(true)
     try {
       if (!getValues('message')) return
       const payload = { text: getValues('message') };
@@ -55,6 +59,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
 
       reset({ message: '' });
       setIsSending(false)
+      setIsSubmitted(false)
 
     } catch (error) {
       setIsSending(false)
@@ -111,7 +116,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
                 <SendIcon size={16} />
               </Button>
             </div>
-            {errors.message && <span className="text-xs text-red-500">This field is required</span>}
+            {isSubmitted && errors.message && <span className="text-xs text-red-500">This field is required</span>}
 
           </div>
         </div>

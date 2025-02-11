@@ -6,6 +6,7 @@ import { ReactNode, useState } from 'react'
 import { RecoilRoot } from 'recoil'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from 'sonner'
 
 const ThemeProvider = dynamic(() => import('@/providers/ThemeProvider').then((mod) => mod.ThemeProvider), { ssr: false })
 type Props = {
@@ -26,6 +27,7 @@ export const AppProvider: React.FC<Props> = ({ children }) => {
           </QueryClientProvider>
         </RecoilRoot>
       </ThemeProvider>
+      <Toaster />
     </SessionProvider>
   )
 }

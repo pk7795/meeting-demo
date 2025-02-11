@@ -12,6 +12,6 @@ export const env = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
   APP_SECRET: process.env.APP_SECRET as string,
-  ERMIS_CHAT_API: process.env.ERMIS_CHAT_API,
+  ERMIS_CHAT_API: process.env.ERMIS_CHAT_API as string,
   ERMIS_CHAT_API_KEY: process.env.ERMIS_CHAT_API_KEY,
 } as const

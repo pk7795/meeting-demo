@@ -12,6 +12,11 @@ const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: 'select_account',
+        },
+      },
     }),
     GithubProvider({
       clientId: env.GITHUB_ID,
@@ -38,8 +43,6 @@ const authOptions: NextAuthOptions = {
                 id: existingChatToken.id,
               },
               data: {
-                // access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
-                // refresh_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
                 userId: response.data.user_id,
                 projectId: response.data.project_id,
                 accessToken: response.data.token,
@@ -51,8 +54,6 @@ const authOptions: NextAuthOptions = {
             await getPrisma().chatToken.create({
               data: {
                 gUserId: user.id,
-                // access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
-                // refresh_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMHhjMDE5MTg5YmE3MjIyZmZlMGUyM2QzYjY0NzRkMTA0MjY2ZjBmZmIyIiwiY2xpZW50X2lkIjoiNmZiZGVjYjAtMWVjOC00ZTMyLTk5ZDctZmYyNjgzZTMwOGI3IiwiY2hhaW5faWQiOjAsInByb2plY3RfaWQiOiJiNDQ5MzdlNC1jMGQ0LTRhNzMtODQ3Yy0zNzMwYTkyM2NlODMiLCJhcGlrZXkiOiJrVUNxcWJmRVF4a1pnZTdISERGY0l4Zm9IenFTWlVhbSIsImVybWlzIjp0cnVlLCJleHAiOjE4MzI5NjM4MjM0NTYsImFkbWluIjpmYWxzZSwiZ2F0ZSI6ZmFsc2V9.WQDBkjOk_fvRqCRdsu7rqgtqAaIYegjh5SycEr8sDHM",
                 userId: response.data.user_id,
                 projectId: response.data.project_id,
                 accessToken: response.data.token,
@@ -87,7 +88,6 @@ const authOptions: NextAuthOptions = {
         },
       });
 
-      // Kiểm tra và gắn thông tin vào session
       if (existingChatToken) {
         session.chat.accessToken = existingChatToken.accessToken;
         session.chat.userId = existingChatToken.userId;
@@ -95,7 +95,6 @@ const authOptions: NextAuthOptions = {
         session.chat.gUserId = existingChatToken.gUserId;
         session.chat.refreshToken = existingChatToken.refreshToken;
 
-        // Kiểm tra nếu accessToken hết hạn và làm mới nó
         if ((!existingChatToken.accessToken || hasTokenExpired(existingChatToken.accessToken)) && existingChatToken.refreshToken) {
           const newToken = await refreshChatTokens(existingChatToken.refreshToken);
           session.chat.accessToken = newToken.accessToken;

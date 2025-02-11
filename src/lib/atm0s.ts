@@ -1,5 +1,5 @@
 import { LogLevel } from '@8xff/atm0s-media-react'
-import { env } from './env'
+import axios from 'axios'
 
 export interface Atm0sConfig {
   app_secret: string
@@ -36,4 +36,30 @@ export const generateToken = async (room: string, peer: string, gateway: string,
     throw new Error(rawResponse.statusText)
   }
 }
-
+export const sendEmailRequest = async (
+  email: string,
+  senderName: string,
+  meetingLink: string,
+  accessToken: string,
+  gateway: string
+) => {
+  try {
+    const { data } = await axios({
+      method: 'POST',
+      url: `${gateway}/uss/v1/users/send_invite_meeting_link`,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      data: JSON.stringify({
+        email,
+        inviter_name: senderName,
+        meeting_link: meetingLink
+      })
+    });
+    return data;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
+}

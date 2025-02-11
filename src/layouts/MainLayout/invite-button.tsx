@@ -2,7 +2,8 @@
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { CopyIcon, UserRoundPlus } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Copy, CopyIcon, UserRoundPlus } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCopyToClipboard } from 'usehooks-ts'
 
@@ -24,7 +25,16 @@ export const InviteButton: React.FC<Props> = ({ meetingLink }) => {
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="ghost" size="icon" className={'h-7 w-7 text-background'}>
-            <UserRoundPlus />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className={'flex aspect-square h-full items-center justify-center'}>
+                  <CopyIcon />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Copy link meeting</p>
+              </TooltipContent>
+            </Tooltip>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">

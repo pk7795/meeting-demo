@@ -1,7 +1,7 @@
 'use client'
 
 import { UserType } from '../constants'
-import { useMeetingParticipantsList, usePendingParticipants } from '../contexts'
+import { useCurrentParticipant, useMeetingParticipantsList, usePendingParticipants } from '../contexts'
 import { Modal, Select, Space, Typography } from 'antd'
 import { isEmpty, map } from 'lodash'
 import { MailPlusIcon, MicIcon, MicOff, MicOffIcon, PlusIcon, XIcon } from 'lucide-react'
@@ -10,7 +10,7 @@ import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room, UserRole, UserStatus } from '@prisma/client'
-import { inviteToRoom, rejectParticipant } from '@/app/actions'
+import { inviteToRoom, rejectParticipant, sendInviteMeetingLink } from '@/app/actions'
 import { ButtonIcon, useApp } from '@/components'
 import { supabase } from '@/config'
 import { MeetingParticipant } from '@/types/types'
@@ -19,6 +19,8 @@ import { useRemoteAudioTracks, useRemoteTracks } from '@atm0s-media-sdk/react-ho
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useSidebar } from '@/components/ui/sidebar'
+import { sendEmailRequest } from '@/lib/atm0s'
+import { toast } from 'sonner'
 
 type Props = {
   room: Partial<Room> | null
@@ -28,6 +30,8 @@ type Props = {
 export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinRequest }) => {
   const { data: session } = useSession()
   const params = useParams()
+  const baseUrl = window.location.origin
+  const meetingLink = `${baseUrl}/${params?.passcode}`
   const { message } = useApp()
   const participantsList = useMeetingParticipantsList()
   const [pendingParticipants, delPendingParticipant] = usePendingParticipants()
@@ -50,7 +54,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
       updatedAt: Date
     }[]
   >([])
-
+  const currentParticipant = useCurrentParticipant()
   const isRoomOwner = useMemo(() => {
     return room?.ownerId === session?.user.id
   }, [session?.user.id, room?.ownerId])
@@ -111,9 +115,12 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
         data: map(inviteEmail, (i) => ({
           passcode: params?.passcode as string,
           email: i,
+          senderName: currentParticipant.name,
+          meetingLink,
+          accessToken: session?.chat.accessToken as string,
         })),
       }).then(() => {
-        message.success('Invite successfully')
+        toast.success('Invite successfully')
         setOpenModalInvites(false)
         setInviteEmail([])
       })
@@ -141,22 +148,41 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
             <div className="text-sm dark:text-gray-200 text-gray-900 mt-4 mb-2">
               Pending requests ({pendingParticipants?.length})
             </div>
-            {map(pendingParticipants, (p) => (
-              <div className="flex items-center justify-between mb-2 last:mb-0 w-full" key={p.id}>
-                <Space>
-                  <Avatar src={p.user?.image}>{p.name?.charAt(0)}</Avatar>
-                  <div className="text-gray-400">{p.name}</div>
-                </Space>
-                <Space>
-                  <ButtonIcon size="small" type="default" onClick={() => onReject(p)}>
-                    Reject
-                  </ButtonIcon>
-                  <ButtonIcon size="small" type="primary" onClick={() => onAccept(p)} className="mr-2">
-                    Accept
-                  </ButtonIcon>
-                </Space>
-              </div>
-            ))}
+            {map(pendingParticipants, (p) => {
+              const name = p.user?.name || p.name || ""
+              const avatar = p.user?.image || ""
+              const firstLetter = name.charAt(0).toUpperCase()
+              return (
+                <div className="flex items-center justify-between mb-2 last:mb-0 w-full" key={p.id}>
+                  <Space>
+                    <Avatar className="h-10 w-10 rounded-full">
+                      <AvatarImage src={avatar} alt={name} />
+                      <AvatarFallback className="rounded-full">{firstLetter}</AvatarFallback>
+                    </Avatar>
+                    <div className="text-gray-400">{p.name}</div>
+                  </Space>
+                  <Space>
+                    <Button
+                      variant={'link'}
+                      onClick={() => {
+                        onReject(p)
+                      }}
+                    >
+                      <p className='text-sm text-muted-foreground'>Deny</p>
+                    </Button>
+                    <Button
+                      variant="blue"
+                      size={"sm"}
+                      onClick={() => {
+                        onAccept(p)
+                      }}
+                    >
+                      Admit
+                    </Button>
+                  </Space>
+                </div>
+              )
+            })}
           </>
         )}
       </div>
@@ -211,7 +237,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
 const ParticipantList = ({ participant }: { participant: MeetingParticipant }) => {
   const name = participant.user?.name || participant.name
   const avatar = participant.user?.image
-  const firstLetter = name.charAt(0)
+  const firstLetter = name.charAt(0).toUpperCase()
   const { speaking } = useAudioMixerSpeaking(participant.id)
   const audioTracks = useRemoteAudioTracks(participant.id)
   const renderUserStatus = useCallback((participant: MeetingParticipant) => {

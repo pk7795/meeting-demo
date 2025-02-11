@@ -1,7 +1,8 @@
 'use server'
 
 import { env, getPrisma, getSessionUser } from '@/lib'
-import { generateToken } from '@/lib/atm0s'
+import { generateToken, sendEmailRequest } from '@/lib/atm0s'
+import { useSession } from 'next-auth/react'
 
 
 export async function createRoomParticipantLoginUser({ data }: { data: { passcode: string } }) {
@@ -166,4 +167,29 @@ export async function rejectParticipant(participantId: string) {
   })
 
   return updatedRoomParticipant
+}
+export async function sendInviteMeetingLink({
+  data
+}: {
+  data: {
+    email: string;
+    senderName: string;
+    meetingLink: string;
+    accessToken: string
+  }
+}) {
+  try {
+    const response = await sendEmailRequest(
+      data.email,
+      data.senderName,
+      data.meetingLink,
+      data.accessToken,
+      env.ERMIS_CHAT_API
+    )
+
+    return response;
+  } catch (error) {
+    console.error('Failed to send invite:', error);
+    throw new Error('Failed to send meeting invite');
+  }
 }

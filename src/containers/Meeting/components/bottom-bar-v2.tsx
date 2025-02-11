@@ -9,7 +9,7 @@ import { useFullScreen } from '@/hooks/use-full-screen'
 
 import { ChevronDown, ChevronUp, HandIcon, MaximizeIcon, MessagesSquareIcon, MinimizeIcon, MoreHorizontalIcon, PhoneMissedIcon, UsersIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useMeetingParticipantState } from '../contexts'
 import { cn } from '@/lib/utils'
 import { useDevice } from '@/hooks'
@@ -75,8 +75,8 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
           </Button>
         </div>
         {!isMobile && <div className='flex pr-2'>
-          <SidebarTriggerWithType className={'text-background '} sidebarType={'chat'} />
-          <SidebarTriggerWithType className={'text-background'} sidebarType={'participant'} />
+          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-background '} sidebarType={'chat'} />
+          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-background'} sidebarType={'participant'} />
         </div>}
       </div>
     </BlurFade >
@@ -84,6 +84,7 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
 }
 const SettingsButton: React.FC = () => {
   const [isOpenSetting, setIsOpenSetting] = useState(false)
+
   const { toggleSidebar } = useSidebar()
   return (
     <Button
@@ -108,36 +109,10 @@ const SettingsButton: React.FC = () => {
         <DropdownMenuContent className={'border-none'}>
           <DropdownMenuLabel>Settings</DropdownMenuLabel>
           <DropdownMenuItem>
-            <Button
-              data-sidebar="trigger-with-type"
-              variant="secondary"
-              size="full"
-              className={cn('rounded-lg [&_svg]:!size-full')}
-              onClick={(event) => {
-                toggleSidebar('chat')
-                setIsOpenSetting(false)
-              }}
-            >
-              <MessagesSquareIcon size={16} />
-
-              <span className="sr-only">Toggle Sidebar Chat</span>
-            </Button>
+            <SidebarTriggerWithType variant={"secondary"} size={"full"} className={'rounded-lg [&_svg]:!size-full'} sidebarType={'chat'} />
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Button
-              data-sidebar="trigger-with-type"
-              variant="secondary"
-              size="full"
-              className={cn('rounded-lg [&_svg]:!size-full')}
-              onClick={(event) => {
-                toggleSidebar('chat')
-                setIsOpenSetting(false)
-              }}
-            >
-              <UsersIcon size={16} />
-
-              <span className="sr-only">Toggle Sidebar Chat</span>
-            </Button>
+            <SidebarTriggerWithType variant={"secondary"} size={"full"} className={'rounded-lg [&_svg]:!size-full'} sidebarType={'participant'} />
           </DropdownMenuItem>
           <DropdownMenu className="fill-white" />
         </DropdownMenuContent>
