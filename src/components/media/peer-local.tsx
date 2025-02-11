@@ -6,6 +6,7 @@ import { slice } from 'lodash'
 import { Pin, PinOff } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
 type Props = {
   // sourceName: string
@@ -46,7 +47,7 @@ export const PeerLocal: React.FC<Props> = ({ userName }) => {
   return (
     <div className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl bg-zinc-800">
       <div className="absolute bottom-3 left-2 z-[1] flex items-center gap-1">
-        <div className="rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white">
+        <div className="rounded-full bg-[#191B23] bg-opacity-30 px-2 py-0.5 text-sm text-white">
           {name || 'You'} {streamVideoScreen && `(You, presenting)`}
         </div>
       </div>
@@ -54,7 +55,7 @@ export const PeerLocal: React.FC<Props> = ({ userName }) => {
         onClick={onPin}
         variant={!isPinned ? 'outline' : 'blue'}
         size="icon"
-        className={'absolute right-2 top-2 z-[2] h-7 w-7 text-foreground'}
+        className={'absolute right-2 top-2 z-[2] h-7 w-7 text-background'}
       >
         {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
       </Button>
@@ -73,9 +74,10 @@ export const PeerLocal: React.FC<Props> = ({ userName }) => {
           />
         </div>
       ) : (
-        <div className="flex aspect-square max-h-40 w-1/3 max-w-40 items-center justify-center rounded-full bg-zinc-500 text-[calc(200%)] uppercase text-white">
-          {firstNameInitials || 'You'}
-        </div>
+        <Avatar className="w-1/3 rounded-full">
+          <AvatarImage src={user?.image || ""} alt={name} />
+          <AvatarFallback className="rounded-full">{firstNameInitials}</AvatarFallback>
+        </Avatar>
       )}
     </div>
   )

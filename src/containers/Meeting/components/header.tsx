@@ -33,13 +33,13 @@ export const Header: React.FC<Props> = ({ meetingLink }) => {
       duration={0.2}
       yOffset={-4}
       className={
-        'absolute -top-1 z-10 h-fit w-full rounded-b-2xl bg-opacity-100 bg-gradient-to-b from-foreground/50 to-transparent p-4'
+        'absolute -top-1 z-10 h-fit w-full rounded-b-2xl bg-opacity-100 from-background/50 to-transparent p-4'
       }
     >
       <header className="flex justify-between">
         <div className={'flex items-center gap-2'}>
           <div className="flex items-center gap-2">
-            <div className="hidden text-background lg:block">{date} | Room ID: {params?.passcode}</div>
+            <div className="hidden text-foreground lg:block">{date} | Room ID: {params?.passcode}</div>
           </div>
           <InviteButton meetingLink={meetingLink} />
         </div>
@@ -47,7 +47,7 @@ export const Header: React.FC<Props> = ({ meetingLink }) => {
           <Button
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             variant={'ghost'}
-            className='h-7 w-7 text-background'
+            className='h-7 w-7 text-foreground'
           >
             {theme === 'light' ? <SunIcon size={16} /> : <MoonIcon size={16} />}
           </Button>
@@ -55,7 +55,7 @@ export const Header: React.FC<Props> = ({ meetingLink }) => {
             variant="ghost"
             size="icon"
             onClick={onToggleFullScreen}
-            className={'h-7 w-7 text-background'}
+            className={'h-7 w-7 text-foreground'}
           >
             {!isMaximize ? <MaximizeIcon size={16} /> : <MinimizeIcon size={16} />}
           </Button>

@@ -379,7 +379,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       {contextHolder}
       <div
         ref={containerRef}
-        className=" h-full relative flex w-full items-start justify-center overflow-hidden bg-foreground px-4 pt-[60px] rounded-xl" id="id--fullScreen"
+        className=" h-full relative flex w-full items-start justify-center overflow-hidden px-4 pt-[60px] rounded-xl" id="id--fullScreen"
       >
         {isHoverContent && <Header meetingLink={meetingLink} />}
 
@@ -398,16 +398,16 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
         {isHoverContent && <BottomBarV2 sendEvent={sendRoomEvent} />}
 
         {isCreateNewRoom && (
-          <div className="absolute bottom-24 left-8 z-[2] w-[360px] rounded-xl bg-muted">
-            <div className="flex items-center justify-between py-2 pl-4 pr-3">
+          <div className="absolute bottom-24 left-8 z-[2] w-[360px] rounded-xl bg-mutedV2">
+            <div className="flex items-center justify-between py-2 pl-4 pr-3 text-background">
               <div>Your meeting&apos;s ready</div>
               <Button className={'h-7 w-7'} variant={'ghost'} onClick={() => setIsCreateNewRoom(false)}>
                 <XIcon size={16} />
               </Button>
             </div>
             <div className="grid gap-4 px-4 pb-4">
-              <div className="text-xs text-muted-foreground">Share this meeting link with others you want in the meeting</div>
-              <div className="flex h-10 items-center gap-2 rounded bg-zinc-200 pl-3 boreder border-red-300 dark:border-red-100">
+              <div className="text-xs text-mutedV2-foreground">Share this meeting link with others you want in the meeting</div>
+              <div className="flex h-10 items-center gap-2 rounded bg-mutedV2-foreground pl-3 boreder border-red-300 dark:border-red-100">
                 <div className="flex-1 text-sm">{meetingLink}</div>
                 <Button variant="link" size="icon" onClick={onCopyInviteLink}>
                   <CopyIcon size={16} />

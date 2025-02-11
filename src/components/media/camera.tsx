@@ -186,7 +186,7 @@ export const CameraToggleV2: React.FC<CameraSelectionProps> = ({ sourceName, isF
     <Button
       variant={'secondary'}
       size="full"
-      className={'gap-0 bg-secondary/90 p-0'}
+      className={'gap-0 bg-secondary-foreground/90 p-0'}
       onClick={() => setIsOpenSetting((prev) => !prev)}
     >
       <DropdownMenu open={isOpenSetting} onOpenChange={(v) => setIsOpenSetting(v)}>

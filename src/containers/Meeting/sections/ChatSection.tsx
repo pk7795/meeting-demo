@@ -6,12 +6,12 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
 import { useChatChannelContext, useChatMessages, } from '@/contexts/chat'
-import { MessageAvatar } from '../components/chat/MessageAvatar'
 import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/components/ui/sidebar'
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
+import { MessageAvatar } from '@/components/ui/message-avatar'
 
 type Props = {
   room: Partial<Room> | null

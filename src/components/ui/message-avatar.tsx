@@ -1,10 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useChatClientContext } from "@/contexts/chat";
-import { ErmisChatGenerics } from "@/hooks/common/useChatClient/types";
 import { formatDateChat } from "@/utils";
 import dayjs from "dayjs";
-import { ErmisChat } from "ermis-chat-js-sdk/dist/types/client";
 import { FormatMessageResponse } from "ermis-chat-js-sdk/dist/types/types";
 import React, { useMemo } from "react";
 

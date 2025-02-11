@@ -130,8 +130,10 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
   return (
     <div className="flex flex-col h-full">
       <div className="h-16 border-b dark:border-[#293042] flex items-center font-bold px-4 justify-between">
-        <span className="dark:text-gray-200 text-gray-900">Participants ({participantsList?.length})</span>
-        <ButtonIcon icon={<XIcon size={16} />} onClick={() => toggleSidebar("participant")} />
+        <span className="text-foreground">Participants ({participantsList?.length})</span>
+        <Button variant={"ghost"} size={"icon"} onClick={() => toggleSidebar("participant")}>
+          <XIcon size={16} />
+        </Button>
       </div>
       <div className="border-b dark:border-[#232C3C] flex flex-col items-start font-bold p-4">
         <Button
@@ -187,8 +189,8 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
         )}
       </div>
       <div className="flex flex-col flex-1">
-        <Scrollbars className="h-full dark:bg-[#1D2431] bg-white">
-          <div className="h-full p-2">
+        <Scrollbars className="h-full bg-backgroundV2">
+          <div className="h-full p-3">
             {map(participantsList, (p) => (
               <ParticipantList key={p.id} participant={p} />
             ))}

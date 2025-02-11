@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, Col, Divider, Popover, Row, Space, Typography } from 'antd'
+import { Avatar, Col, Divider, Row, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import dayjs from 'dayjs'
 import { LogInIcon, LogOutIcon, MoonIcon, SunIcon } from 'lucide-react'
@@ -13,6 +13,8 @@ import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react'
 import { ButtonIcon } from '@/components'
 import { themeState } from '@/recoil'
 import { ERMIS_LOGO } from '@public'
+import { Button } from '../ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
 type Props = {}
 
@@ -23,7 +25,7 @@ export const Header: React.FC<Props> = () => {
   const [theme, setTheme] = useRecoilState(themeState)
 
   const [date, setDate] = useState(dayjs().format('hh:mm A • ddd, MMM DD'))
-
+  const [popoverOpen, setPopoverOpen] = useState(false);
   useEffect(() => {
     const interval = setInterval(() => {
       setDate(dayjs().format('hh:mm A • ddd, MMM DD'))
@@ -46,109 +48,106 @@ export const Header: React.FC<Props> = () => {
   }, [theme])
 
   return (
-    <div className="h-16 flex items-center w-full">
-      <Row align="middle" justify="space-between" className="w-full">
-        <Col>
+    <div>
+      <header className="flex justify-between h-16 items-center w-full">
+        <div className={'flex items-center gap-2'}>
           <Link href="/" style={{ justifyContent: 'center', flex: 'row' }}>
             <div className='flex'>
               <img src={theme === 'dark' ? ERMIS_LOGO : ERMIS_LOGO} alt="" className="h-8 mr-4" />
-              <Typography.Title level={3} className="mb-0 cursor-pointer dark:text-white text-black">
-                Ermis Meet
-              </Typography.Title>
+              <div className="hidden text-foreground lg:block text-xl">Ermis Meet</div>
             </div>
           </Link>
-        </Col>
-        <Col>
-          <Space>
-            {user ? (
-              <Space>
-                <Typography.Paragraph className="mb-0 hidden md:block lg:text-lg dark:text-white">
-                  {date}
-                </Typography.Paragraph>
-                <Popover
-                  placement="bottomRight"
-                  overlayInnerStyle={{
-                    padding: 8,
-                  }}
-                  content={
+        </div>
+        <div className='flex gap-2 items-center'>
+          {
+            user ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="hidden text-foreground lg:block">{date}</div>
+                </div>
+                <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" size="icon"
+                      onMouseEnter={() => setPopoverOpen(true)}
+                      onMouseLeave={() => setPopoverOpen(false)}
+                    >
+                      <Avatar src={user?.user?.image}>{user?.user?.name?.charAt(0)}</Avatar>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    onMouseEnter={() => setPopoverOpen(true)}
+                    onMouseLeave={() => setPopoverOpen(false)}>
                     <div>
-                      <div>
-                        <Space>
-                          <Avatar size={48} src={user?.user?.image}>
-                            {user?.user?.name?.charAt(0)}
-                          </Avatar>
-                          <div className="flex flex-col">
-                            <div className="">{user?.user?.name}</div>
-                            <div className="text-neutral-500">{user?.user?.email}</div>
-                          </div>
-                        </Space>
+                      <div className="flex items-center gap-2">
+                        <Avatar size={48} src={user?.user?.image}>
+                          {user?.user?.name?.charAt(0)}
+                        </Avatar>
+                        <div className="flex flex-col">
+                          <div className="">{user?.user?.name}</div>
+                          <div className="text-neutral-500">{user?.user?.email}</div>
+                        </div>
                       </div>
-                      <Divider className="my-2" />
-                      <div
-                        className={classNames(
-                          'hover:bg-gray-100 dark:hover:bg-gray-800 h-8 px-2 rounded-lg flex items-center cursor-pointer text-primary_text dark:text-gray-100'
-                        )}
+                      <div className="my-2"></div>
+
+                      <Button
+                        variant="outline"
+                        size="full"
                         onClick={() => {
                           signOut({
                             callbackUrl: '/',
                           })
                         }}
+                        className={classNames(
+                          'h-8 flex mb-1 bg-backgroundV2'
+                        )}
                       >
-                        <LogOutIcon size={16} />
-                        <div className="text-sm ml-2">Log out</div>
-                      </div>
+                        <div className='flex items-start gap-2 w-full pl-2'>
+                          <LogOutIcon size={16} />
+                          <div className="text-sm ml-2">Log out</div>
+                        </div>
+                      </Button>
                     </div>
-                  }
-                  trigger="hover"
-                >
-                  <Avatar src={user?.user?.image}>{user?.user?.name?.charAt(0)}</Avatar>
+                  </PopoverContent>
                 </Popover>
-              </Space>
-            ) : (
-              <Space>
-                <Popover
-                  placement="bottomRight"
-                  overlayInnerStyle={{
-                    padding: 8,
-                  }}
-                  content={
-                    <div>
-                      <div
-                        className={classNames(
-                          'hover:bg-gray-100 dark:hover:bg-gray-800 h-8 px-2 rounded-lg flex items-center cursor-pointer text-primary_text dark:text-gray-100 mb-1'
-                        )}
-                        onClick={() => signIn('google', { callbackUrl })}
-                      >
-                        <IconBrandGoogle size={16} />
-                        <div className="text-sm ml-2">Continue with Google</div>
-                      </div>
-                      <div
-                        className={classNames(
-                          'hover:bg-gray-100 dark:hover:bg-gray-800 h-8 px-2 rounded-lg flex items-center cursor-pointer text-primary_text dark:text-gray-100'
-                        )}
-                        onClick={() => signIn('github', { callbackUrl })}
-                      >
-                        <IconBrandGithub size={16} />
-                        <div className="text-sm ml-2">Continue with Github</div>
-                      </div>
-                    </div>
-                  }
-                  trigger="hover"
-                >
-                  <ButtonIcon size="large" type="primary" ghost icon={<LogInIcon size={16} />}>
+              </>
+            ) : (<div>
+              <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="secondary" size="default"
+                    onMouseEnter={() => setPopoverOpen(true)}
+                    onMouseLeave={() => setPopoverOpen(false)}
+                  >
+                    <LogInIcon size={16} />
                     Sign in
-                  </ButtonIcon>
-                </Popover>
-              </Space>
-            )}
-            <ButtonIcon
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              shape="circle"
-              icon={theme === 'dark' ? <SunIcon size={16} color='#ffffff' /> : <MoonIcon size={16} color="#000" />}
-            />
-          </Space>
-        </Col>
-      </Row>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  onMouseEnter={() => setPopoverOpen(true)}
+                  onMouseLeave={() => setPopoverOpen(false)}>
+                  <Button
+                    variant="outline"
+                    size="full"
+                    onClick={() => signIn('google', { callbackUrl })}
+                    className={classNames(
+                      'h-8 px-2 flex items-center mb-1'
+                    )}
+                  >
+                    <IconBrandGoogle size={16} />
+                    <div className="text-sm ml-2">Continue with Google</div>
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            </div>)
+          }
+          <Button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            variant={'ghost'}
+            className='h-7 w-7 text-foreground'
+          >
+            {theme === 'light' ? <SunIcon size={16} /> : <MoonIcon size={16} />}
+          </Button>
+        </div>
+      </header>
     </div>
   )
 }

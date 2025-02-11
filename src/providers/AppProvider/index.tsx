@@ -18,7 +18,7 @@ export const AppProvider: React.FC<Props> = ({ children }) => {
 
   return (
     <SessionProvider>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="dark">
         <RecoilRoot>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>

@@ -8,7 +8,9 @@ export default {
     extend: {
       colors: {
         background: 'hsl(var(--background))',
+        backgroundV2: 'hsl(var(--background-v2))',
         foreground: 'hsl(var(--foreground))',
+        foregroundV2: 'hsl(var(--foreground-v2))',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
@@ -28,6 +30,10 @@ export default {
         muted: {
           DEFAULT: 'hsl(var(--muted))',
           foreground: 'hsl(var(--muted-foreground))',
+        },
+        mutedV2: {
+          DEFAULT: 'hsl(var(--muted-v2))',
+          foreground: 'hsl(var(--muted-foreground-v2))',
         },
         accent: {
           DEFAULT: 'hsl(var(--accent))',

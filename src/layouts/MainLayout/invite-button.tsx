@@ -24,7 +24,7 @@ export const InviteButton: React.FC<Props> = ({ meetingLink }) => {
     <div className={'flex gap-2'}>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="ghost" size="icon" className={'h-7 w-7 text-background'}>
+          <Button variant="ghost" size="icon" className={'h-7 w-7 text-foreground'}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div className={'flex aspect-square h-full items-center justify-center'}>

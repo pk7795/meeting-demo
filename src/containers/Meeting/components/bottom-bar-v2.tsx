@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { SidebarTriggerWithType, useSidebar } from '@/components/ui/sidebar'
 import { useFullScreen } from '@/hooks/use-full-screen'
 
-import { ChevronDown, ChevronUp, HandIcon, MaximizeIcon, MessagesSquareIcon, MinimizeIcon, MoreHorizontalIcon, PhoneMissedIcon, UsersIcon } from 'lucide-react'
+import { ChevronDown, ChevronUp, HandIcon, LogOutIcon, MaximizeIcon, MessagesSquareIcon, MinimizeIcon, MoreHorizontalIcon, PhoneMissedIcon, UsersIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useCallback, useEffect } from 'react'
 import { useMeetingParticipantState } from '../contexts'
@@ -39,7 +39,7 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
       key={'zoom-footer'}
       duration={0.2}
       yOffset={4}
-      className={'absolute -bottom-1 z-10 h-fit w-full rounded-b-2xl bg-gradient-to-t from-foreground/50 to-transparent p-4'}
+      className={'absolute -bottom-1 z-10 h-fit w-full rounded-b-2xl from-background/50 to-transparent p-4'}
     >
       <div className={'relative py-2 flex justify-between'}>
         <div className={'mx-auto flex h-11 w-max items-start gap-2'}>
@@ -54,10 +54,7 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
           >
             <HandIcon
               size={16}
-              className={cn(
-                'dark:text-white text-primary_text',
-                userState.handRaised ? 'text-white' : ''
-              )} />
+              className={cn(userState.handRaised ? 'text-white' : '')} />
           </Button>
           {!isMobile && <ScreenToggleV2 sourceName={'video_screen'} />}
           {isMobile && <SettingsButton />}
@@ -71,12 +68,12 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
               router.push('/')
             }}
           >
-            <PhoneMissedIcon size={16} />
+            <LogOutIcon size={20} className="rotate-icon" />
           </Button>
         </div>
         {!isMobile && <div className='flex pr-2'>
-          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-background '} sidebarType={'chat'} />
-          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-background'} sidebarType={'participant'} />
+          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-foreground'} sidebarType={'chat'} />
+          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-foreground'} sidebarType={'participant'} />
         </div>}
       </div>
     </BlurFade >
@@ -90,7 +87,7 @@ const SettingsButton: React.FC = () => {
     <Button
       variant={'secondary'}
       size="full"
-      className={'gap-0 bg-secondary/90 p-0'}
+      className={'gap-0 bg-secondary-foreground/90 p-0'}
       onClick={() => setIsOpenSetting((prev) => !prev)}
     >
       <DropdownMenu open={isOpenSetting} onOpenChange={(v) => setIsOpenSetting(v)}>
