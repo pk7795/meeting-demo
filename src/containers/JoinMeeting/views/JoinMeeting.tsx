@@ -272,7 +272,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
 
                             {!isLoadingCreate && (
                               <div className="flex h-10 items-center gap-2 rounded bg-zinc-200 pl-3">
-                                <div className="flex-1 text-sm">{meetingLink}</div>
+                                <div className="flex-1 text-background text-sm">{meetingLink}</div>
                                 <Button variant="link" size="icon" onClick={() => copyToClipboardMeetingLink(meetingLink)}>
                                   {isCopy ? <CopyCheck size={16} className="text-green-500" /> : <Copy size={16} />}
                                 </Button>

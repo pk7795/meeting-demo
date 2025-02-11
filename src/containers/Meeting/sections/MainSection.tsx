@@ -52,6 +52,7 @@ import { PeerLocal, PeerRemote } from '@/components/media'
 import { SidebarLayout } from '@/layouts'
 import { useChatClientContext } from '@/contexts/chat'
 import { useSidebar } from '@/components/ui/sidebar'
+import { cn } from '@/lib/utils'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -398,7 +399,13 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
         {isHoverContent && <BottomBarV2 sendEvent={sendRoomEvent} />}
 
         {isCreateNewRoom && (
-          <div className="absolute bottom-24 left-8 z-[2] w-[360px] rounded-xl bg-mutedV2">
+          <div className={cn(
+            "absolute z-[2] rounded-xl bg-mutedV2",
+            // Mobile styles
+            "w-[90%] left-[5%] bottom-24",
+            // Tablet and desktop styles
+            "md:w-[360px] md:left-8"
+          )}>
             <div className="flex items-center justify-between py-2 pl-4 pr-3 text-background">
               <div>Your meeting&apos;s ready</div>
               <Button className={'h-7 w-7'} variant={'ghost'} onClick={() => setIsCreateNewRoom(false)}>
