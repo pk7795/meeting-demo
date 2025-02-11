@@ -129,7 +129,7 @@ export const Header: React.FC<Props> = () => {
                     size="full"
                     onClick={() => signIn('google', { callbackUrl })}
                     className={classNames(
-                      'h-8 px-2 flex items-center mb-1'
+                      'h-8 flex mb-1 bg-backgroundV2'
                     )}
                   >
                     <IconBrandGoogle size={16} />
