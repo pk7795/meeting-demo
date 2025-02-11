@@ -298,7 +298,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                         className="w-full border-primary/20 bg-background/50 transition-shadow duration-200 focus:border-primary focus:shadow-md placeholder:text-muted-foreground dark:placeholder:text-white/50"
                         {...registerJoinRoom('passCode', { required: true })}
                       />
-                      <Button loading={isLoadingJoin} type="submit" variant={'outline'}>
+                      <Button loading={isLoadingJoin} type="submit" variant={'default'}>
                         Join
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </Button>

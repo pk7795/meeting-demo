@@ -63,8 +63,6 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
             size="full"
             className={'rounded-lg [&_svg]:!size-full'}
             onClick={() => {
-              const audio = new Audio('/sound-out.mp3')
-              audio.play()
               router.push('/')
             }}
           >
