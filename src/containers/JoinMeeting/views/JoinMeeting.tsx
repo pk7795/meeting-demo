@@ -1,14 +1,12 @@
 'use client'
 
-import classNames from 'classnames'
-import { isEmpty, map } from 'lodash'
-import { ArrowRight, Copy, CopyCheck, CopyIcon, HashIcon, Link, Loader, LogInIcon, Plus, XIcon } from 'lucide-react'
+
+import { ArrowRight, Copy, CopyCheck, Link, Loader, Plus, } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
 import { RoomInvite } from '@prisma/client'
-import { ImgSignInBg, SCREEN } from '@public'
-import { IconBrandGithub, IconBrandGoogle, IconLogin, IconVideoPlus } from '@tabler/icons-react'
+import { IconBrandGoogle } from '@tabler/icons-react'
 import { OneMyRooms, OneRoomInvite } from '@/app/(join-meeting)/page'
 import { createRoom } from '@/app/actions'
 import { supabase } from '@/config/supabase'
@@ -40,13 +38,13 @@ export const WrappedJoinMeeting = ({ roomInvite, myRooms }: Props) => (
   </GlobalContextProvider>
 )
 
-export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
+export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
   const router = useRouter()
   const [isLoadingJoin, setIsLoadingJoin] = useState(false)
   const [isLoadingCreate, setIsLoadingCreate] = useState(false)
 
   const { data: user } = useSession()
-  const [isPendingCreateRoom, startTransitionCreateRoom] = useTransition()
+  const [, startTransitionCreateRoom] = useTransition()
   const [invites, setInvites] = useState<OneRoomInvite[] | null>(roomInvite)
   const [passCode, setPassCode] = useState<string | null>(null)
   const [isCopy, setIsCopy] = useState(false)
@@ -59,7 +57,6 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
     register: registerJoinRoom,
     handleSubmit: handleSubmitJoinRoom,
     formState: { errors: errorsJoinRoom },
-    getValues: getValuesJoinRoom,
   } = useForm<PassCodeInput>({
     defaultValues: { passCode: '' },
     mode: 'onChange',
@@ -69,7 +66,6 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
     handleSubmit: handleSubmitCreateRoom,
     formState: { errors: errorsCreateRoom },
     getValues: getValuesCreateRoom,
-    watch: watchCreateRoom,
   } = useForm<RoomNameInput>({
     defaultValues: { roomName: '' },
     mode: 'onChange',
@@ -298,7 +294,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite, myRooms }) => {
                         className="w-full border-primary/20 bg-background/50 transition-shadow duration-200 focus:border-primary focus:shadow-md placeholder:text-muted-foreground dark:placeholder:text-white/50"
                         {...registerJoinRoom('passCode', { required: true })}
                       />
-                      <Button loading={isLoadingJoin} type="submit" variant={'default'}>
+                      <Button loading={isLoadingJoin} onClick={handleSubmitJoinRoom(onJoinRoom)} variant={'default'}>
                         Join
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </Button>

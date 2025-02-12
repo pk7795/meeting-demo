@@ -17,10 +17,10 @@ type Props = {
 
 export const PeerRemote: React.FC<Props> = ({ peer, participant, raiseRingTone }) => {
 
-  const remote_videos = useRemoteVideoTracks(peer.peer)
+  const remoteVideos = useRemoteVideoTracks(peer.peer)
   const { speaking } = useAudioMixerSpeaking(peer.peer)
-  const video_main = find(remote_videos, (t) => t.track === 'video_main')
-  const video_screen = find(remote_videos, (t) => t.track === 'video_screen')
+  const videoMain = find(remoteVideos, (t) => t.track === 'video_main')
+  const videoScreen = find(remoteVideos, (t) => t.track === 'video_screen')
   const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
   const isPinned = pinnedParticipant?.p.peer === peer?.peer
   const isHandRaised = participant?.meetingStatus?.handRaised
@@ -60,15 +60,15 @@ export const PeerRemote: React.FC<Props> = ({ peer, participant, raiseRingTone }
 
       <div className="absolute bottom-3 left-2 z-[1] flex items-center gap-1 jk">
         <div className="truncate rounded-full bg-slate-950 bg-opacity-30 px-2 py-0.5 text-sm text-white text-center flex">
-          {participant?.name || peer.peer} {video_screen && <div>, presenting</div>}
+          {participant?.name || peer.peer} {videoScreen && <div>, presenting</div>}
         </div>
       </div>
-      {!isEmpty(remote_videos) ? (
+      {!isEmpty(remoteVideos) ? (
         <>
-          {video_screen ? (
-            <VideoRemote key={video_screen?.track} track={video_screen as RemoteTrack} mirror={false} />
+          {videoScreen ? (
+            <VideoRemote key={videoScreen?.track} track={videoScreen as RemoteTrack} mirror={false} />
           ) : (
-            <VideoRemote key={video_main?.track} track={video_main as RemoteTrack} />
+            <VideoRemote key={videoMain?.track} track={videoMain as RemoteTrack} />
           )}
         </>
       ) : (

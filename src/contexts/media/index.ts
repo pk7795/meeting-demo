@@ -13,9 +13,9 @@ export class Context extends EventEmitter {
 
     async requestDevice(source_name: string, kind: 'audio' | 'video' | 'screen', deviceId?: string): Promise<MediaStream> {
 
-        const old_stream = this.streams.get(source_name)
-        if (old_stream) {
-            old_stream.getTracks().map((t) => t.stop())
+        const oldStream = this.streams.get(source_name)
+        if (oldStream) {
+            oldStream.getTracks().map((t) => t.stop())
             this.streams.delete(source_name)
             this.emit(ContextEvent.DeviceChanged + source_name, null)
         }
@@ -56,9 +56,9 @@ export class Context extends EventEmitter {
     }
 
     turnOffDevice(source_name: string) {
-        const old_stream = this.streams.get(source_name)
-        if (old_stream) {
-            old_stream.getTracks().map((t) => t.stop())
+        const oldStream = this.streams.get(source_name)
+        if (oldStream) {
+            oldStream.getTracks().map((t) => t.stop())
             this.streams.delete(source_name)
             this.emit(ContextEvent.DeviceChanged + source_name, null)
         }

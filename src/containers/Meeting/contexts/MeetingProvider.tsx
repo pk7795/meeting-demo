@@ -1,13 +1,10 @@
-import { UserType } from '../constants'
-import { useActions } from '@8xff/atm0s-media-react'
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { UserType } from '@/lib/constants'
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
-import { useAudioSlotsQueueContainer } from '@/hooks'
 import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
 import { MeetingParticipant, RoomMessageWithParticipant, RoomParticipantWithUser, RoomPopulated } from '@/types/types'
-import { ChatUser } from '@/hooks/common/useChatClient/types'
 import { JoinInfo } from '@atm0s-media-sdk/core'
 import { RemotePeer, useSession } from '@atm0s-media-sdk/react-hooks'
 
@@ -16,7 +13,6 @@ type PinnedParticipant = { p: JoinInfo | RemotePeer; force?: boolean, name?: str
 export const MeetingContext = createContext<{
   data: {
     participants: MapContainer<string, MeetingParticipant>
-    messages: MapContainer<string, RoomMessageWithParticipant>
     participantState: DataContainer<MeetingParticipantStatus>
     joinRequest: DataContainer<{ id: string; name: string; type: UserType } | null>
     receiveMessage: DataContainer<RoomMessageWithParticipant | null>
@@ -24,14 +20,12 @@ export const MeetingContext = createContext<{
     currentParticipant: RoomParticipant
     pendingParticipants: MapContainer<string, Partial<RoomParticipantWithUser>>
     roomSupabaseChannel: DataContainer<RealtimeChannel>
-    talkingParticipants: MapContainer<string, { peerId: string; ts: number }>
     isConnected: DataContainer<boolean | null>
     destroy: () => void
   }
   setParticipantState: (state: MeetingParticipantStatus) => void
   setPinnedParticipant: (participant: PinnedParticipant | null) => void
   clearJoinRequest: () => void
-  clearReceiveMessage: () => void
   deletePendingParticipant: (participantId: string) => void
 }>({} as any)
 
@@ -66,13 +60,13 @@ export const MeetingProvider = ({
     joinedAt: Date
     createdAt: Date
     updatedAt: Date
+    lastAccessedAt: Date
   }
   pendingParticipantsList: RoomParticipantWithUser[]
 }) => {
 
   const data = useMemo(() => {
     const participants = new MapContainer<string, MeetingParticipant>()
-    const messages = new MapContainer<string, RoomMessageWithParticipant>()
     const participantState = new DataContainer<MeetingParticipantStatus>({
       online: true,
       joining: 'meeting',
@@ -86,59 +80,12 @@ export const MeetingProvider = ({
     const roomSupabaseChannel = new DataContainer<RealtimeChannel>({} as any)
     const isConnected = new DataContainer<boolean | null>(null)
 
-    const messagesMap = room!.messages.reduce((acc, message) => {
-      acc.set(message.id, {
-        id: message.id,
-        content: message.content,
-        createdAt: message.createdAt,
-        participant: message.participant,
-      })
-      return acc
-    }, new Map<string, RoomMessageWithParticipant>())
-    messages.setBatch(messagesMap)
-
     const pendingMap = pendingParticipantsList.reduce((acc, participant) => {
       acc.set(participant.id, participant)
       return acc
     }, new Map<string, Partial<RoomParticipantWithUser>>())
     pendingParticipants.setBatch(pendingMap)
 
-    const onMessageRoomChanged = (payload: {
-      new: {
-        id: string
-        participantId: string
-        createdAt: string
-        content: string
-        type: string
-      }
-    }) => {
-      console.log('--------------------------------------------------------')
-      console.log('onMessageRoomChanged', new Date().getTime())
-      console.log('--------------------------------------------------------')
-      const participant = participants.get(payload.new.participantId) as any
-      const message = {
-        ...payload.new,
-        participant,
-        // TODO: Fix this hack, the date is not being deliver by supabase correctly
-        createdAt: new Date(payload.new.createdAt + 'Z'),
-      }
-      messages.set(payload.new.id, message)
-      receiveMessage.change(message)
-    }
-
-    const roomMessageSubscription = supabase
-      .channel(`room:${room!.id}:messages`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'Messages',
-          filter: 'roomId=eq.' + room!.id,
-        },
-        onMessageRoomChanged
-      )
-      .subscribe()
 
     roomSupabaseChannel.change(supabase.channel(`room:${room!.id}`))
 
@@ -167,7 +114,7 @@ export const MeetingProvider = ({
           }
         }
       })
-      .subscribe((status) => { })
+      .subscribe(() => { })
 
     let presenceChannelSubscription: RealtimeChannel | null = null
     if (roomParticipant.id) {
@@ -258,7 +205,6 @@ export const MeetingProvider = ({
     }
 
     const destroy = () => {
-      supabase.removeChannel(roomMessageSubscription)
       presenceChannelSubscription && supabase.removeChannel(presenceChannelSubscription)
       supabase.removeChannel(roomSupabaseChannel.data)
     }
@@ -267,7 +213,6 @@ export const MeetingProvider = ({
       participants,
       pinnedParticipant,
       pendingParticipants,
-      messages,
       participantState,
       joinRequest,
       receiveMessage,
@@ -276,7 +221,7 @@ export const MeetingProvider = ({
       currentParticipant: roomParticipant,
       destroy,
     }
-  }, [])
+  }, [pendingParticipantsList, room, roomParticipant])
 
   const session = useSession()
 
@@ -301,9 +246,6 @@ export const MeetingProvider = ({
     data.joinRequest.change(null)
   }, [data])
 
-  const clearReceiveMessage = useCallback(() => {
-    data.receiveMessage.change(null)
-  }, [data])
 
   const setPinnedParticipant = useCallback(
     (participant: PinnedParticipant | null) => {
@@ -319,33 +261,12 @@ export const MeetingProvider = ({
     [data.pendingParticipants]
   )
 
-  const talkingParticipants = useAudioSlotsQueueContainer(3, -1000)
-  talkingParticipants.onListChanged((list) => {
-    if (list.length > 0 && list[0].peerId) {
-      const sorted = list.sort((a, b) => a.ts - b.ts)
-      let selected = sorted[0].peerId
-      const pinned = sorted.find((p) => p.peerId === data.pinnedParticipant?.data?.p?.peer)
-      if (pinned) {
-        selected = sorted.find((p) => p.audioLevel - pinned.audioLevel > 20)?.peerId || pinned.peerId
-      }
-      if (!data.pinnedParticipant?.data?.force) {
-        // setPinnedParticipant({
-        //   p: data.participants.get(selected),
-        //   force: false,
-        // })
-      }
-    }
-  })
 
   return (
     <MeetingContext.Provider
       value={{
-        data: {
-          ...data,
-          talkingParticipants,
-        },
+        data,
         clearJoinRequest,
-        clearReceiveMessage,
         deletePendingParticipant,
         setParticipantState,
         setPinnedParticipant,
@@ -360,12 +281,6 @@ export const useMeeting = () => {
   const context = useContext(MeetingContext)
   return context
 }
-
-export const useMeetingMessages = () => {
-  const context = useMeeting()
-  return useReactionList(context.data.messages)
-}
-
 export const useRoomSupabaseChannel = () => {
   const context = useMeeting()
   return useReactionData<RealtimeChannel>(context.data.roomSupabaseChannel)
@@ -416,24 +331,12 @@ export const useJoinRequest = () => {
   return [joinRequest, context.clearJoinRequest] as const
 }
 
-export const useReceiveMessage = () => {
-  const context = useMeeting()
-  const receiveMessage = useReactionData<RoomMessageWithParticipant | null>(context.data.receiveMessage)
-  return [receiveMessage, context.clearReceiveMessage] as const
-}
-
 export const usePendingParticipants = () => {
   const context = useMeeting()
   const pendingParticipants = useReactionList<string, Partial<RoomParticipantWithUser>>(
     context.data.pendingParticipants
   )
   return [pendingParticipants, context.deletePendingParticipant] as const
-}
-
-export const useTalkingParticipants = () => {
-  const context = useMeeting()
-  const talkingParticipants = useReactionList<string, { peerId: string; ts: number }>(context.data.talkingParticipants)
-  return talkingParticipants
 }
 
 export const useIsConnected = () => {

@@ -4,6 +4,9 @@ CREATE TYPE "UserRole" AS ENUM ('User', 'Admin', 'SuperAdmin');
 -- CreateEnum
 CREATE TYPE "UserStatus" AS ENUM ('Inactive', 'Actived', 'Blocked');
 
+-- CreateEnum
+CREATE TYPE "MessageType" AS ENUM ('TEXT', 'IMAGE', 'VIDEO', 'AUDIO', 'FILE');
+
 -- CreateTable
 CREATE TABLE "Account" (
     "id" TEXT NOT NULL,
@@ -61,6 +64,7 @@ CREATE TABLE "Room" (
     "passcode" TEXT,
     "record" BOOLEAN NOT NULL DEFAULT false,
     "ownerId" TEXT NOT NULL,
+    "active" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -88,8 +92,50 @@ CREATE TABLE "RoomParticipant" (
     "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "lastAccessedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "accepted" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "RoomParticipant_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Messages" (
+    "id" TEXT NOT NULL,
+    "roomId" TEXT NOT NULL,
+    "participantId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "type" "MessageType" NOT NULL DEFAULT 'TEXT',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Messages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ChatToken" (
+    "id" TEXT NOT NULL,
+    "gUserId" TEXT NOT NULL,
+    "userId" TEXT,
+    "projectId" TEXT,
+    "accessToken" TEXT,
+    "refreshToken" TEXT,
+    "expiresAt" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ChatToken_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ChatChannel" (
+    "id" TEXT NOT NULL,
+    "channelId" TEXT NOT NULL,
+    "channelType" TEXT NOT NULL,
+    "roomId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ChatChannel_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -127,3 +173,21 @@ CREATE INDEX "RoomParticipant_roomId_idx" ON "RoomParticipant"("roomId");
 
 -- CreateIndex
 CREATE INDEX "RoomParticipant_userId_idx" ON "RoomParticipant"("userId");
+
+-- CreateIndex
+CREATE INDEX "Messages_roomId_idx" ON "Messages"("roomId");
+
+-- CreateIndex
+CREATE INDEX "Messages_participantId_idx" ON "Messages"("participantId");
+
+-- CreateIndex
+CREATE INDEX "ChatToken_gUserId_idx" ON "ChatToken"("gUserId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ChatChannel_channelId_key" ON "ChatChannel"("channelId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ChatChannel_roomId_key" ON "ChatChannel"("roomId");
+
+-- CreateIndex
+CREATE INDEX "ChatChannel_roomId_idx" ON "ChatChannel"("roomId");

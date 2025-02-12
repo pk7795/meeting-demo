@@ -31,29 +31,6 @@ export const roomInclude = Prisma.validator<Prisma.RoomInclude>()({
       },
     },
   },
-  messages: {
-    select: {
-      id: true,
-      content: true,
-      createdAt: true,
-      updatedAt: true,
-      participantId: true,
-      participant: {
-        select: {
-          id: true,
-          name: true,
-          userId: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-            },
-          },
-        },
-      },
-    },
-  },
 })
 
 export type RoomPopulated = Prisma.RoomGetPayload<{

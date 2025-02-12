@@ -1,11 +1,10 @@
 'use client'
 
-import { Atm0sSenders } from '../constants'
 import { MediaDeviceProvider, MeetingProvider } from '../contexts'
 import { MainSection } from '../sections/MainSection'
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
-import { peerSession } from '@/lib/atm0s'
+import { PeerSession } from '@/lib/ermis'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { ChatContextProvider } from '@/contexts/chat'
@@ -20,41 +19,10 @@ type Props = {
 }
 
 export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingParticipants }) => {
-  const [peerSession, setPeerSession] = useState<peerSession>()
+  const [peerSession, setPeerSession] = useState<PeerSession>()
   const [joined, setJoined] = useState(false)
   const [roomParticipant, setRoomParticipant] = useState<RoomParticipant | null>(myParticipant)
   console.log('RERENDER HERE')
-  const senders = useMemo(() => {
-    return [Atm0sSenders.audio, Atm0sSenders.video, Atm0sSenders.screen_audio, Atm0sSenders.screen_video]
-  }, [])
-
-  const createAudio: [HTMLAudioElement, HTMLAudioElement, HTMLAudioElement] = useMemo(() => {
-    const audio1 = document.createElement('audio')
-    audio1.id = 'id-audio-1'
-    audio1.autoplay = true
-    audio1.hidden = false
-    const audio2 = document.createElement('audio')
-    audio2.id = 'id-audio-2'
-    audio2.autoplay = true
-    audio2.hidden = false
-    const audio3 = document.createElement('audio')
-    audio3.id = 'id-audio-3'
-    audio3.autoplay = true
-    audio3.hidden = false
-
-    return [audio1, audio2, audio3]
-  }, [])
-
-  useEffect(() => {
-    document.body.appendChild(createAudio[0])
-    document.body.appendChild(createAudio[1])
-    document.body.appendChild(createAudio[2])
-    return () => {
-      document.getElementById('id-audio-1')?.remove()
-      document.getElementById('id-audio-2')?.remove()
-      document.getElementById('id-audio-3')?.remove()
-    }
-  }, [createAudio])
 
   return (
     <MediaDeviceProvider>

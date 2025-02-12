@@ -39,7 +39,7 @@ export const ScreenToggle: React.FC<MicrophoneSelectionProps> = ({ sourceName })
   )
 }
 
-export const ScreenToggleV2: React.FC<MicrophoneSelectionProps> = ({ }) => {
+export const ScreenToggleV2: React.FC<MicrophoneSelectionProps> = () => {
   const publisher = usePublisher('video_screen', Kind.VIDEO)
   const ctx = useContext(MediaContext)
   const stream = useDeviceStream('video_screen')

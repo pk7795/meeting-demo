@@ -1,8 +1,7 @@
 'use server'
 
 import { env, getPrisma, getSessionUser } from '@/lib'
-import { generateToken, sendEmailRequest } from '@/lib/atm0s'
-import { useSession } from 'next-auth/react'
+import { generateToken, sendEmailRequest } from '@/lib/ermis'
 
 
 export async function createRoomParticipantLoginUser({ data }: { data: { passcode: string } }) {

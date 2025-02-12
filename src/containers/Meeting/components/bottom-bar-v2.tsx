@@ -1,21 +1,22 @@
 
 import { CameraToggleV2 } from '@/components/media/camera'
-import { MicrophoneSelection, MicrophoneToggleV2 } from '@/components/media/microphone'
+import { MicrophoneToggleV2 } from '@/components/media/microphone'
 import { ScreenToggleV2 } from '@/components/media/screen'
 import BlurFade from '@/components/ui/blur-fade'
 import { Button } from '@/components/ui/button'
 import { SidebarTriggerWithType, useSidebar } from '@/components/ui/sidebar'
-import { useFullScreen } from '@/hooks/use-full-screen'
 
-import { ChevronDown, ChevronUp, HandIcon, LogOutIcon, MaximizeIcon, MessagesSquareIcon, MinimizeIcon, MoreHorizontalIcon, PhoneMissedIcon, UsersIcon } from 'lucide-react'
+import { HandIcon, LogOutIcon, MoreHorizontalIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useCallback, useEffect } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useMeetingParticipantState } from '../contexts'
 import { cn } from '@/lib/utils'
 import { useDevice } from '@/hooks'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useState } from 'react'
+import { throttle } from 'lodash'
+import { MESSAGE_RINGTONE } from '@public'
 
 type Props = {
   sendEvent: (event: string, data?: any) => void
@@ -24,6 +25,7 @@ type Props = {
 export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
   const router = useRouter()
   const [userState, setUserState] = useMeetingParticipantState()
+  const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
   const { isMobile } = useDevice();
   const toggleRaiseHand = () => {
     if (userState.handRaised) {
@@ -34,6 +36,18 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
       sendEvent('interact', { handRaised: true })
     }
   }
+
+
+
+  const throttled = useRef(
+    throttle(
+      () => {
+        return messageRingTone.play()
+      },
+      1000 * 3,
+      { trailing: false, leading: true }
+    )
+  )
   return (
     <BlurFade
       key={'zoom-footer'}
@@ -80,7 +94,6 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
 const SettingsButton: React.FC = () => {
   const [isOpenSetting, setIsOpenSetting] = useState(false)
 
-  const { toggleSidebar } = useSidebar()
   return (
     <Button
       variant={'secondary'}
@@ -109,7 +122,7 @@ const SettingsButton: React.FC = () => {
           <DropdownMenuItem>
             <SidebarTriggerWithType variant={"secondary"} size={"full"} className={'rounded-lg [&_svg]:!size-full'} sidebarType={'participant'} />
           </DropdownMenuItem>
-          <DropdownMenu className="fill-white" />
+          <DropdownMenu />
         </DropdownMenuContent>
       </DropdownMenu>
     </Button>

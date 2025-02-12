@@ -1,6 +1,5 @@
 'use client'
 
-import { Avatar, Col, Divider, Row, Space, Typography } from 'antd'
 import classNames from 'classnames'
 import dayjs from 'dayjs'
 import { LogInIcon, LogOutIcon, MoonIcon, SunIcon } from 'lucide-react'
@@ -9,19 +8,19 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useRecoilState } from 'recoil'
-import { IconBrandGithub, IconBrandGoogle } from '@tabler/icons-react'
-import { ButtonIcon } from '@/components'
+import { IconBrandGoogle } from '@tabler/icons-react'
 import { themeState } from '@/recoil'
 import { ERMIS_LOGO } from '@public'
 import { Button } from '../ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
 type Props = {}
 
 export const Header: React.FC<Props> = () => {
   const pathname = usePathname()
   const callbackUrl = useMemo(() => pathname || '/', [pathname])
-  const { data: user } = useSession()
+  const { data: session } = useSession()
   const [theme, setTheme] = useRecoilState(themeState)
 
   const [date, setDate] = useState(dayjs().format('hh:mm A • ddd, MMM DD'))
@@ -60,7 +59,7 @@ export const Header: React.FC<Props> = () => {
         </div>
         <div className='flex gap-2 items-center'>
           {
-            user ? (
+            session ? (
               <>
                 <div className="flex items-center gap-2">
                   <div className="hidden text-foreground lg:block">{date}</div>
@@ -71,7 +70,10 @@ export const Header: React.FC<Props> = () => {
                       onMouseEnter={() => setPopoverOpen(true)}
                       onMouseLeave={() => setPopoverOpen(false)}
                     >
-                      <Avatar src={user?.user?.image}>{user?.user?.name?.charAt(0)}</Avatar>
+                      <Avatar className="h-10 w-10 rounded-full">
+                        <AvatarImage src={session.user?.image as string} alt={session.user?.name as string} />
+                        <AvatarFallback className="rounded-full">{session.user?.name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
@@ -79,12 +81,13 @@ export const Header: React.FC<Props> = () => {
                     onMouseLeave={() => setPopoverOpen(false)}>
                     <div>
                       <div className="flex items-center gap-2">
-                        <Avatar size={48} src={user?.user?.image}>
-                          {user?.user?.name?.charAt(0)}
+                        <Avatar className="h-10 w-10 rounded-full">
+                          <AvatarImage src={session.user?.image as string} alt={session.user?.name as string} />
+                          <AvatarFallback className="rounded-full">{session.user?.name?.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                          <div className="">{user?.user?.name}</div>
-                          <div className="text-neutral-500">{user?.user?.email}</div>
+                          <div className="">{session?.user?.name}</div>
+                          <div className="text-neutral-500">{session?.user?.email}</div>
                         </div>
                       </div>
                       <div className="my-2"></div>

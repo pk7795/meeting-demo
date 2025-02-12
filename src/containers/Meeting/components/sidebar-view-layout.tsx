@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button'
 import { useDevice } from '@/hooks'
 import { cn } from '@/lib/utils'
 import { isEmpty, map, size } from 'lodash'
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, UsersRound } from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 
 type Props = {

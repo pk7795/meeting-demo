@@ -5,12 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@8xff/atm0s-media-js':
-    specifier: 0.1.3-alpha.10
-    version: 0.1.3-alpha.10
-  '@8xff/atm0s-media-react':
-    specifier: 0.1.0-alpha.4
-    version: 0.1.0-alpha.4(@8xff/atm0s-media-js@0.1.3-alpha.10)(@types/react@18.2.14)(react@18.2.0)
   '@emotion/css':
     specifier: ^11.11.2
     version: 11.11.2
@@ -29,12 +23,6 @@ dependencies:
   '@prisma/client':
     specifier: ^4.16.2
     version: 4.16.2(prisma@5.0.0)
-  '@sendbird/chat':
-    specifier: ^4.9.3
-    version: 4.9.3
-  '@sendbird/uikit-react':
-    specifier: ^3.6.3
-    version: 3.6.3(react-dom@18.2.0)(react@18.2.0)
   '@supabase/supabase-js':
     specifier: ^2.26.0
     version: 2.26.0(encoding@0.1.13)
@@ -253,31 +241,8 @@ devDependencies:
   ts-node:
     specifier: ^10.9.1
     version: 10.9.1(@types/node@20.3.2)(typescript@5.1.6)
-  uikit-react:
-    specifier: link:@types/@sendbird/uikit-react
-    version: link:@types/@sendbird/uikit-react
 
 packages:
-
-  /@8xff/atm0s-media-js@0.1.3-alpha.10:
-    resolution: {integrity: sha512-yVN4c5+o6P5WI7MEJFmOB5RUq5faBRj10znVp08Y2FN3SzMUGKcTI8QHi2mKh/yhQkiZsmfSOCBJYrJkh/M3uQ==}
-    dependencies:
-      pako: 2.1.0
-      ts-debounce: 4.0.0
-      tslib: 2.6.2
-    dev: false
-
-  /@8xff/atm0s-media-react@0.1.0-alpha.4(@8xff/atm0s-media-js@0.1.3-alpha.10)(@types/react@18.2.14)(react@18.2.0):
-    resolution: {integrity: sha512-MVi5IqlUkNAjvnKzQ8a9KAKZWTy6ur2kSCfBaFd4t8ytPw56EFqrk0nExvXeJrEgJ6kn7vStGx3PPvEE7jN43w==}
-    peerDependencies:
-      '@8xff/atm0s-media-js': '>=0.1.3-alpha'
-      '@types/react': '>=16'
-      react: '>=16'
-    dependencies:
-      '@8xff/atm0s-media-js': 0.1.3-alpha.10
-      '@types/react': 18.2.14
-      react: 18.2.0
-    dev: false
 
   /@aashutoshrathi/word-wrap@1.2.6:
     resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}
@@ -1820,43 +1785,6 @@ packages:
   /@rushstack/eslint-patch@1.3.2:
     resolution: {integrity: sha512-V+MvGwaHH03hYhY+k6Ef/xKd6RYlc4q8WBx+2ANmipHJcKuktNcI/NgEsJgdSUF6Lw32njT6OnrRsKYCdgHjYw==}
     dev: true
-
-  /@sendbird/chat@4.9.3:
-    resolution: {integrity: sha512-TvK32c8L54QedDrdshA/tKgv9UJUfKXDPADIu0IORrfsWKqp3X4bqYTb40IYSX31v6ksK8rbJTofz3y3bUVSRg==}
-    peerDependencies:
-      '@react-native-async-storage/async-storage': ^1.17.6
-    peerDependenciesMeta:
-      '@react-native-async-storage/async-storage':
-        optional: true
-    dev: false
-
-  /@sendbird/uikit-react@3.6.3(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-aNIJKTS2ljh7GJearkBMZEIuL/GoR0BgqVfjt0i6DWI841n9kHaSMwN2w7MImsVYp26hZHNSMJ4oMS/CXg9Asw==}
-    peerDependencies:
-      react: ^16.8.6 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.6 || ^17.0.0 || ^18.0.0
-    dependencies:
-      '@sendbird/chat': 4.9.3
-      '@sendbird/uikit-tools': 0.0.1-alpha.40(@sendbird/chat@4.9.3)(react@18.2.0)
-      css-vars-ponyfill: 2.4.8
-      date-fns: 2.30.0
-      dompurify: 3.0.5
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    transitivePeerDependencies:
-      - '@react-native-async-storage/async-storage'
-    dev: false
-
-  /@sendbird/uikit-tools@0.0.1-alpha.40(@sendbird/chat@4.9.3)(react@18.2.0):
-    resolution: {integrity: sha512-Ld23LpXxN6XJayNayD/wcOa6mRKvR2cy1Qk+QHt9SLO/z3K1uglPI+x89JHOmaPzu3vbUkosM7iTjFJ0ab6LeQ==}
-    peerDependencies:
-      '@sendbird/chat': ^4.9.2
-      react: '>=16.8.6'
-    dependencies:
-      '@sendbird/chat': 4.9.3
-      react: 18.2.0
-    dev: false
 
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}

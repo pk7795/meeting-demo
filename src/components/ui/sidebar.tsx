@@ -2,7 +2,7 @@
 
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import { MessagesSquareIcon, PanelLeft, PanelRight, UsersIcon } from 'lucide-react'
+import { MessagesSquareIcon, PanelRight, UsersIcon } from 'lucide-react'
 import * as React from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,7 @@ import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { useChatNewMessageContext } from '@/contexts/chat'
 import { useJoinRequest } from '@/containers/Meeting/contexts'
+import { ElementType } from 'react'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -114,7 +115,7 @@ const SidebarProvider = React.forwardRef<
       toggleSidebar,
       triggerType,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, triggerType]
   )
 
   return (
@@ -317,12 +318,11 @@ export const SidebarTriggerWithType = React.forwardRef<React.ElementRef<typeof B
   }
 )
 SidebarTriggerWithType.displayName = 'SidebarTriggerWithType'
-const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentProps<'button'>>(({ className, ...props }, ref) => {
+const SidebarRail = React.forwardRef<HTMLButtonElement, React.ComponentPropsWithRef<'button'>>(({ className, ...props }, ref) => {
   const { toggleSidebar } = useSidebar()
-  const handleToggleClick = React.useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      toggleSidebar('setting');
-    },
+  const handleToggleClick = React.useCallback(() => {
+    toggleSidebar('setting');
+  },
     [toggleSidebar]
   );
   return (
@@ -423,7 +423,7 @@ SidebarGroup.displayName = 'SidebarGroup'
 
 const SidebarGroupLabel = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'> & { asChild?: boolean }>(
   ({ className, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'div'
+    const Comp: ElementType = asChild ? Slot : 'div'
 
     return (
       <Comp
@@ -443,7 +443,7 @@ SidebarGroupLabel.displayName = 'SidebarGroupLabel'
 
 const SidebarGroupAction = React.forwardRef<HTMLButtonElement, React.ComponentProps<'button'> & { asChild?: boolean }>(
   ({ className, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button'
+    const Comp: ElementType = asChild ? Slot : 'button'
 
     return (
       <Comp
@@ -508,12 +508,12 @@ const SidebarMenuButton = React.forwardRef<
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(({ asChild = false, isActive = false, variant = 'default', size = 'default', tooltip, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : 'button'
+  const Comp: ElementType = asChild ? Slot : 'button'
   const { isMobile, state } = useSidebar()
 
   const button = (
     <Comp
-      ref={ref}
+      ref={ref as React.Ref<HTMLButtonElement>}
       data-sidebar="menu-button"
       data-size={size}
       data-active={isActive}
@@ -548,7 +548,7 @@ const SidebarMenuAction = React.forwardRef<
     showOnHover?: boolean
   }
 >(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : 'button'
+  const Comp: ElementType = asChild ? Slot : 'button'
 
   return (
     <Comp
@@ -650,7 +650,7 @@ const SidebarMenuSubButton = React.forwardRef<
     isActive?: boolean
   }
 >(({ asChild = false, size = 'md', isActive, className, ...props }, ref) => {
-  const Comp = asChild ? Slot : 'a'
+  const Comp: ElementType = asChild ? Slot : 'a'
 
   return (
     <Comp

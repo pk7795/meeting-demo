@@ -1,42 +1,29 @@
 'use client'
 
-import { UserType } from '../constants'
+import { UserType } from '@/lib/constants'
 import {
   useIsConnected,
   useJoinRequest,
   useOnlineMeetingParticipantsList,
   usePendingParticipants,
   usePinnedParticipant,
-  useReceiveMessage,
   useRoomSupabaseChannel,
 } from '../contexts'
 import { Button as AntdButton, Modal, notification, Space } from 'antd'
-import { find, throttle, filter, map } from 'lodash'
+import { find, filter, map } from 'lodash'
 import {
   CopyIcon,
-  LayoutGridIcon,
-  LayoutPanelLeftIcon,
   Loader2Icon,
-  MaximizeIcon,
-  MinimizeIcon,
-  MoonIcon,
   RefreshCwIcon,
-  SunIcon,
   XIcon,
 } from 'lucide-react'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useRecoilState } from 'recoil'
-import useWindowFocus from 'use-window-focus'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useCopyToClipboard, useTimeout } from 'usehooks-ts'
 import { RoomParticipant } from '@prisma/client'
-import { ADMIT_RINGTONE, MESSAGE_RINGTONE, ERMIS_LOGO, RAISE_HAND_RINGTONE } from '@public'
+import { ADMIT_RINGTONE, MESSAGE_RINGTONE, RAISE_HAND_RINGTONE } from '@public'
 import { acceptParticipant } from '@/app/actions'
-import { ButtonIcon, Drawer, Icon } from '@/components'
 import { supabase } from '@/config/supabase'
-import { useDevice, useFullScreen } from '@/hooks'
-import { themeState } from '@/recoil'
+import { useDeviceStream } from '@/hooks'
 import { RoomPopulated } from '@/types/types'
 import { useMouse } from '@uidotdev/usehooks'
 import { toast } from 'sonner'
@@ -50,7 +37,6 @@ import { SidebarViewLayout } from '../components/sidebar-view-layout'
 import { useRemotePeers, useRoom, useSessionStatus } from '@atm0s-media-sdk/react-hooks'
 import { PeerLocal, PeerRemote } from '@/components/media'
 import { SidebarLayout } from '@/layouts'
-import { useChatClientContext } from '@/contexts/chat'
 import { useSidebar } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 type Props = {
@@ -60,20 +46,13 @@ type Props = {
 
 export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [api, contextHolder] = notification.useNotification()
-  const [layout, setLayout] = useState<'GRID' | 'LEFT'>('GRID')
-  const [openChat, setOpenChat] = useState(false)
-  const [openParticipant, setOpenParticipant] = useState(false)
-  const { isMobile } = useDevice()
-  const [theme, setTheme] = useRecoilState(themeState)
 
   const [joinRequest, clearJoinRequest] = useJoinRequest()
   const [, delPendingParticipant] = usePendingParticipants()
   const roomSupabaseChannel = useRoomSupabaseChannel()
   const isConnected = useIsConnected()
   const admitRingTone = useMemo(() => new Audio(ADMIT_RINGTONE), [])
-  const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
   const raiseRingTone = useMemo(() => new Audio(RAISE_HAND_RINGTONE), [])
-  const windowFocused = useWindowFocus()
   const sessionStatus = useSessionStatus()
   const [visibleRefresh, setVisibleRefresh] = useState(false)
   const participants = useOnlineMeetingParticipantsList()
@@ -90,7 +69,14 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
   const roomInfo = useRoom()
   const remotePeers = useRemotePeers()
+  const audioStream = useDeviceStream("audio_main")
+  const videoStream = useDeviceStream("video_main")
+  useEffect(() => {
+    console.log('---------------audioStream from mainSection: ', audioStream);
+    console.log('---------------videoStream from mainSection: ', videoStream);
 
+
+  }, [audioStream, videoStream])
   // const isHoverContent = true
   const isHoverContent =
     mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
@@ -124,12 +110,11 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   }, [checkPeerPinned, peerLocal])
 
   const filterRemotePeers = useMemo(() => {
-    const nonLocalPeers = filter(remotePeers, (p) => p.peer != roomInfo?.peer)
+    const nonLocalPeers = remotePeers.filter(p => p.peer !== roomInfo?.peer)
+      .filter(peer => participants.some(participant => participant.id === peer.peer));
 
-    return filter(nonLocalPeers, (peer) =>
-      find(participants, participant => participant.id === peer.peer)
-    )
-  }, [remotePeers, roomInfo?.peer, participants])
+    return nonLocalPeers;
+  }, [remotePeers, roomInfo, roomInfo?.peer, participants])
 
   const peerRemoteMixerAudio = useMemo(() => {
     let mapRemotePeers = []
@@ -149,7 +134,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       })
     }
     return mapRemotePeers
-  }, [checkPeerPinned.check, checkPeerPinned.peer, checkPeerPinned?.peerItem?.peer, filterRemotePeers, peerLocal])
+  }, [checkPeerPinned.check, checkPeerPinned.peer, checkPeerPinned?.peerItem?.peer, filterRemotePeers, peerLocal, raiseRingTone, participants])
   useTimeout(() => setVisibleRefresh(true), 30000)
 
   useEffect(() => {
@@ -173,51 +158,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     }
   }, [isConnected, sessionStatus, visibleRefresh])
 
-  // console.log('--------------------------------------------------------')
-  // console.log('sessionStatus', sessionStatus)
-  // console.log('--------------------------------------------------------')
 
-  const { data: session } = useSession()
-
-  const [receiveMessage, clearReceiveMessage] = useReceiveMessage()
-
-  useEffect(() => {
-    if (openChat && windowFocused) {
-      clearReceiveMessage()
-    }
-  }, [clearReceiveMessage, openChat, windowFocused])
-
-  const throttled = useRef(
-    throttle(
-      () => {
-        return messageRingTone.play()
-      },
-      1000 * 3,
-      { trailing: false, leading: true }
-    )
-  )
-
-  useEffect(() => {
-    if (receiveMessage && !openChat) {
-      if (receiveMessage?.participant?.user?.id !== session?.user.id) {
-        throttled.current()
-      }
-    }
-  }, [session?.user.id, messageRingTone, receiveMessage, openChat, clearReceiveMessage])
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.body.classList.remove('light')
-      document.body.classList.remove('bg-white')
-      document.body.classList.add('dark')
-      document.body.classList.add('bg-dark_ebony')
-    } else {
-      document.body.classList.remove('dark')
-      document.body.classList.remove('bg-dark_ebony')
-      document.body.classList.add('light')
-      document.body.classList.add('bg-white')
-    }
-  }, [theme])
 
   const openNotification = useCallback(
     (opts: {
@@ -333,7 +274,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       className: 'join-request-toast'
     })
 
-  }, [admitRingTone, clearJoinRequest, delPendingParticipant, joinRequest, openNotification, sendAcceptJoinRequest])
+  }, [admitRingTone, clearJoinRequest, delPendingParticipant, joinRequest, openNotification, sendAcceptJoinRequest, toggleSidebar])
 
   // TODO: Move every send and receive event to hooks
   const sendRoomEvent = useCallback(
@@ -364,16 +305,16 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       >
         <div className="flex flex-col items-center justify-center">
           <div className="text-lg text-black dark:text-white mb-4">Connecting to Server ...</div>
-          <Icon className="rotate-center text-black dark:text-white" icon={<Loader2Icon />} />
+          <div className="rotate-center text-black dark:text-white" ><Loader2Icon /></div>
           {visibleRefresh && (
-            <ButtonIcon
+            <Button
               onClick={() => window.location.reload()}
-              type="primary"
+              variant="default"
               className="mt-4"
-              icon={<RefreshCwIcon size={16} className="" />}
             >
-              Refresh
-            </ButtonIcon>
+              <RefreshCwIcon size={16} className="" />
+              <div>Refresh</div>
+            </Button>
           )}
         </div>
       </Modal>

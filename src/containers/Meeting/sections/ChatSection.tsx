@@ -29,7 +29,6 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
     handleSubmit,
     formState: { errors },
     getValues,
-    watch,
     reset
   } = useForm<TextInput>()
 
@@ -54,7 +53,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
     try {
       if (!getValues('message')) return
       const payload = { text: getValues('message') };
-      const message = await chatChannel?.sendMessage(payload)
+      await chatChannel?.sendMessage(payload)
 
       reset({ message: '' });
       setIsSending(false)

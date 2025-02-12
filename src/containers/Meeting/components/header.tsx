@@ -26,7 +26,7 @@ export const Header: React.FC<Props> = ({ meetingLink }) => {
   }, [])
   const onToggleFullScreen = useCallback(() => {
     onOnOffFullScreen()
-  }, [isMaximize, onOnOffFullScreen])
+  }, [onOnOffFullScreen])
   return (
     <BlurFade
       key={'zoom-header'}

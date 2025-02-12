@@ -1,25 +1,23 @@
 'use client'
 
-import { UserType } from '../constants'
+import { UserType } from '@/lib/constants'
 import { useCurrentParticipant, useMeetingParticipantsList, usePendingParticipants } from '../contexts'
 import { Modal, Select, Space, Typography } from 'antd'
 import { isEmpty, map } from 'lodash'
-import { MailPlusIcon, MicIcon, MicOff, MicOffIcon, PlusIcon, XIcon } from 'lucide-react'
+import { MailPlusIcon, MicIcon, MicOffIcon, PlusIcon, XIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState, useTransition } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room, UserRole, UserStatus } from '@prisma/client'
-import { inviteToRoom, rejectParticipant, sendInviteMeetingLink } from '@/app/actions'
-import { ButtonIcon, useApp } from '@/components'
+import { inviteToRoom, rejectParticipant } from '@/app/actions'
 import { supabase } from '@/config'
 import { MeetingParticipant } from '@/types/types'
 import { useAudioMixerSpeaking } from '@/hooks/use-audio-mixer-speaking'
-import { useRemoteAudioTracks, useRemoteTracks } from '@atm0s-media-sdk/react-hooks'
+import { useRemoteAudioTracks } from '@atm0s-media-sdk/react-hooks'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useSidebar } from '@/components/ui/sidebar'
-import { sendEmailRequest } from '@/lib/atm0s'
 import { toast } from 'sonner'
 
 type Props = {
@@ -32,7 +30,6 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
   const params = useParams()
   const baseUrl = window.location.origin
   const meetingLink = `${baseUrl}/${params?.passcode}`
-  const { message } = useApp()
   const participantsList = useMeetingParticipantsList()
   const [pendingParticipants, delPendingParticipant] = usePendingParticipants()
   const [, startTransitionAccept] = useTransition()
@@ -125,7 +122,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
         setInviteEmail([])
       })
     })
-  }, [inviteEmail, message, params?.passcode])
+  }, [inviteEmail, params?.passcode])
 
   return (
     <div className="flex flex-col h-full">

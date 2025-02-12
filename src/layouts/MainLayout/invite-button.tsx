@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { Copy, CopyIcon, UserRoundPlus } from 'lucide-react'
+import { CopyIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCopyToClipboard } from 'usehooks-ts'
 

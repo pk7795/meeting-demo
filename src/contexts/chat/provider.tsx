@@ -7,7 +7,7 @@ import { Channel } from "ermis-chat-js-sdk/dist/types/channel";
 import { ErmisChat } from "ermis-chat-js-sdk/dist/types/client";
 import { FormatMessageResponse } from "ermis-chat-js-sdk/dist/types/types";
 import { useSession } from "next-auth/react";
-import { createContext, use, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 export const ChatContext = createContext<{
     chatClient: ErmisChat<ErmisChatGenerics> | null;
@@ -37,7 +37,7 @@ export const ChatContextProvider = ({
     useEffect(() => {
         if (!session) return;
         if (!chatClient) {
-            let loginConfig = {
+            const loginConfig = {
                 userId: session.chat.userId,
                 userToken: session.chat.accessToken,
                 projectId: session.chat.projectId,
@@ -47,7 +47,7 @@ export const ChatContextProvider = ({
         }
 
         if (roomAccessStatus === RoomAccessStatus.JOINED && roomParticipant && room) {
-            let roomConfig: RoomConfig = {
+            const roomConfig: RoomConfig = {
                 userId: session.chat.userId,
                 meetingRoomId: roomParticipant.roomId,
                 roomName: room.name,
@@ -56,7 +56,7 @@ export const ChatContextProvider = ({
 
             joinChatChannel(roomConfig);
         }
-    }, [session, chatClient, roomParticipant, room, roomAccessStatus]);
+    }, [session, chatClient, roomParticipant, room, roomAccessStatus, joinChatChannel, loginUser]);
 
     useEffect(() => {
         if (!channel) return;
@@ -92,10 +92,6 @@ export const ChatContextProvider = ({
             listener.unsubscribe();
         };
     }, [channel]);
-    useEffect(() => {
-        console.log('----------------isNewMessage', isNewMessage);
-
-    }, [isNewMessage])
     return <ChatContext.Provider
         value={{
             chatClient,

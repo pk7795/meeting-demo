@@ -4,7 +4,7 @@ import { signOut, useSession } from 'next-auth/react'
 
 type Props = {}
 
-export const Username: React.FC<Props> = ({ }) => {
+export const Username: React.FC<Props> = () => {
   const { data: session } = useSession()
   const user = session?.user
   return (

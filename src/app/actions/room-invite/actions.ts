@@ -3,7 +3,7 @@
 import { InviteToRoomInput } from './types'
 import { map } from 'lodash'
 import { env, getPrisma } from '@/lib'
-import { sendEmailRequest } from '@/lib/atm0s'
+import { sendEmailRequest } from '@/lib/ermis'
 
 const DURATION_7DAYS_MS = 1000 * 60 * 60 * 24 * 7
 

@@ -17,6 +17,7 @@ async function initializeChannel(client: ErmisChat<ErmisChatGenerics>, roomConfi
             }
             await chatChannel.watch();
             const userIds: string[] = Object.keys(chatChannel.state.members);
+            // update name from participants to users state
             const existingUserIds = userIds.filter((userId) => {
                 if (userId === 'mockMember') {
                     return false;
@@ -46,14 +47,11 @@ async function initializeChannel(client: ErmisChat<ErmisChatGenerics>, roomConfi
         await newChannel.watch();
 
         // Step 5: Save to DB
-        createChatChannel(
+        await createChatChannel(
             roomConfig.meetingRoomId,
             newChannel.id!,
             'team'
-        ).then((res) => {
-        }).catch(e => {
-            console.error('Error: ', e);
-        });
+        );
 
         return newChannel;
 
@@ -74,11 +72,11 @@ export const useChatClient = () => {
      * @returns function to unsubscribe from listeners
      */
     const loginUser = async (config: LoginConfig) => {
-        let api_key = process.env.ERMIS_CHAT_API_KEY || "VskVZNX0ouKF1751699014812";
-        let project_id = config.projectId;
+        const apiKey = process.env.ERMIS_CHAT_API_KEY || "VskVZNX0ouKF1751699014812";
+        const projectId = config.projectId;
         // unsubscribe from previous push listeners
         unsubscribePushListenersRef.current?.();
-        const client = ErmisChat.getInstance<ErmisChatGenerics>(api_key, project_id, {
+        const client = ErmisChat.getInstance<ErmisChatGenerics>(apiKey, projectId, {
             timeout: 6000,
             logger: (type, msg) => console.log(type, msg),
             baseURL: process.env.ERMIS_CHAT_API || 'https://api-stagging.ermis.network',
@@ -87,7 +85,7 @@ export const useChatClient = () => {
         setChatClient(client);
         const user = {
             id: config.userId,
-            api_key: api_key,
+            api_key: apiKey,
         };
 
         const connectedUser = await client.connectUser(user, config.userToken).then((res) => res).catch((e) => {

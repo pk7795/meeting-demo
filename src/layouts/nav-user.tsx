@@ -19,7 +19,6 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
 import { BadgeCheck, Bell, ChevronsUpDown, LogOut, SunMoonIcon } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
-import { useTheme } from 'next-themes'
 import { useRecoilState } from 'recoil'
 import { themeState } from '@/recoil'
 export const NavUser = () => {

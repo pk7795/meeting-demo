@@ -14,14 +14,16 @@ const formatUserName = (name: string) => {
 };
 
 export const MessageAvatar = React.memo(({ message }: MessageAvatarProps) => {
+  //? get userName and avatar from participants list
   const client = useChatClientContext();
 
   const user = useMemo(() => {
     if (!client || !message?.user?.id) return message.user;
     return client.state.users[message.user.id] || message.user;
-  }, [client?.state.users, message.user]);
+  }, [client, message.user]);
 
   if (!user) return null;
+  const avatar = user.image as string || user.avatar as string || '';
   const userName = typeof user.name === 'string' ? user.name : '';
   const systemCode = message.text?.trim().split(' ')[0];
   switch (systemCode) {
@@ -37,7 +39,7 @@ export const MessageAvatar = React.memo(({ message }: MessageAvatarProps) => {
     <div key={message.id} className="p-2">
       <div className="flex items-end">
         <Avatar className="h-10 w-10 rounded-full">
-          <AvatarImage src={user?.image || user?.avatar} alt={userName} />
+          <AvatarImage src={avatar} alt={userName} />
           <AvatarFallback className="rounded-full">{user?.name?.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="flex-1 ml-1">

@@ -1,17 +1,10 @@
-import { LogLevel } from '@8xff/atm0s-media-react'
 import axios from 'axios'
 
-export interface Atm0sConfig {
-  app_secret: string
-  gateway: string
-}
-
-export interface peerSession {
+export interface PeerSession {
   gateway: string
   room: string
   peer: string
   token: string
-  log_level: LogLevel
 }
 
 export const generateToken = async (room: string, peer: string, gateway: string, app_secret: string): Promise<string> => {

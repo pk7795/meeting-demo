@@ -91,14 +91,12 @@ model Room {
   record   Boolean @default(false)
   ownerId  String
 
-  lastActivityAt DateTime @default(now())
   active Boolean @default(true)
 
   owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   invites      RoomInvite[]
   participants RoomParticipant[]
-  messages     Messages[]
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -134,37 +132,12 @@ model RoomParticipant {
   lastAccessedAt DateTime @default(now())
   room     Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
   user     User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages Messages[]
 
   // Is accepted by room owner to join
   accepted Boolean @default(false)
 
   @@index([roomId])
   @@index([userId])
-}
-
-enum MessageType {
-  TEXT
-  IMAGE
-  VIDEO
-  AUDIO
-  FILE
-}
-
-model Messages {
-  id            String      @id @default(cuid())
-  roomId        String
-  participantId String
-  content       String
-  type          MessageType @default(TEXT)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  room        Room            @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  participant RoomParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-
-  @@index([roomId])
-  @@index([participantId])
 }
 
 model ChatToken {

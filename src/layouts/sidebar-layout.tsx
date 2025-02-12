@@ -1,9 +1,9 @@
 'use client'
 
-import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from './app-sidebar'
-import { UserType } from '@/containers/Meeting/constants'
+
 import { RoomPopulated } from '@/types/types'
+import { UserType } from '@/lib/constants'
 
 
 type Props = {

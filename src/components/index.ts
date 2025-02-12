@@ -1,4 +1,3 @@
-export * from './Custom'
 export * from './Header'
 export * from './logo'
 // export * from './media'
