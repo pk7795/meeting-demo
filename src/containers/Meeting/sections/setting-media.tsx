@@ -33,7 +33,7 @@ type Props = {
     roomAccess: RoomAccessStatus
 }
 
-export const SettingSection: React.FC<Props> = ({
+export const SettingMedia: React.FC<Props> = ({
     onConnected,
     room,
     setRoomParticipant,
@@ -43,7 +43,7 @@ export const SettingSection: React.FC<Props> = ({
     const router = useRouter()
     const params = useParams()
 
-    const { data: user, status } = useAuthSession()
+    const { data: user } = useAuthSession()
 
     const [isLoading, setIsLoading] = useState(false)
     const [isPendingCreateRoomParticipant, startTransitionCreateRoomParticipant] = useTransition()
@@ -55,7 +55,6 @@ export const SettingSection: React.FC<Props> = ({
         handleSubmit,
         formState: { errors },
         getValues,
-        watch,
     } = useForm<NameInputs>()
 
     const guestUUID = useMemo(() => {
@@ -99,7 +98,7 @@ export const SettingSection: React.FC<Props> = ({
                     setIsLoading(false)
                 })
         })
-    }, [onConnected, room.passcode, setPeerSession, setRoomParticipant])
+    }, [onConnected, room.passcode, setPeerSession, setRoomParticipant, getValues])
 
     const sendJoinRequest = useCallback(
         (id: string, name: string, type: string) => {
@@ -148,7 +147,7 @@ export const SettingSection: React.FC<Props> = ({
     useEffect(() => {
         setRoomAccessStatus(access)
 
-    }, [access])
+    }, [access, setRoomAccessStatus])
     useEffect(() => {
         return () => {
             acceptSubscription && supabase.removeChannel(acceptSubscription)
@@ -188,7 +187,7 @@ export const SettingSection: React.FC<Props> = ({
                 )
             }
         })
-    }, [guestUUID, watch, onJoin, room.id, room.passcode, sendJoinRequest, setPeerSession, setRoomParticipant, user])
+    }, [guestUUID, onJoin, room.id, room.passcode, sendJoinRequest, setPeerSession, setRoomParticipant, user, getValues])
 
     const renderJoinButton = () => {
         switch (access) {

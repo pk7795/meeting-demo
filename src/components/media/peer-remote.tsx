@@ -1,6 +1,6 @@
 import { VideoRemote } from './video-remote'
 import { Button } from '@/components/ui/button'
-import { usePinnedParticipant } from '@/containers/Meeting/contexts'
+import { usePinnedParticipant } from '@/containers/meeting/contexts'
 import { useAudioMixerSpeaking } from '@/hooks'
 import { cn } from '@/lib/utils'
 import { MeetingParticipant } from '@/types/types'
@@ -8,6 +8,7 @@ import { RemotePeer, RemoteTrack, useRemoteVideoTracks } from '@atm0s-media-sdk/
 import { find, isEmpty, throttle } from 'lodash'
 import { Pin, PinOff } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
 type Props = {
   peer: RemotePeer
@@ -53,7 +54,7 @@ export const PeerRemote: React.FC<Props> = ({ peer, participant, raiseRingTone }
         onClick={onPin}
         variant={!isPinned ? 'outline' : 'blue'}
         size="icon"
-        className={'absolute right-2 top-2 z-[2] h-7 w-7 text-foreground'}
+        className={'absolute right-2 top-2 z-[2] h-7 w-7 text-background'}
       >
         {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
       </Button>
@@ -72,9 +73,13 @@ export const PeerRemote: React.FC<Props> = ({ peer, participant, raiseRingTone }
           )}
         </>
       ) : (
-        <div className="flex aspect-square max-h-40 w-1/3 max-w-40 items-center justify-center rounded-full bg-zinc-500 text-[calc(200%)] uppercase text-white">
-          {participant?.name?.[0]}
-        </div>
+        // <div className="flex aspect-square max-h-40 w-1/3 max-w-40 items-center justify-center rounded-full bg-zinc-500 text-[calc(200%)] uppercase text-white">
+        //   {participant?.name?.[0]}
+        // </div>
+        <Avatar className=" max-h-40 w-1/3 max-w-40 aspect-square rounded-full">
+          <AvatarImage src={participant.image || ""} alt={participant.name} />
+          <AvatarFallback className="rounded-full text-[min(3vw,2rem)]">{participant?.name?.[0].toUpperCase()}</AvatarFallback>
+        </Avatar>
       )
       }
     </div >

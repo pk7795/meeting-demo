@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from 'sonner'
 
-const ThemeProvider = dynamic(() => import('@/providers/ThemeProvider').then((mod) => mod.ThemeProvider), { ssr: false })
+const ThemeProvider = dynamic(() => import('@/providers/theme-provider').then((mod) => mod.ThemeProvider), { ssr: false })
 type Props = {
   children?: ReactNode
 }

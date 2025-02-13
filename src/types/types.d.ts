@@ -64,9 +64,8 @@ export type MeetingParticipant = Partial<RoomParticipant> & {
   is_me: boolean
   online_at?: string
   meetingStatus?: MeetingParticipantStatus
+  connected_at?: string
   handRaised?: boolean
-  user?: {
-    name: string
-    image: string
-  }
+  name: string
+  image: string
 }

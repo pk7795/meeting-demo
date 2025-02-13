@@ -1,5 +1,6 @@
-export * from './useDevice'
+export * from './use-device'
 
-export * from './usePageDataQuery'
+export * from './use-page-data-query'
 
-export * from './useReaction'
+export * from './use-reaction'
+export * from './use-chat-client'

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { usePinnedParticipant } from '@/containers/Meeting/contexts'
+import { usePinnedParticipant } from '@/containers/meeting/contexts'
 import { useDeviceStream } from '@/hooks'
 import { useRoom } from '@atm0s-media-sdk/react-hooks'
 import { slice } from 'lodash'
@@ -30,7 +30,7 @@ export const PeerLocal: React.FC<Props> = ({ userName }) => {
   }
 
 
-  const firstNameInitials = slice(name, 0, 1).join('')
+  const firstNameInitials = slice(name, 0, 1).join('').toUpperCase()
   // const lastNameInitials = slice(user?.lastName, 0, 1).join('')
   useEffect(() => {
     if (videoRef.current) {
@@ -74,9 +74,9 @@ export const PeerLocal: React.FC<Props> = ({ userName }) => {
           />
         </div>
       ) : (
-        <Avatar className="w-1/3 rounded-full">
+        <Avatar className="max-h-40 w-1/3 max-w-40 aspect-square rounded-full">
           <AvatarImage src={user?.image || ""} alt={name} />
-          <AvatarFallback className="rounded-full">{firstNameInitials}</AvatarFallback>
+          <AvatarFallback className="rounded-full text-[min(3vw,2rem)]">{firstNameInitials}</AvatarFallback>
         </Avatar>
       )}
     </div>

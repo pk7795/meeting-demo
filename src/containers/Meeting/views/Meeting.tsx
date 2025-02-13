@@ -1,16 +1,19 @@
 'use client'
 
-import { MediaDeviceProvider, MeetingProvider } from '../contexts'
-import { MainSection } from '../sections/MainSection'
+
+
 import { useState } from 'react'
 import { RoomParticipant } from '@prisma/client'
 import { PeerSession } from '@/lib/ermis'
 import { RoomAccessStatus } from '@/lib/constants'
 import { RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { ChatContextProvider } from '@/contexts/chat'
-import { SettingSection } from '../sections/SettingSection'
+
 import { Atm0sMediaProvider, AudioMixerMode } from '@atm0s-media-sdk/react-hooks'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import { MainSection, SettingMedia } from '../sections'
+import { MediaDeviceProvider, MeetingProvider } from '../contexts'
+
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -55,7 +58,7 @@ export const Meeting: React.FC<Props> = ({ room, myParticipant, access, pendingP
             </MeetingProvider>
           </Atm0sMediaProvider>
         ) : (
-          <SettingSection
+          <SettingMedia
             onConnected={() => setJoined(true)}
             myParticipant={roomParticipant}
             room={room}

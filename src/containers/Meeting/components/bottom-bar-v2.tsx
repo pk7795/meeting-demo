@@ -4,19 +4,19 @@ import { MicrophoneToggleV2 } from '@/components/media/microphone'
 import { ScreenToggleV2 } from '@/components/media/screen'
 import BlurFade from '@/components/ui/blur-fade'
 import { Button } from '@/components/ui/button'
-import { SidebarTriggerWithType, useSidebar } from '@/components/ui/sidebar'
+import { SidebarTriggerWithType } from '@/components/ui/sidebar'
 
 import { HandIcon, LogOutIcon, MoreHorizontalIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useMemo, useRef } from 'react'
-import { useMeetingParticipantState } from '../contexts'
+import React, { useMemo, useRef, useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { useDevice } from '@/hooks'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useState } from 'react'
 import { throttle } from 'lodash'
 import { MESSAGE_RINGTONE } from '@public'
+import { useMeetingParticipantState } from '../contexts'
 
 type Props = {
   sendEvent: (event: string, data?: any) => void

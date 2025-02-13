@@ -35,7 +35,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
   const [, startTransitionAccept] = useTransition()
   const [, startTransitionReject] = useTransition()
   const [openModalInvites, setOpenModalInvites] = useState(false)
-  const [inviteEmail, setInviteEmail] = useState<string[]>([])
+  const [inviteEmails, setInviteEmail] = useState<string[]>([])
   const [isPendingInviteToRoom, startTransitionInviteToRoom] = useTransition()
   const [isLoadingAvailableInvites, startTransitionAvailableInvites] = useTransition()
   const [inviteOptions, setInviteOptions] = useState<
@@ -109,7 +109,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
   const onInvite = useCallback(() => {
     startTransitionInviteToRoom(() => {
       inviteToRoom({
-        data: map(inviteEmail, (i) => ({
+        data: map(inviteEmails, (i) => ({
           passcode: params?.passcode as string,
           email: i,
           senderName: currentParticipant.name,
@@ -122,7 +122,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
         setInviteEmail([])
       })
     })
-  }, [inviteEmail, params?.passcode])
+  }, [inviteEmails, params?.passcode, currentParticipant, meetingLink, session?.chat.accessToken])
 
   return (
     <div className="flex flex-col h-full">
@@ -226,7 +226,7 @@ export const ParticipantSection: React.FC<Props> = ({ room, sendAcceptJoinReques
             label: user.email,
             value: user.email,
           }))}
-          value={inviteEmail}
+          value={inviteEmails}
           onChange={(value) => setInviteEmail(value)}
         />
       </Modal>

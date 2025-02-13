@@ -1,5 +1,5 @@
-import { useChatClient } from "@/hooks/common/useChatClient";
-import { ErmisChatGenerics, LoginConfig, RoomConfig } from "@/hooks/common/useChatClient/types";
+import { useChatClient } from "@/hooks/common/use-chat-client";
+import { ErmisChatGenerics, LoginConfig, RoomConfig } from "@/hooks/common/use-chat-client/types";
 import { RoomAccessStatus } from "@/lib/constants";
 import { RoomPopulated } from "@/types/types";
 import { RoomParticipant } from "@prisma/client";

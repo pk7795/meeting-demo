@@ -1,6 +1,5 @@
 'use server'
 
-import { MessageInput } from './types'
 import { getPrisma } from '@/lib'
 
 export async function getChatChannelByRoomId(roomId: string) {

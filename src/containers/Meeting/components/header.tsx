@@ -1,6 +1,6 @@
 import BlurFade from '@/components/ui/blur-fade'
 import { Button } from '@/components/ui/button'
-import { InviteButton } from '@/layouts/MainLayout/invite-button'
+import { InviteButton } from '@/layouts/main-layout/invite-button'
 import { useParams } from 'next/navigation'
 import { themeState } from '@/recoil'
 import { useRecoilState } from 'recoil'

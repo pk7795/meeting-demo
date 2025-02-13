@@ -1,8 +1,8 @@
 // contexts/ChatContext.tsx
-import { createContext, useContext, useState, useEffect } from 'react';
-import { Channel, ChannelData, ErmisChat } from 'ermis-chat-js-sdk';
-import { ErmisChatGenerics, LoginConfig } from '@/hooks/common/useChatClient/types';
-import { useChatClient } from '@/hooks/common/useChatClient';
+import { createContext, useContext, useEffect } from 'react';
+import { ChannelData, ErmisChat } from 'ermis-chat-js-sdk';
+import { ErmisChatGenerics, LoginConfig } from '@/hooks/common/use-chat-client/types';
+import { useChatClient } from '@/hooks/common/use-chat-client';
 
 interface ChatContextType {
     chatClient: ErmisChat<ErmisChatGenerics> | null;
@@ -24,7 +24,7 @@ export function ChatProvider({ children, channelType, channelId, options }: { ch
             chatClient.channel(channelType, channelId, options)
         }
     }
-        , [chatClient, channelId]);
+        , [chatClient, channelId, channelType, options]);
     return (
         <ChatContext.Provider value={{ chatClient, loginUser, logout, switchUser, unreadCount }}>
             {children}

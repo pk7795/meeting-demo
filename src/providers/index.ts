@@ -1,1 +1,1 @@
-export * from './AppProvider'
+export * from './app-provider'

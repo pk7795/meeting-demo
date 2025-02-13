@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo } from 'reac
 import { RoomParticipant } from '@prisma/client'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from '@/config'
-import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/useReaction'
+import { DataContainer, MapContainer, useReactionData, useReactionList } from '@/hooks/common/use-reaction'
 import { MeetingParticipant, RoomMessageWithParticipant, RoomParticipantWithUser, RoomPopulated } from '@/types/types'
 import { JoinInfo } from '@atm0s-media-sdk/core'
 import { RemotePeer, useSession } from '@atm0s-media-sdk/react-hooks'

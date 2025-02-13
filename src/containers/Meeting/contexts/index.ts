@@ -1,2 +1,2 @@
-export * from './MeetingProvider'
-export * from './MediaDeviceProvider'
+export * from './meeting-provider'
+export * from './media-device-provider'

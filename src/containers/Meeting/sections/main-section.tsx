@@ -20,12 +20,12 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useCopyToClipboard, useTimeout } from 'usehooks-ts'
 import { RoomParticipant } from '@prisma/client'
-import { ADMIT_RINGTONE, MESSAGE_RINGTONE, RAISE_HAND_RINGTONE } from '@public'
+import { ADMIT_RINGTONE, RAISE_HAND_RINGTONE } from '@public'
 import { acceptParticipant } from '@/app/actions'
 import { supabase } from '@/config/supabase'
 import { useDeviceStream } from '@/hooks'
 import { RoomPopulated } from '@/types/types'
-import { useMouse } from '@uidotdev/usehooks'
+// import { useMouse } from '@uidotdev/usehooks'
 import { toast } from 'sonner'
 import { useParams } from 'next/navigation'
 import { Header } from '../components/header'
@@ -63,10 +63,10 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const params = useParams()
   const [, onCopy] = useCopyToClipboard()
   const [isCreateNewRoom, setIsCreateNewRoom] = useState(true)
-  const [mouse, containerRef] = useMouse<any>()
-  const widthContent = containerRef?.current?.clientWidth
-  const heightContent = containerRef?.current?.clientHeight
-  const [pinnedParticipant, setPinnedParticipant] = usePinnedParticipant()
+  // const [mouse, containerRef] = useMouse<any>()
+  // const widthContent = containerRef?.current?.clientWidth
+  // const heightContent = containerRef?.current?.clientHeight
+  const [pinnedParticipant] = usePinnedParticipant()
   const roomInfo = useRoom()
   const remotePeers = useRemotePeers()
   const audioStream = useDeviceStream("audio_main")
@@ -77,9 +77,9 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
 
 
   }, [audioStream, videoStream])
-  // const isHoverContent = true
-  const isHoverContent =
-    mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
+  const isHoverContent = true
+  // const isHoverContent =
+  //   mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
   const baseUrl = window.location.origin
   const meetingLink = `${baseUrl}/${params?.passcode}`
 
@@ -95,9 +95,9 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     return findRemotePeer
       ? { check: true, peer: 'remote', peerItem: findRemotePeer }
       : { check: false, peer: null, peerItem: null }
-  }, [pinnedParticipant?.p.peer, room, remotePeers])
+  }, [pinnedParticipant?.p.peer, remotePeers, roomInfo])
 
-  const peerLocal = useMemo(() => <PeerLocal userName={myParticipant?.name} />, [])
+  const peerLocal = useMemo(() => <PeerLocal userName={myParticipant?.name} />, [myParticipant?.name])
 
   const mainPeerScreen = useMemo(() => {
     if (checkPeerPinned.check && checkPeerPinned.peer === 'remote') {
@@ -107,14 +107,14 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       return <PeerRemote peer={peer} participant={remoteParticipant} raiseRingTone={raiseRingTone} />
     }
     return peerLocal
-  }, [checkPeerPinned, peerLocal])
+  }, [checkPeerPinned, peerLocal, participants, raiseRingTone])
 
   const filterRemotePeers = useMemo(() => {
     const nonLocalPeers = remotePeers.filter(p => p.peer !== roomInfo?.peer)
       .filter(peer => participants.some(participant => participant.id === peer.peer));
 
     return nonLocalPeers;
-  }, [remotePeers, roomInfo, roomInfo?.peer, participants])
+  }, [remotePeers, roomInfo, participants])
 
   const peerRemoteMixerAudio = useMemo(() => {
     let mapRemotePeers = []
@@ -320,7 +320,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       </Modal>
       {contextHolder}
       <div
-        ref={containerRef}
+        // ref={containerRef}
         className=" h-full relative flex w-full items-start justify-center overflow-hidden px-4 pt-[60px] rounded-xl" id="id--fullScreen"
       >
         {isHoverContent && <Header meetingLink={meetingLink} />}
@@ -354,7 +354,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
               </Button>
             </div>
             <div className="grid gap-4 px-4 pb-4">
-              <div className="text-xs text-mutedV2-foreground">Share this meeting link with others you want in the meeting</div>
+              <div className="text-xs text-mutedV2-foreground">Share this meeting with others</div>
               <div className="flex h-10 items-center gap-2 rounded bg-mutedV2-foreground pl-3 boreder border-red-300 dark:border-red-100">
                 <div className="flex-1 text-sm">{meetingLink}</div>
                 <Button variant="link" size="icon" onClick={onCopyInviteLink}>
