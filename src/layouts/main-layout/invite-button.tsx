@@ -45,7 +45,7 @@ export const InviteButton: React.FC<Props> = ({ meetingLink }) => {
                 <div className="text-xs text-muted-foreground">
                   Share this meeting link with others you want in the meeting
                 </div>
-                <div className="flex h-10 items-center gap-2 rounded bg-zinc-200 pl-3">
+                <div className="flex h-10 items-center gap-2 rounded bg-accent pl-3">
                   <div className="flex-1 text-sm">{meetingLink}</div>
                   <Button variant="link" size="icon" onClick={onCopyInviteLink}>
                     <CopyIcon size={16} />
