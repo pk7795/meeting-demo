@@ -16,7 +16,6 @@ const formatUserName = (name: string) => {
 export const MessageAvatar = React.memo(({ message }: MessageAvatarProps) => {
   //? get userName and avatar from participants list
   const client = useChatClientContext();
-
   const user = useMemo(() => {
     if (!client || !message?.user?.id) return message.user;
     return client.state.users[message.user.id] || message.user;
@@ -24,7 +23,7 @@ export const MessageAvatar = React.memo(({ message }: MessageAvatarProps) => {
 
   if (!user) return null;
   const avatar = user.image as string || user.avatar as string || '';
-  const userName = typeof user.name === 'string' ? user.name : '';
+  const userName = typeof user.name === 'string' ? user.name : formatUserName(user.id);
   const systemCode = message.text?.trim().split(' ')[0];
   switch (systemCode) {
     case "17":
@@ -45,7 +44,7 @@ export const MessageAvatar = React.memo(({ message }: MessageAvatarProps) => {
         <div className="flex-1 ml-1">
           <div className="flex items-center justify-between">
             <Tooltip>
-              <div className="text-xs font-bold text-[#F87171]">{userName || formatUserName(user.id)}</div>
+              <div className="text-xs font-bold text-[#F87171]">{client?.user?.id === message.user?.id ? "You" : userName}</div>
               <TooltipTrigger asChild>
                 <div className="ml-2 text-[9px] text-gray-400">{formatDateChat(message.created_at)}</div>
               </TooltipTrigger>

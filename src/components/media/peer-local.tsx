@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { usePinnedParticipant } from '@/containers/meeting/contexts'
+
 import { useDeviceStream } from '@/hooks'
 import { useRoom } from '@atm0s-media-sdk/react-hooks'
 import { slice } from 'lodash'
@@ -7,6 +7,7 @@ import { Pin, PinOff } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { usePinnedParticipant } from '@/contexts/meeting/meeting-provider'
 
 type Props = {
   // sourceName: string

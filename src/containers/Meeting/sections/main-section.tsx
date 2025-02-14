@@ -1,15 +1,6 @@
 'use client'
 
 import { UserType } from '@/lib/constants'
-import {
-  useIsConnected,
-  useJoinRequest,
-  useOnlineMeetingParticipantsList,
-  usePendingParticipants,
-  usePinnedParticipant,
-  useRoomSupabaseChannel,
-} from '../contexts'
-import { Button as AntdButton, Modal, notification, Space } from 'antd'
 import { find, filter, map } from 'lodash'
 import {
   CopyIcon,
@@ -23,7 +14,6 @@ import { RoomParticipant } from '@prisma/client'
 import { ADMIT_RINGTONE, RAISE_HAND_RINGTONE } from '@public'
 import { acceptParticipant } from '@/app/actions'
 import { supabase } from '@/config/supabase'
-import { useDeviceStream } from '@/hooks'
 import { RoomPopulated } from '@/types/types'
 // import { useMouse } from '@uidotdev/usehooks'
 import { toast } from 'sonner'
@@ -39,13 +29,14 @@ import { PeerLocal, PeerRemote } from '@/components/media'
 import { SidebarLayout } from '@/layouts'
 import { useSidebar } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
+import { useIsConnected, useJoinRequest, useOnlineMeetingParticipantsList, usePendingParticipants, usePinnedParticipant, useRoomSupabaseChannel } from '@/contexts/meeting/meeting-provider'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
 }
 
 export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
-  const [api, contextHolder] = notification.useNotification()
 
   const [joinRequest, clearJoinRequest] = useJoinRequest()
   const [, delPendingParticipant] = usePendingParticipants()
@@ -69,14 +60,6 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const [pinnedParticipant] = usePinnedParticipant()
   const roomInfo = useRoom()
   const remotePeers = useRemotePeers()
-  const audioStream = useDeviceStream("audio_main")
-  const videoStream = useDeviceStream("video_main")
-  useEffect(() => {
-    console.log('---------------audioStream from mainSection: ', audioStream);
-    console.log('---------------videoStream from mainSection: ', videoStream);
-
-
-  }, [audioStream, videoStream])
   const isHoverContent = true
   // const isHoverContent =
   //   mouse.elementX > 0 && mouse.elementX <= widthContent && mouse.elementY > 0 && mouse.elementY <= heightContent
@@ -158,57 +141,6 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     }
   }, [isConnected, sessionStatus, visibleRefresh])
 
-
-
-  const openNotification = useCallback(
-    (opts: {
-      message: string
-      description: string
-      buttons: {
-        confirm: string
-        onConfirm: () => void
-        cancel: string
-        onCancel: () => void
-      }
-      onClose?: () => void
-    }) => {
-      const key = 'open' + Date.now()
-      const btn = (
-        <Space>
-          <AntdButton
-            type="link"
-            size="small"
-            onClick={() => {
-              opts.buttons.onCancel()
-              api.destroy(key)
-            }}
-          >
-            {opts.buttons.cancel}
-          </AntdButton>
-          <AntdButton
-            type="primary"
-            size="small"
-            onClick={() => {
-              opts.buttons.onConfirm()
-              api.destroy(key)
-            }}
-          >
-            {opts.buttons.confirm}
-          </AntdButton>
-        </Space>
-      )
-      api.open({
-        message: opts.message,
-        description: opts.description,
-        btn,
-        key,
-        onClose: opts.onClose,
-        duration: 0, // never auto close
-      })
-    },
-    [api]
-  )
-
   const sendAcceptJoinRequest = useCallback(
     (id: string, type: UserType) => {
       console.log(`${id}:room:${room.id}`)
@@ -274,7 +206,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       className: 'join-request-toast'
     })
 
-  }, [admitRingTone, clearJoinRequest, delPendingParticipant, joinRequest, openNotification, sendAcceptJoinRequest, toggleSidebar])
+  }, [admitRingTone, clearJoinRequest, delPendingParticipant, joinRequest, sendAcceptJoinRequest, toggleSidebar])
 
   // TODO: Move every send and receive event to hooks
   const sendRoomEvent = useCallback(
@@ -292,33 +224,31 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   )
   return (
     <SidebarLayout room={room} sendAcceptJoinRequest={sendAcceptJoinRequest}>
-      <Modal
-        getContainer={() => document.getElementById('id--fullScreen') as HTMLElement}
-        footer={false}
-        closable={false}
-        open={
-          isConnected === false ||
-          sessionStatus === 'reconnecting' ||
-          sessionStatus === 'disconnected' ||
-          sessionStatus === 'error'
-        }
-      >
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-lg text-black dark:text-white mb-4">Connecting to Server ...</div>
-          <div className="rotate-center text-black dark:text-white" ><Loader2Icon /></div>
-          {visibleRefresh && (
-            <Button
-              onClick={() => window.location.reload()}
-              variant="default"
-              className="mt-4"
-            >
-              <RefreshCwIcon size={16} className="" />
-              <div>Refresh</div>
-            </Button>
-          )}
-        </div>
-      </Modal>
-      {contextHolder}
+      <Dialog modal open={
+        isConnected === false ||
+        sessionStatus === 'reconnecting' ||
+        sessionStatus === 'disconnected' ||
+        sessionStatus === 'error'
+      }>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogTitle>Connecting to Server ...</DialogTitle>
+          <DialogDescription>
+            <div className="flex flex-col items-center justify-center">
+              <div className="rotate-center text-black dark:text-white" ><Loader2Icon /></div>
+              {visibleRefresh && (
+                <Button
+                  onClick={() => window.location.reload()}
+                  variant="default"
+                  className="mt-4"
+                >
+                  <RefreshCwIcon size={16} className="" />
+                  <div>Refresh</div>
+                </Button>
+              )}
+            </div>
+          </DialogDescription>
+        </DialogContent>
+      </Dialog>
       <div
         // ref={containerRef}
         className=" h-full relative flex w-full items-start justify-center overflow-hidden px-4 pt-[60px] rounded-xl" id="id--fullScreen"

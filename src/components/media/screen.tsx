@@ -1,9 +1,9 @@
-import { MediaContext } from '@/contexts'
+import { useMediaContext } from '@/contexts'
 import { useDeviceStream } from '@/hooks'
 import { Kind } from '@atm0s-media-sdk/core'
 import { usePublisher } from '@atm0s-media-sdk/react-hooks'
 import { ScreenShareIcon, ScreenShareOffIcon } from 'lucide-react'
-import { useCallback, useContext, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { Button } from '../ui/button'
 
 type MicrophoneSelectionProps = {
@@ -12,7 +12,7 @@ type MicrophoneSelectionProps = {
 
 export const ScreenToggle: React.FC<MicrophoneSelectionProps> = ({ sourceName }) => {
   const publisher = usePublisher(sourceName, Kind.VIDEO)
-  const ctx = useContext(MediaContext)
+  const ctx = useMediaContext();
   const stream = useDeviceStream(sourceName)
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export const ScreenToggle: React.FC<MicrophoneSelectionProps> = ({ sourceName })
 
 export const ScreenToggleV2: React.FC<MicrophoneSelectionProps> = () => {
   const publisher = usePublisher('video_screen', Kind.VIDEO)
-  const ctx = useContext(MediaContext)
+  const ctx = useMediaContext();
   const stream = useDeviceStream('video_screen')
 
   useEffect(() => {

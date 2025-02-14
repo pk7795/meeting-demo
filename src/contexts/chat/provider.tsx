@@ -3,11 +3,13 @@ import { ErmisChatGenerics, LoginConfig, RoomConfig } from "@/hooks/common/use-c
 import { RoomAccessStatus } from "@/lib/constants";
 import { RoomPopulated } from "@/types/types";
 import { RoomParticipant } from "@prisma/client";
+import { MESSAGE_RINGTONE } from "@public";
 import { Channel } from "ermis-chat-js-sdk/dist/types/channel";
 import { ErmisChat } from "ermis-chat-js-sdk/dist/types/client";
 import { FormatMessageResponse } from "ermis-chat-js-sdk/dist/types/types";
+import { throttle } from "lodash";
 import { useSession } from "next-auth/react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export const ChatContext = createContext<{
     chatClient: ErmisChat<ErmisChatGenerics> | null;
@@ -34,6 +36,18 @@ export const ChatContextProvider = ({
     const [messages, setMessages] = useState<FormatMessageResponse[]>([]);
     const [roomAccessStatus, setRoomAccessStatus] = useState<RoomAccessStatus | null>(RoomAccessStatus.PENDING);
     const [isNewMessage, setIsNewMessage] = useState(false);
+
+    const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
+    const throttled = useRef(
+        throttle(
+            () => {
+                return messageRingTone.play()
+            },
+            0,
+            { trailing: false, leading: true }
+        )
+    )
+
     useEffect(() => {
         if (!session) return;
         if (!chatClient) {
@@ -68,9 +82,11 @@ export const ChatContextProvider = ({
         // const channelSubscriptions: Array<ReturnType<Channel['on']>> = [];
         const handleNewMessage = (event: any) => {
             if (event.message.type !== 'system') {
-                setIsNewMessage(true);
-
                 setMessages((prev) => [...prev, event.message]);
+                if (event.message.user.id !== session?.chat.userId) {
+                    messageRingTone.play();
+                    setIsNewMessage(true);
+                }
             }
 
         };

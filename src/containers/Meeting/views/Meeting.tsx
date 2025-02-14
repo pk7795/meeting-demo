@@ -12,7 +12,8 @@ import { ChatContextProvider } from '@/contexts/chat'
 import { Atm0sMediaProvider, AudioMixerMode } from '@atm0s-media-sdk/react-hooks'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { MainSection, SettingMedia } from '../sections'
-import { MediaDeviceProvider, MeetingProvider } from '../contexts'
+import { MeetingProvider } from '@/contexts/meeting/meeting-provider'
+import { MediaDeviceProvider } from '@/contexts/media/media-device-provider'
 
 type Props = {
   room: RoomPopulated

@@ -1,6 +1,5 @@
 import { VideoRemote } from './video-remote'
 import { Button } from '@/components/ui/button'
-import { usePinnedParticipant } from '@/containers/meeting/contexts'
 import { useAudioMixerSpeaking } from '@/hooks'
 import { cn } from '@/lib/utils'
 import { MeetingParticipant } from '@/types/types'
@@ -9,6 +8,7 @@ import { find, isEmpty, throttle } from 'lodash'
 import { Pin, PinOff } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { usePinnedParticipant } from '@/contexts/meeting/meeting-provider'
 
 type Props = {
   peer: RemotePeer

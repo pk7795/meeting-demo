@@ -1,7 +1,6 @@
 'use client'
 
 import { UserType } from '@/lib/constants'
-import { useCurrentParticipant, useMeetingParticipantsList, usePendingParticipants } from '../contexts'
 import { Modal, Select, Space, Typography } from 'antd'
 import { isEmpty, map } from 'lodash'
 import { MailPlusIcon, MicIcon, MicOffIcon, PlusIcon, XIcon } from 'lucide-react'
@@ -19,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useSidebar } from '@/components/ui/sidebar'
 import { toast } from 'sonner'
+import { usePendingParticipants, useCurrentParticipant, useMeetingParticipantsList } from '@/contexts/meeting/meeting-provider'
 
 type Props = {
   room: Partial<Room> | null

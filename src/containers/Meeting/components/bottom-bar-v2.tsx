@@ -8,15 +8,14 @@ import { SidebarTriggerWithType } from '@/components/ui/sidebar'
 
 import { HandIcon, LogOutIcon, MoreHorizontalIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useState } from 'react'
 
 import { cn } from '@/lib/utils'
 import { useDevice } from '@/hooks'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { throttle } from 'lodash'
-import { MESSAGE_RINGTONE } from '@public'
-import { useMeetingParticipantState } from '../contexts'
+
+import { useMediaContext, useMeetingParticipantState } from '@/contexts'
 
 type Props = {
   sendEvent: (event: string, data?: any) => void
@@ -25,8 +24,10 @@ type Props = {
 export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
   const router = useRouter()
   const [userState, setUserState] = useMeetingParticipantState()
-  const messageRingTone = useMemo(() => new Audio(MESSAGE_RINGTONE), [])
   const { isMobile } = useDevice();
+
+  const mediaContext = useMediaContext()
+
   const toggleRaiseHand = () => {
     if (userState.handRaised) {
       setUserState({ ...userState, handRaised: false })
@@ -36,18 +37,11 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
       sendEvent('interact', { handRaised: true })
     }
   }
+  const toggleLeaveMeeting = () => {
+    mediaContext.turnOffAllDevices()
+    router.push('/')
+  }
 
-
-
-  const throttled = useRef(
-    throttle(
-      () => {
-        return messageRingTone.play()
-      },
-      1000 * 3,
-      { trailing: false, leading: true }
-    )
-  )
   return (
     <BlurFade
       key={'zoom-footer'}
@@ -76,16 +70,14 @@ export const BottomBarV2: React.FC<Props> = ({ sendEvent }) => {
             variant="destructive"
             size="full"
             className={'rounded-lg [&_svg]:!size-full'}
-            onClick={() => {
-              router.push('/')
-            }}
+            onClick={toggleLeaveMeeting}
           >
             <LogOutIcon size={20} className="rotate-icon" />
           </Button>
         </div>
         {!isMobile && <div className='flex pr-2'>
-          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-foreground'} sidebarType={'chat'} />
-          <SidebarTriggerWithType variant={"ghost"} size={"icon"} className={'h-10 w-10 text-foreground'} sidebarType={'participant'} />
+          <SidebarTriggerWithType variant={"ghost"} size={"full"} className={'h-10 w-10 text-foreground'} sidebarType={'chat'} />
+          <SidebarTriggerWithType variant={"ghost"} size={"full"} className={'h-10 w-10 text-foreground'} sidebarType={'participant'} />
         </div>}
       </div>
     </BlurFade >

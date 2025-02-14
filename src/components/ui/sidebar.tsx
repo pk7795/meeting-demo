@@ -14,8 +14,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useIsMobile } from '@/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { useChatNewMessageContext } from '@/contexts/chat'
-import { useJoinRequest } from '@/containers/meeting/contexts'
 import { ElementType } from 'react'
+import { useJoinRequest } from '@/contexts/meeting/meeting-provider'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7

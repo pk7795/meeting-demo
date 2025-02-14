@@ -1,13 +1,13 @@
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { MediaContext } from '@/contexts'
+import { useMediaContext } from '@/contexts'
 import { useDeviceStream } from '@/hooks'
 import { BitrateControlMode, Kind } from '@atm0s-media-sdk/core'
 import { usePublisher } from '@atm0s-media-sdk/react-hooks'
 import { DropdownMenu, DropdownMenuArrow } from '@radix-ui/react-dropdown-menu'
 import { filter, map } from 'lodash'
 import { ChevronDown, ChevronUp, VideoIcon, VideoOffIcon } from 'lucide-react'
-import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button } from '../ui/button'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
@@ -63,8 +63,7 @@ const PUBLISHER_CONFIG = {
 export const CameraSelection: React.FC<CameraSelectionProps> = ({ sourceName }) => {
   const [devices, setDevices] = useState<{ id: string; label: string }[]>([])
   const [selectedDevice, setSelectedDevice] = useState<string>()
-  const ctx = useContext(MediaContext)
-
+  const ctx = useMediaContext();
   useEffect(() => {
     const init = async () => {
       const allDevices = await navigator.mediaDevices.enumerateDevices()
@@ -112,7 +111,7 @@ export const CameraSelection: React.FC<CameraSelectionProps> = ({ sourceName }) 
 }
 
 export const CameraToggle: React.FC<CameraSelectionProps> = ({ sourceName, isFirstPage }) => {
-  const ctx = useContext(MediaContext)
+  const ctx = useMediaContext();
   // const publisher = usePublisher(sourceName, Kind.VIDEO, PUBLISHER_CONFIG)
   const stream = useDeviceStream(sourceName)
 
@@ -152,7 +151,7 @@ export const CameraToggle: React.FC<CameraSelectionProps> = ({ sourceName, isFir
 
 export const CameraToggleV2: React.FC<CameraSelectionProps> = ({ sourceName, isFirstPage }) => {
   const publisher = usePublisher(sourceName, Kind.VIDEO, PUBLISHER_CONFIG)
-  const ctx = useContext(MediaContext)
+  const ctx = useMediaContext();
   const stream = useDeviceStream(sourceName)
   const [isOpenSetting, setIsOpenSetting] = useState(false)
 

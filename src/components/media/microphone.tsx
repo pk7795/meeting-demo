@@ -1,12 +1,12 @@
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { MediaContext } from '@/contexts'
+import { useMediaContext } from '@/contexts'
 import { Kind } from '@atm0s-media-sdk/core'
 import { usePublisher } from '@atm0s-media-sdk/react-hooks'
 import { DropdownMenu, DropdownMenuArrow } from '@radix-ui/react-dropdown-menu'
 import { filter, map } from 'lodash'
 import { ChevronDown, ChevronUp, MicIcon, MicOffIcon } from 'lucide-react'
-import { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDeviceStream } from '../../hooks'
 import { Button } from '../ui/button'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
@@ -41,7 +41,7 @@ type MicrophoneSelectionProps = {
 export const MicrophoneSelection: React.FC<MicrophoneSelectionProps> = ({ sourceName, isFirstPage }) => {
   const [devices, setDevices] = useState<{ id: string; label: string }[]>([])
   const [selectedDevice, setSelectedDevice] = useState<string>()
-  const ctx = useContext(MediaContext)
+  const ctx = useMediaContext();
 
   useEffect(() => {
     const init = async () => {
@@ -91,7 +91,7 @@ export const MicrophoneSelection: React.FC<MicrophoneSelectionProps> = ({ source
 
 export const MicrophoneToggle: React.FC<MicrophoneSelectionProps> = ({ sourceName, isFirstPage }) => {
   // const publisher = usePublisher(sourceName, Kind.AUDIO)
-  const ctx = useContext(MediaContext)
+  const ctx = useMediaContext();
   const stream = useDeviceStream(sourceName)
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export const MicrophoneToggle: React.FC<MicrophoneSelectionProps> = ({ sourceNam
 
 export const MicrophoneToggleV2: React.FC<MicrophoneSelectionProps> = ({ sourceName, isFirstPage }) => {
   const publisher = usePublisher(sourceName, Kind.AUDIO)
-  const ctx = useContext(MediaContext)
+  const ctx = useMediaContext();
   const stream = useDeviceStream(sourceName)
 
   const [isOpenSetting, setIsOpenSetting] = useState(false)

@@ -1,7 +1,7 @@
 // 'use client'
 
 import { EventEmitter } from '@atm0s-media-sdk/core'
-import { createContext } from 'react'
+import { createContext, useContext } from 'react'
 
 export enum ContextEvent {
     DeviceChanged = 'device.changed.',
@@ -63,6 +63,19 @@ export class Context extends EventEmitter {
             this.emit(ContextEvent.DeviceChanged + source_name, null)
         }
     }
+    turnOffAllDevices() {
+        this.streams.forEach((stream) => {
+            stream.getTracks().map((t) => t.stop())
+        })
+        this.streams.clear()
+        this.streams_history.clear()
+        this.emit(ContextEvent.DeviceChanged + '*', null)
+    }
 }
 
 export const MediaContext = createContext<Context>({} as any)
+
+export const useMediaContext = () => {
+    const mediaContext = useContext(MediaContext)
+    return mediaContext
+}

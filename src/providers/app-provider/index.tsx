@@ -18,15 +18,15 @@ export const AppProvider: React.FC<Props> = ({ children }) => {
 
   return (
     <SessionProvider>
-      <ThemeProvider defaultTheme="dark">
-        <RecoilRoot>
+      <RecoilRoot>
+        <ThemeProvider defaultTheme="dark">
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>
               {children}
             </TooltipProvider>
           </QueryClientProvider>
-        </RecoilRoot>
-      </ThemeProvider>
+        </ThemeProvider>
+      </RecoilRoot>
       <Toaster />
     </SessionProvider>
   )
