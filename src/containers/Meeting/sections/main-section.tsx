@@ -31,6 +31,8 @@ import { useSidebar } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 import { useIsConnected, useJoinRequest, useOnlineMeetingParticipantsList, usePendingParticipants, usePinnedParticipant, useRoomSupabaseChannel } from '@/contexts/meeting/meeting-provider'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { useRecoilState } from 'recoil'
+import { themeState } from '@/recoil'
 type Props = {
   room: RoomPopulated
   myParticipant: RoomParticipant | null
@@ -49,7 +51,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
   const participants = useOnlineMeetingParticipantsList()
 
   const { toggleSidebar } = useSidebar()
-
+  const [theme, setTheme] = useRecoilState(themeState)
   //From new meeting
   const params = useParams()
   const [, onCopy] = useCopyToClipboard()
@@ -222,6 +224,21 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     },
     [roomSupabaseChannel, myParticipant?.id]
   )
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.remove('light')
+      document.body.classList.remove('bg-white')
+      document.body.classList.add('dark')
+      document.body.classList.add('bg-dark_ebony')
+    } else {
+      document.body.classList.remove('dark')
+      document.body.classList.remove('bg-dark_ebony')
+      document.body.classList.add('light')
+      document.body.classList.add('bg-white')
+    }
+  }, [theme,setTheme])
+
   return (
     <SidebarLayout room={room} sendAcceptJoinRequest={sendAcceptJoinRequest}>
       <Dialog modal open={
