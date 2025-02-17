@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars-2'
 import { Room } from '@prisma/client'
-import { useChatChannelContext, useChatMessages, } from '@/contexts/chat'
+import { useChatChannelContext, useChatMessages, useChatNewMessageContext, } from '@/contexts/chat'
 import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/components/ui/sidebar'
 import { useForm } from 'react-hook-form'
@@ -24,6 +24,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
   const scrollRef = useRef<Scrollbars>(null)
   const [isSending, setIsSending] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [, setIsNewMessage] = useChatNewMessageContext();
   const {
     register,
     handleSubmit,
@@ -103,6 +104,7 @@ export const ChatSection: React.FC<Props> = ({ room }) => {
                     }
                   }
                 })}
+                onFocus={() => setIsNewMessage(false)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();

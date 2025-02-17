@@ -172,11 +172,13 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
     admitRingTone.play()
     toast.custom((t) => (
       <div className="flex flex-col gap-4 rounded-lg bg-background p-4 shadow-lg">
-        <div className="flex flex-col gap-2">
+        <div className="flex">
           <p className="text-sm text-muted-foreground">
             A {type} named <span className="font-semibold">{name}</span> wants to join this meeting
           </p>
-
+          <Button className={'h-3 w-3'} variant={'ghost'} onClick={() => setIsCreateNewRoom(false)}>
+            <XIcon size={16} />
+          </Button>
         </div>
 
         <div className="flex justify-end gap-2">
@@ -237,7 +239,7 @@ export const MainSection: React.FC<Props> = ({ room, myParticipant }) => {
       document.body.classList.add('light')
       document.body.classList.add('bg-white')
     }
-  }, [theme,setTheme])
+  }, [theme, setTheme])
 
   return (
     <SidebarLayout room={room} sendAcceptJoinRequest={sendAcceptJoinRequest}>
