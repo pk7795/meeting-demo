@@ -1,7 +1,7 @@
 'use client'
 
 
-import { ArrowRight, Copy, CopyCheck, Link, Loader, Plus, } from 'lucide-react'
+import { ArrowRight, Copy, CopyCheck, Link, Loader, Plus, CalendarClockIcon } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState, useTransition } from 'react'
@@ -19,13 +19,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useCopyToClipboard } from 'usehooks-ts'
 import { Input } from '@/components/ui/input'
+import { scheduleHandler } from '@/app/actions/calender/actions'
+import { ScheduleButton } from '../components/schedule'
 
 
 type PassCodeInput = {
   passCode: string
-}
-type RoomNameInput = {
-  roomName: string
 }
 type Props = {
   roomInvite: OneRoomInvite[] | null
@@ -61,15 +60,6 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
     defaultValues: { passCode: '' },
     mode: 'onChange',
   })
-  const {
-    register: registerCreateRoom,
-    handleSubmit: handleSubmitCreateRoom,
-    formState: { errors: errorsCreateRoom },
-    getValues: getValuesCreateRoom,
-  } = useForm<RoomNameInput>({
-    defaultValues: { roomName: '' },
-    mode: 'onChange',
-  })
 
   const onNewInvite = useCallback(
     async (invite: RoomInvite) => {
@@ -88,11 +78,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
   const onCreate = async () => {
     setIsLoadingCreate(true)
     startTransitionCreateRoom(() => {
-      createRoom({
-        data: {
-          name: getValuesCreateRoom('roomName'),
-        },
-      }).then((room) => {
+      createRoom().then((room) => {
         if (room?.passcode) {
           setPassCode(room.passcode)
           setOpenDialog(true)
@@ -107,11 +93,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
   const onCreateMeetRoom = async () => {
     setIsLoadingCreate(true)
     startTransitionCreateRoom(() => {
-      createRoom({
-        data: {
-          name: getValuesCreateRoom('roomName'),
-        },
-      }).then((room) => {
+      createRoom().then((room) => {
         if (room?.passcode) {
           router.push(`/${room?.passcode}`)
         } else {
@@ -122,7 +104,34 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
     })
     setIsLoadingCreate(false)
   }
+  const onScheduleMeetRoom = async () => {
+    setIsLoadingCreate(true)
+    startTransitionCreateRoom(() => {
+      createRoom().then((room) => {
+        if (room?.passcode) {
+          setPassCode(room.passcode)
+          const inviteUsers = [{ email: user!.user!.email }]
+          scheduleHandler(
+            new Date().toISOString(),
+            new Date().toISOString(),
+            `${baseUrl}/${room?.passcode}`,
+            inviteUsers
+          ).then((response) => {
+            if (response.success) {
+              console.log("Schedule meeting success: ", response.data);
+            } else {
+              alert(`Error while schedule. Please try again later. ${response}`)
+              console.log("Schedule meeting error: ", response.error);
 
+            }
+          })
+        } else {
+          alert('Error while creating room. Please try again later.')
+        }
+      })
+    })
+    setIsLoadingCreate(false)
+  }
   const onJoinRoom: SubmitHandler<PassCodeInput> = async (data) => {
     setIsLoadingJoin(true)
     router.push(`/${data.passCode}`)
@@ -202,27 +211,11 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="room-name"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Room Name
-                        </label>
-                        <Input
-                          id="room-name"
-                          placeholder="Enter room name"
-                          className="w-full border-primary/20 bg-background/50 transition-shadow duration-200 focus:border-primary focus:shadow-md placeholder:text-muted-foreground dark:placeholder:text-white/50"
-                          {...registerCreateRoom('roomName', { required: true })}
-                        />
-                        {errorsCreateRoom.roomName && <span className="text-xs text-red-500">This field is required</span>}
-                      </div>
-
                       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button className="group w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                              Create Room
+                              New Meeting
                               <Plus className="ml-2 h-4 w-4 transition-transform group-hover:rotate-90" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -231,7 +224,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
                               <DropdownMenuItem className="cursor-pointer">
                                 <DialogTrigger
                                   asChild
-                                  onClick={handleSubmitCreateRoom(onCreate)}
+                                  onClick={onCreate}
                                 >
                                   <div className="flex flex-1 items-center gap-2 [&>svg]:size-4 [&>svg]:shrink-0">
                                     <Link />
@@ -241,7 +234,7 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="cursor-pointer"
-                                onClick={handleSubmitCreateRoom(onCreateMeetRoom)}
+                                onClick={onCreateMeetRoom}
                               >
                                 <Button
                                   loading={isLoadingCreate}
@@ -252,10 +245,15 @@ export const JoinMeeting: React.FC<Props> = ({ roomInvite }) => {
                                   Start an instant meeting
                                 </Button>
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={onCreateMeetRoom}
+                              >
+                                <ScheduleButton onScheduleMeetRoom={onScheduleMeetRoom} />
+                              </DropdownMenuItem>
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
                         </DropdownMenu>
-
                         <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
                             <DialogTitle>Here is information on how to participate.</DialogTitle>

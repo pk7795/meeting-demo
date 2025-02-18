@@ -13,6 +13,7 @@ declare module 'next-auth' {
     user: User
     accessToken: string
     refreshToken: string
+    idToken?: string
     expires: string
     chat: ChatSession
   }

@@ -1,10 +1,9 @@
 'use server'
 
-import { RoomInput } from './types'
 import { getPrisma, getSessionUser } from '@/lib'
 import { genPasscode } from '@/utils'
 
-export async function createRoom({ data }: { data: RoomInput }) {
+export async function createRoom() {
   const prisma = getPrisma()
   const session = await getSessionUser()
   let passcode = genPasscode()
@@ -26,7 +25,7 @@ export async function createRoom({ data }: { data: RoomInput }) {
   if (!findRoom) {
     const res = await prisma.room.create({
       data: {
-        ...data,
+        name: passcode,
         passcode,
         ownerId: session?.id as string,
       },
